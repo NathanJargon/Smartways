@@ -1,118 +1,160 @@
-import React, { useState, useMemo, useRef } from 'react';
-import { View, Text, StyleSheet, Button, ScrollView } from 'react-native';
-import { Calendar } from 'react-native-calendars';
-import { VictoryBar, VictoryChart, VictoryTheme } from 'victory-native';
+import React, { useState } from 'react';
+import { View, Text, StyleSheet, TouchableOpacity, Image, ScrollView, Dimensions, Animated } from 'react-native';
+import { ImageBackground } from 'react-native';
+import { FontAwesome as Icon } from '@expo/vector-icons';
 
-const HomeScreen = ({ navigation }) => {
-  const [selectedDay, setSelectedDay] = useState({carbonFootprint: 0});
-  const [markedDates, setMarkedDates] = useState({
-    '2022-09-20': {selected: true, marked: true, selectedColor: 'blue', carbonFootprint: 10},
-    '2022-09-21': {marked: true, dotColor: 'red', activeOpacity: 0, carbonFootprint: 20},
-    '2022-09-22': {disabled: true, disableTouchEvent: true, carbonFootprint: 30}
-  });
+function HomeScreen({ navigation }) {
+  const [isStarted, setIsStarted] = useState(false);
+  const [isWatched, setIsWatched] = useState(false);
 
-  const lastSelectedDay = useRef();
-
-  const monthlyData = [
-    { month: 'Jan', carbonFootprint: 20 },
-    { month: 'Feb', carbonFootprint: 30 },
-    { month: 'Mar', carbonFootprint: 25 },
-    { month: 'Apr', carbonFootprint: 27 },
-    { month: 'May', carbonFootprint: 22 },
-    { month: 'Jun', carbonFootprint: 24 },
-    { month: 'Jul', carbonFootprint: 26 },
-    { month: 'Aug', carbonFootprint: 28 },
-    { month: 'Sep', carbonFootprint: 23 },
-    { month: 'Oct', carbonFootprint: 21 },
-    { month: 'Nov', carbonFootprint: 29 },
-    { month: 'Dec', carbonFootprint: 31 },
-  ];
-  
-  const yearlyData = [
-    { year: '2018', carbonFootprint: 250 },
-    { year: '2019', carbonFootprint: 300 },
-    { year: '2020', carbonFootprint: 275 },
-    { year: '2021', carbonFootprint: 290 },
-    { year: '2022', carbonFootprint: 310 },
-  ];
-
-  const handleDayPress = (day) => {
-    let newMarkedDates = {...markedDates};
-  
-    if (lastSelectedDay.current) {
-      newMarkedDates[lastSelectedDay.current] = {...newMarkedDates[lastSelectedDay.current], selected: false};
+  const handlePress = () => {
+    if (!isStarted) {
+      navigation.navigate('Education');
+    } else {
+      navigation.navigate('News');
     }
+    setIsStarted(true);
+  };
   
-    newMarkedDates[day.dateString] = {
-      ...newMarkedDates[day.dateString], 
-      selected: true, 
-      selectedColor: 'blue',
-      carbonFootprint: newMarkedDates[day.dateString]?.carbonFootprint || 0
-    };
-  
-    setMarkedDates(newMarkedDates);
-    setSelectedDay(newMarkedDates[day.dateString]);
-    lastSelectedDay.current = day.dateString;
+  const newshandlePress = () => {
+    if (!isStarted) {
+      navigation.navigate('Carbon Footprint Assessment');
+    }
+    // setIsWatched(true);
   };
 
-  const MonthlyChart = useMemo(() => (
-    <VictoryChart width={350} theme={VictoryTheme.material}>
-      <VictoryBar data={monthlyData} x="month" y="carbonFootprint" />
-    </VictoryChart>
-  ), [monthlyData]);
-
-  const YearlyChart = useMemo(() => (
-    <VictoryChart width={350} theme={VictoryTheme.material}>
-      <VictoryBar data={yearlyData} x="year" y="carbonFootprint" />
-    </VictoryChart>
-  ), [yearlyData]);
 
   return (
-    <ScrollView contentContainerStyle={styles.container}>
-      <Text style={styles.graphTitle}>Your Carbon Footprint Calendar</Text>
-      <Calendar
-        markedDates={markedDates}
-        onDayPress={handleDayPress}
-      />
-
-    {selectedDay && (
-      <View style={styles.footprintContainer}>
-        <Text style={styles.footprintText}>Daily Carbon Footprint: {selectedDay.carbonFootprint}</Text>
-
-        <Text style={styles.graphTitle}>Monthly Carbon Footprint</Text>
-          {MonthlyChart}
-  
-          <Text style={styles.graphTitle}>Yearly Carbon Footprint</Text>
-          {YearlyChart}
-          
-        <Button title="Action Plan" onPress={() => { /* Navigate to action plan */ }} />
+    <ImageBackground source={require('autocarb/assets/homebg.png')} style={styles.container}>
+      <ScrollView
+        contentContainerStyle={[ styles.scrollContainer ]}
+        scrollEventThrottle={16}
+      >
+        <View style={styles.contentContainer}>
+          <Image
+            style={styles.logo}
+            source={require('../assets/logo.png')}
+          />
+          <Text style={styles.title}>Welcome to</Text>
+          <Text style={styles.title}>AutoCarb</Text>
+          <Text style={styles.subtitle}>
+            Less Carbon Footprint—More Life on Earth.
+          </Text>
+          <View style={styles.buttonContainer}>
+          <TouchableOpacity
+            style={styles.pointsContainer}
+            onPress={handlePress}
+          >
+            <Text style={styles.pointsText}>{isStarted ? 'Get updated!' : "Let's get started!"}</Text>
+          </TouchableOpacity>
+          <TouchableOpacity
+            style={styles.pointsContainer}
+            onPress={newshandlePress}
+          >
+            <Text style={styles.pointsText}>{!isWatched ? 'Take Assessment!' : "Check News!"}</Text>
+          </TouchableOpacity>
+        </View>
       </View>
-    )}
     </ScrollView>
+  </ImageBackground>
   );
-};
+}
+
 
 const styles = StyleSheet.create({
+  buttonContainer: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+  },
   container: {
-    flexGrow: 1,
-    backgroundColor: '#fff',
-    alignItems: 'center',
+    flex: 1,
     justifyContent: 'center',
-    padding: 20,
-  },
-  graphTitle: {
-    fontSize: 20,
-    fontWeight: 'bold',
-    marginBottom: 10,
-  },
-  footprintContainer: {
-    marginTop: 20,
     alignItems: 'center',
   },
-  footprintText: {
+  contentContainer: {
+    marginTop: -150,
+    marginLeft: -29,
+    flex: 1,
+    justifyContent: 'center',
+    alignItems: 'center',
+  },
+  scrollContainer: {
+    flexGrow: 1,
+    justifyContent: 'center',
+  },
+  logo: {
+    width: 450,
+    height: 450,
+    marginRight: -30,
+    marginBottom: -130,
+  },
+  title: {
+    fontSize: 32,
+    fontWeight: 'bold',
+    color: '#000',
+    marginBottom: 10,
+    textAlign: 'center',
+  },
+  subtitle: {
+    fontSize: 16,
+    color: '#000',
+    marginTop: 20,
+    marginBottom: 60,
+    textAlign: 'center',
+  },
+  pointsContainer: {
+    borderColor: '#4caf50',
+    borderWidth: 2,
+    padding: 10,
+    margin: 10,
+    borderRadius: 20,
+    marginBottom: 20,
+  },
+  pointsText: {
+    color: '#4caf50',
+    fontSize: 16,
+    textAlign: 'center',
+  },
+  button: {
+    backgroundColor: '#4caf50',
+    padding: 10,
+    margin: 10,
+    borderRadius: 10,
+  },
+  buttonText: {
+    color: '#fff',
+    textAlign: 'center',
+  },
+  iconarrow: {
+    margin: 30,
+  },
+  pointsTitle: {
     fontSize: 24,
     fontWeight: 'bold',
+    color: '#000',
     marginBottom: 10,
+    marginTop: 100,
+    textAlign: 'center',
+  },
+  pointsValue: {
+    fontSize: 20,
+    color: '#000',
+    textAlign: 'center',
+  },
+  leaderboardContainer: {
+    marginTop: 20,
+  },
+  leaderboardTitle: {
+    fontSize: 24,
+    fontWeight: 'bold',
+    color: '#000',
+    marginBottom: 10,
+    textAlign: 'center',
+  },
+  leaderboardEntry: {
+    fontSize: 16,
+    color: '#000',
+    textAlign: 'center',
   },
 });
 

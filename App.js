@@ -1,5 +1,5 @@
 import React from 'react';
-import { View, TouchableOpacity } from 'react-native';
+import { View, TouchableOpacity, Text } from 'react-native';
 import { NavigationContainer, useNavigation } from '@react-navigation/native';
 import { createBottomTabNavigator } from '@react-navigation/bottom-tabs';
 import { createStackNavigator } from '@react-navigation/stack';
@@ -10,6 +10,10 @@ import CarbonFootprintScreen from './screens/CarbonFootprintScreen';
 import EducationScreen from './screens/EducationScreen';
 import Profile from './screens/Profile';
 import News from './screens/News';
+import LeaderboardScreen from './screens/LeaderboardScreen'; 
+import GamificationScreen from './screens/GamificationScreen'; 
+import Step1 from './screens/Step1';
+import Step2 from './screens/Step2';
 
 const Stack = createStackNavigator();
 const Tab = createBottomTabNavigator();
@@ -19,6 +23,18 @@ function HomeStack() {
     <Stack.Navigator initialRouteName="HomeStack">
       <Stack.Screen name="HomeStack" component={HomeScreen} options={{ headerShown: false }} />
       <Stack.Screen name="Details" component={DetailsScreen} options={{ headerShown: false }} />
+      <Stack.Screen name="Gamification" component={GamificationScreen} options={{ headerShown: false }} />
+      <Stack.Screen name="Leaderboard" component={LeaderboardScreen} options={{ headerShown: false }} />
+    </Stack.Navigator>
+  );
+}
+
+function EducationStack() {
+  return (
+    <Stack.Navigator initialRouteName="Education">
+      <Stack.Screen name="Education" component={EducationScreen} options={{ title: 'Education', headerShown: false }} />
+      <Stack.Screen name="Step1" component={Step1} options={{ title: 'Education' }} />
+      <Stack.Screen name="Step2" component={Step2} options={{ title: 'Education' }} />
     </Stack.Navigator>
   );
 }
@@ -33,6 +49,10 @@ function CustomTabBar({ state, descriptors, navigation }) {
             ? options.tabBarLabel
             : options.title !== undefined
             ? options.title
+            : route.name === 'Education'
+            ? 'Learn'
+            : route.name === 'Carbon Footprint Assessment'
+            ? 'Assess'
             : route.name;
 
         const isFocused = state.index === index;
@@ -56,7 +76,6 @@ function CustomTabBar({ state, descriptors, navigation }) {
           });
         };
 
-
         return (
           <TouchableOpacity
             key={index}
@@ -66,29 +85,43 @@ function CustomTabBar({ state, descriptors, navigation }) {
             testID={options.tabBarTestID}
             onPress={onPress}
             onLongPress={onLongPress}
-            style={{ flex: 1, alignItems: 'center', justifyContent: 'center', borderBottomWidth: 2, borderBottomColor: isFocused ? '#673ab7' : '#ccc' }}
+            style={{
+              flex: 1,
+              alignItems: 'center',
+              justifyContent: 'center',
+              borderBottomWidth: 2,
+              borderBottomColor: isFocused ? '#4caf50' : '#ccc',
+              marginHorizontal: 8,
+            }}
           >
-            {label === 'Home' ? (
-              <View style={{ width: 60, height: 60, borderRadius: 30, backgroundColor: isFocused ? '#673ab7' : '#f8f8f8', alignItems: 'center', justifyContent: 'center', bottom: 20, elevation: 10 }}>
-                <Icon name="home" size={40} color={isFocused ? '#ffffff' : '#222'} />
-              </View>
-            ) : label === 'Education' ? (
-              <Icon name="graduation-cap" size={30} color={isFocused ? '#673ab7' : '#222'} />
-            ) : label === 'Carbon Footprint' ? (
-              <Icon name="leaf" size={30} color={isFocused ? '#673ab7' : '#222'} />
-            ) : label === 'News' ? (
-              <Icon name="newspaper-o" size={30} color={isFocused ? '#673ab7' : '#222'} />
-            ) : label === 'Profile' ? (
-              <Icon name="user" size={30} color={isFocused ? '#673ab7' : '#222'} />
-            ) : (
-              <Icon name="circle-o" size={30} color={isFocused ? '#673ab7' : '#222'} />
-            )}
+            <View>
+              {label === 'Home' ? (
+                <View style={{ width: 60, height: 60, borderRadius: 30, backgroundColor: isFocused ? '#4caf50' : '#f8f8f8', alignItems: 'center', justifyContent: 'center', bottom: 20, elevation: 10 }}>
+                  <Icon name="home" size={40} color={isFocused ? '#ffffff' : '#4caf50'} />
+                </View>
+              ) : label === 'Education' || label === 'Learn' ? (
+                <Icon name="graduation-cap" size={30} color={isFocused ? '#4caf50' : '#222'} />
+              ) : label === 'Carbon Footprint Assessment' || label === 'Assess' ? (
+                <Icon name="leaf" size={30} color={isFocused ? '#4caf50' : '#222'} />
+              ) : label === 'News' ? (
+                <Icon name="newspaper-o" size={30} color={isFocused ? '#4caf50' : '#222'} />
+              ) : label === 'Profile' ? (
+                <Icon name="user" size={30} color={isFocused ? '#4caf50' : '#222'} />
+              ) : label === 'Leaderboard' ? (
+                <Icon name="trophy" size={25} color={isFocused ? '#4caf50' : '#222'} />
+              ) : label === 'Gamification' ? (
+                <Icon name="money" size={25} color={isFocused ? '#4caf50' : '#222'} />
+              ) : (
+                <Icon name="circle-o" size={30} color={isFocused ? '#4caf50' : '#222'} />
+              )}
+            </View>
+            <Text style={{ color: isFocused ? '#4caf50' : '#222', marginTop: 5 }}>{label}</Text>
           </TouchableOpacity>
         );
       })}
-      </View>
-    );
-  }
+    </View>
+  );
+}
 
 
   export default function App() {
@@ -102,31 +135,49 @@ function CustomTabBar({ state, descriptors, navigation }) {
           name="News" 
           component={News} 
           options={({ navigation }) => ({ 
-          headerRight: () => (
-            <TouchableOpacity
-              accessibilityRole="button"
-              onPress={() => navigation.navigate('Profile')}
-              style={{ 
-                marginRight: 10, 
-                width: 40, 
-                height: 40, 
-                borderRadius: 20, 
-                backgroundColor: '#f8f8f8', 
-                alignItems: 'center', 
-                justifyContent: 'center', 
-              }}
-            >
-              <Icon name="user" size={30} color="#222" />
-            </TouchableOpacity>
-          ),
-        })}
+            headerRight: () => (
+              <View style={{ flexDirection: 'row' }}>
+                <TouchableOpacity
+                  accessibilityRole="button"
+                  onPress={() => navigation.navigate('Profile')}
+                  style={{ 
+                    marginRight: 10, 
+                    width: 40, 
+                    height: 40, 
+                    borderRadius: 20, 
+                    backgroundColor: '#f8f8f8', 
+                    alignItems: 'center', 
+                    justifyContent: 'center', 
+                  }}
+                >
+                  <Icon name="user" size={30} color="#222" />
+                </TouchableOpacity>
+                <TouchableOpacity
+                  accessibilityRole="button"
+                  onPress={() => navigation.navigate('Gamification')}
+                  style={{ 
+                    marginRight: 10, 
+                    width: 40, 
+                    height: 40, 
+                    borderRadius: 20, 
+                    backgroundColor: '#f8f8f8', 
+                    alignItems: 'center', 
+                    justifyContent: 'center', 
+                  }}
+                >
+                  <Icon name="money" size={30} color="#222" />
+                </TouchableOpacity>
+              </View>
+            ),
+          })}
         />
 
-          <Tab.Screen 
-            name="Education" 
-            component={EducationScreen} 
-            options={({ navigation }) => ({ 
-              headerRight: () => (
+        <Tab.Screen 
+          name="Education" 
+          component={EducationStack} 
+          options={({ navigation }) => ({ 
+            headerRight: () => (
+              <View style={{ flexDirection: 'row' }}>
                 <TouchableOpacity
                   accessibilityRole="button"
                   onPress={() => navigation.navigate('Profile')}
@@ -142,17 +193,9 @@ function CustomTabBar({ state, descriptors, navigation }) {
                 >
                   <Icon name="user" size={30} color="#222" />
                 </TouchableOpacity>
-              ),
-            })}
-          />
-          <Tab.Screen 
-            name="Home" 
-            component={HomeStack} 
-            options={({ navigation }) => ({ 
-              headerRight: () => (
                 <TouchableOpacity
                   accessibilityRole="button"
-                  onPress={() => navigation.navigate('Profile')}
+                  onPress={() => navigation.navigate('Gamification')}
                   style={{ 
                     marginRight: 10, 
                     width: 40, 
@@ -163,13 +206,56 @@ function CustomTabBar({ state, descriptors, navigation }) {
                     justifyContent: 'center', 
                   }}
                 >
-                  <Icon name="user" size={30} color="#222" />
+                  <Icon name="money" size={30} color="#222" />
                 </TouchableOpacity>
-              ),
-            })}
-          />
+              </View>
+            ),
+          })}
+        />
+
+      <Tab.Screen 
+        name="Home" 
+        component={HomeStack} 
+        options={({ navigation }) => ({ 
+          headerRight: () => (
+            <View style={{ flexDirection: 'row' }}>
+              <TouchableOpacity
+                accessibilityRole="button"
+                onPress={() => navigation.navigate('Profile')}
+                style={{ 
+                  marginRight: 10, 
+                  width: 40, 
+                  height: 40, 
+                  borderRadius: 20, 
+                  backgroundColor: '#f8f8f8', 
+                  alignItems: 'center', 
+                  justifyContent: 'center', 
+                }}
+              >
+                <Icon name="user" size={30} color="#222" />
+              </TouchableOpacity>
+              <TouchableOpacity
+                accessibilityRole="button"
+                onPress={() => navigation.navigate('Gamification')}
+                style={{ 
+                  marginRight: 10, 
+                  width: 40, 
+                  height: 40, 
+                  borderRadius: 20, 
+                  backgroundColor: '#f8f8f8', 
+                  alignItems: 'center', 
+                  justifyContent: 'center', 
+                }}
+              >
+                <Icon name="money" size={30} color="#222" />
+              </TouchableOpacity>
+            </View>
+          ),
+        })}
+      />
+                
           <Tab.Screen 
-            name="Carbon Footprint" 
+            name="Carbon Footprint Assessment" 
             component={CarbonFootprintScreen} 
             options={({ navigation }) => ({ 
               headerRight: () => (
@@ -191,6 +277,7 @@ function CustomTabBar({ state, descriptors, navigation }) {
               ),
             })}
           />
+          
         <Tab.Screen 
           name="Profile" 
           component={Profile} 
