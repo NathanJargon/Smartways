@@ -1,22 +1,24 @@
 import React from 'react';
 import { View, TouchableOpacity } from 'react-native';
-import { NavigationContainer } from '@react-navigation/native';
+import { NavigationContainer, useNavigation } from '@react-navigation/native';
 import { createBottomTabNavigator } from '@react-navigation/bottom-tabs';
 import { createStackNavigator } from '@react-navigation/stack';
 import { FontAwesome as Icon } from '@expo/vector-icons';
-import HomeScreen from './screens/HomeScreen';
+import HomeScreen from 'autocarb/screens/HomeScreen.js';
 import DetailsScreen from './screens/DetailsScreen';
 import CarbonFootprintScreen from './screens/CarbonFootprintScreen';
 import EducationScreen from './screens/EducationScreen';
+import Profile from './screens/Profile';
+import News from './screens/News';
 
 const Stack = createStackNavigator();
 const Tab = createBottomTabNavigator();
 
 function HomeStack() {
   return (
-    <Stack.Navigator initialRouteName="HomeStack" screenOptions={{ headerShown: false }}>
-      <Stack.Screen name="HomeStack" component={HomeScreen} />
-      <Stack.Screen name="Details" component={DetailsScreen} />
+    <Stack.Navigator initialRouteName="HomeStack">
+      <Stack.Screen name="HomeStack" component={HomeScreen} options={{ headerShown: false }} />
+      <Stack.Screen name="Details" component={DetailsScreen} options={{ headerShown: false }} />
     </Stack.Navigator>
   );
 }
@@ -74,24 +76,127 @@ function CustomTabBar({ state, descriptors, navigation }) {
               <Icon name="graduation-cap" size={30} color={isFocused ? '#673ab7' : '#222'} />
             ) : label === 'Carbon Footprint' ? (
               <Icon name="leaf" size={30} color={isFocused ? '#673ab7' : '#222'} />
+            ) : label === 'News' ? (
+              <Icon name="newspaper-o" size={30} color={isFocused ? '#673ab7' : '#222'} />
+            ) : label === 'Profile' ? (
+              <Icon name="user" size={30} color={isFocused ? '#673ab7' : '#222'} />
             ) : (
               <Icon name="circle-o" size={30} color={isFocused ? '#673ab7' : '#222'} />
             )}
           </TouchableOpacity>
         );
       })}
-    </View>
-  );
-}
+      </View>
+    );
+  }
 
-export default function App() {
-  return (
-    <NavigationContainer>
-      <Tab.Navigator initialRouteName="Home" tabBar={props => <CustomTabBar {...props} />}>
-          <Tab.Screen name="Education" component={EducationScreen} />
-          <Tab.Screen name="Home" component={HomeStack} />
-          <Tab.Screen name="Carbon Footprint" component={CarbonFootprintScreen} />
-     </Tab.Navigator>
-    </NavigationContainer>
-  );
-}
+
+  export default function App() {
+    const Tab = createBottomTabNavigator();
+  
+    return (
+      <NavigationContainer>
+        <Tab.Navigator initialRouteName="Home" tabBar={props => <CustomTabBar {...props} />}>
+
+        <Tab.Screen 
+          name="News" 
+          component={News} 
+          options={({ navigation }) => ({ 
+          headerRight: () => (
+            <TouchableOpacity
+              accessibilityRole="button"
+              onPress={() => navigation.navigate('Profile')}
+              style={{ 
+                marginRight: 10, 
+                width: 40, 
+                height: 40, 
+                borderRadius: 20, 
+                backgroundColor: '#f8f8f8', 
+                alignItems: 'center', 
+                justifyContent: 'center', 
+              }}
+            >
+              <Icon name="user" size={30} color="#222" />
+            </TouchableOpacity>
+          ),
+        })}
+        />
+
+          <Tab.Screen 
+            name="Education" 
+            component={EducationScreen} 
+            options={({ navigation }) => ({ 
+              headerRight: () => (
+                <TouchableOpacity
+                  accessibilityRole="button"
+                  onPress={() => navigation.navigate('Profile')}
+                  style={{ 
+                    marginRight: 10, 
+                    width: 40, 
+                    height: 40, 
+                    borderRadius: 20, 
+                    backgroundColor: '#f8f8f8', 
+                    alignItems: 'center', 
+                    justifyContent: 'center', 
+                  }}
+                >
+                  <Icon name="user" size={30} color="#222" />
+                </TouchableOpacity>
+              ),
+            })}
+          />
+          <Tab.Screen 
+            name="Home" 
+            component={HomeStack} 
+            options={({ navigation }) => ({ 
+              headerRight: () => (
+                <TouchableOpacity
+                  accessibilityRole="button"
+                  onPress={() => navigation.navigate('Profile')}
+                  style={{ 
+                    marginRight: 10, 
+                    width: 40, 
+                    height: 40, 
+                    borderRadius: 20, 
+                    backgroundColor: '#f8f8f8', 
+                    alignItems: 'center', 
+                    justifyContent: 'center', 
+                  }}
+                >
+                  <Icon name="user" size={30} color="#222" />
+                </TouchableOpacity>
+              ),
+            })}
+          />
+          <Tab.Screen 
+            name="Carbon Footprint" 
+            component={CarbonFootprintScreen} 
+            options={({ navigation }) => ({ 
+              headerRight: () => (
+                <TouchableOpacity
+                  accessibilityRole="button"
+                  onPress={() => navigation.navigate('Profile')}
+                  style={{ 
+                    marginRight: 10, 
+                    width: 40, 
+                    height: 40, 
+                    borderRadius: 20, 
+                    backgroundColor: '#f8f8f8', 
+                    alignItems: 'center', 
+                    justifyContent: 'center', 
+                  }}
+                >
+                <Icon name="user" size={30} color="#222" />
+              </TouchableOpacity>
+              ),
+            })}
+          />
+        <Tab.Screen 
+          name="Profile" 
+          component={Profile} 
+        />
+
+        </Tab.Navigator>
+      </NavigationContainer>
+    );
+  }

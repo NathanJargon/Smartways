@@ -39,12 +39,10 @@ const HomeScreen = ({ navigation }) => {
   const handleDayPress = (day) => {
     let newMarkedDates = {...markedDates};
   
-    // Unselect the last selected day
     if (lastSelectedDay.current) {
       newMarkedDates[lastSelectedDay.current] = {...newMarkedDates[lastSelectedDay.current], selected: false};
     }
   
-    // Select the new day
     newMarkedDates[day.dateString] = {
       ...newMarkedDates[day.dateString], 
       selected: true, 
