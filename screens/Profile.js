@@ -29,17 +29,6 @@ function Profile({ imageUrl = '', coverImageUrl = '' }) {
   return (
     <ImageBackground source={require('../assets/profilebg.png')} style={styles.backgroundImage}>
       <View style={styles.container}>
-      <TouchableOpacity onPress={() => selectImage(setCoverImage, [16, 9])}>
-        {coverImage ? (
-          <Image
-            style={styles.coverImage}
-            source={{ uri: coverImage }}
-          />
-        ) : (
-          <View style={styles.coverPlaceholder}>
-          </View>
-        )}
-      </TouchableOpacity>
       <View style={styles.content}>
         <TouchableOpacity onPress={() => selectImage(setProfileImage, [1, 1])}>
           {profileImage ? (
@@ -91,17 +80,17 @@ function Profile({ imageUrl = '', coverImageUrl = '' }) {
 
 
 
-          <View style={styles.buttonsContainer}>
-            <TouchableOpacity onPress={() => {}} style={styles.signUpButton}>
-              <Text style={styles.buttonText}>Sign Up</Text>
-            </TouchableOpacity>
-            <TouchableOpacity onPress={() => {}} style={styles.signInButton}>
-              <Text style={styles.buttonText}>Sign In</Text>
-            </TouchableOpacity>
-          </View>
+    <View style={styles.buttonsContainer}>
+          <TouchableOpacity onPress={() => {}} style={styles.inContainer}>
+            <Text style={styles.pointsText}>Sign Up</Text>
+          </TouchableOpacity>
+          <TouchableOpacity onPress={() => {}} style={styles.inContainer}>
+            <Text style={styles.pointsText}>Sign In</Text>
+          </TouchableOpacity>
         </View>
       </View>
-    </ImageBackground>
+    </View>
+  </ImageBackground>
   );
 }
 
@@ -109,6 +98,19 @@ const styles = StyleSheet.create({
   backgroundImage: {
     flex: 1,
     resizeMode: 'cover', 
+  },
+  inContainer: {
+    borderColor: '#4caf50',
+    borderWidth: 2,
+    padding: 10,
+    margin: 10,
+    borderRadius: 20,
+    marginBottom: 20,
+  },
+  pointsText: {
+    color: '#4caf50',
+    fontSize: 16,
+    textAlign: 'center',
   },
   container: {
     flex: 1,
@@ -126,7 +128,7 @@ const styles = StyleSheet.create({
     backgroundColor: '#A5AAAB',
   },
   content: {
-    marginTop: -50,
+    marginTop: 50,
     alignItems: 'center',
   },
   profileImage: {
@@ -139,7 +141,7 @@ const styles = StyleSheet.create({
     width: 100,
     height: 100,
     borderRadius: 100,
-    backgroundColor: '#A5AAAB',
+    backgroundColor: '#4caf50',
     justifyContent: 'center',
     alignItems: 'center',
   },
@@ -157,19 +159,22 @@ const styles = StyleSheet.create({
     margin: 10,
   },
   signUpButton: {
-    backgroundColor: '#4caf50', 
+    borderColor: '#4caf50', 
+    borderWidth: 1,
     borderRadius: 20,
     marginTop: 20,
     marginRight: 100, 
   },
   signInButton: {
-    backgroundColor: '#4caf50', 
+    borderColor: '#4caf50', 
+    borderWidth: 1,
     borderRadius: 20,
     marginTop: 20
   },
   buttonText: {
     margin: 10,
-    color: 'white',
+    color: '#4caf50',
+    fontSize: 18,
   },
   listItemDescription: {
     color: '#008000',

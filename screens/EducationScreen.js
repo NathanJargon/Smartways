@@ -1,53 +1,105 @@
-import React from 'react';
-import { View, Text, StyleSheet, ScrollView, Image, TouchableOpacity } from 'react-native';
-import { ImageBackground } from 'react-native';
+import React, { useRef, useEffect } from 'react';
+import { View, Text, StyleSheet, ScrollView, TouchableOpacity, Animated, ImageBackground } from 'react-native';
+import { useFocusEffect } from '@react-navigation/native';
+import { FontAwesome as Icon } from '@expo/vector-icons';
 
 function EducationScreen({ navigation }) {
+  const initialFadeAnim = useRef(new Animated.Value(0)).current;
+  const recurringFadeAnim = useRef(new Animated.Value(0)).current;
+
+  useFocusEffect(
+    React.useCallback(() => {
+      recurringFadeAnim.setValue(0);
+      Animated.timing(
+        recurringFadeAnim,
+        {
+          toValue: 1,
+          duration: 1000,
+          useNativeDriver: true,
+        }
+      ).start();
+    }, [])
+  );
+
   return (
-    <ImageBackground 
-      source={require('../assets/edubg.png')} 
-      style={styles.container}
-      resizeMode="cover"
-    >
-      <ScrollView contentContainerStyle={styles.contentContainer}>
+    <Animated.View style={{ ...styles.container }}>
+      <ImageBackground
+        source={require('../assets/edubg.png')}
+        style={styles.imageBackground}
+        resizeMode="cover"
+      >
+        <ScrollView contentContainerStyle={styles.contentContainer}>
+          <Text style={styles.header}>Ecological Sustainability Practices</Text>
 
-    <Text style={styles.header}>Ecological Sustainability Practices</Text>
+          <Animated.View style={{ ...styles.buttonRow, opacity: recurringFadeAnim }}>
+            <ImageBackground
+              source={require('../assets/edustepbg.png')}
+              style={styles.button}
+              resizeMode="cover"
+              imageStyle={{ borderRadius: 8 }}
+            >
+              <TouchableOpacity onPress={() => navigation.navigate('Step1')}>
+                <Text style={styles.buttonTitle}>Introduction to Carbon Footprint</Text>
+                <Text style={styles.buttonDescription}>Understanding carbon footprint is crucial. It's the total greenhouse gases, especially carbon dioxide, produced by human activities. Explore its impact on our planet.</Text>
+                <Icon name="hand-pointer-o" size={24} color="#4caf50" style={styles.icon} />
+              </TouchableOpacity>
+            </ImageBackground>
 
-    <View style={styles.buttonRow}>
-      <TouchableOpacity style={styles.button} onPress={() => navigation.navigate('Step1')}>
-        <Text style={styles.buttonText}>1. What is Carbon Footprint?</Text>
-      </TouchableOpacity>
+            <ImageBackground
+              source={require('../assets/edustepbg.png')}
+              style={styles.button}
+              resizeMode="cover"
+              imageStyle={{ borderRadius: 8 }}
+            >
+              <TouchableOpacity onPress={() => navigation.navigate('Step2')}>
+                <Text style={styles.buttonTitle}>Daily Activities and Emissions</Text>
+                <Text style={styles.buttonDescription}>Discover the effects of daily activities on the environment. Examine your energy use, food choices, and vehicle carbon emissions. Learn useful tips for lowering your own carbon impact.</Text>
+                <Icon name="hand-pointer-o" size={24} color="#4caf50" style={styles.icon} />
+              </TouchableOpacity>
+            </ImageBackground>
+          </Animated.View>
 
-      <TouchableOpacity style={styles.button} onPress={() => navigation.navigate('Step2')}>
-        <Text style={styles.buttonText}>2. What can you do to help Earth?</Text>
-      </TouchableOpacity>
-    </View>
+          <Animated.View style={{ ...styles.buttonRow, opacity: recurringFadeAnim }}>
+            <ImageBackground
+              source={require('../assets/edustepbg.png')}
+              style={styles.button}
+              resizeMode="cover"
+              imageStyle={{ borderRadius: 8 }}
+            >
+              <TouchableOpacity onPress={() => navigation.navigate('Step3')}>
+                <Text style={styles.buttonTitle}>The Impact of Diet on Emissions</Text>
+                <Text style={styles.buttonDescription}>Discover how food choices influence carbon emissions.</Text>
+                <Icon name="hand-pointer-o" size={24} color="#4caf50" style={styles.icon} />
+              </TouchableOpacity>
+            </ImageBackground>
 
-    <View style={styles.buttonRow}>
-      <TouchableOpacity style={styles.button} onPress={() => navigation.navigate('Step3')}>
-        <Text style={styles.buttonText}>3. How does recycling help?</Text>
-      </TouchableOpacity>
-
-      <TouchableOpacity style={styles.button} onPress={() => navigation.navigate('Step4')}>
-        <Text style={styles.buttonText}>4. What is global warming?</Text>
-      </TouchableOpacity>
-    </View>
-
-    <View style={styles.buttonRow}>
-      <TouchableOpacity style={styles.button} onPress={() => navigation.navigate('Step5')}>
-        <Text style={styles.buttonText}>5. How can we reduce pollution?</Text>
-      </TouchableOpacity>
-    </View>
-
-    {/* Repeat the above pattern for other tutorial buttons */}
-
-    </ScrollView>
-    </ImageBackground>
+            <ScrollView>
+              <ImageBackground
+                source={require('../assets/edustepbg.png')}
+                style={styles.button}
+                resizeMode="cover"
+                imageStyle={{ borderRadius: 8 }}
+              >
+                <TouchableOpacity onPress={() => navigation.navigate('Step4')}>
+                  <Text style={styles.buttonTitle}>Sustainable Transportation Tips</Text>
+                  <Text style={styles.buttonDescription}>Learn eco-friendly ways to commute and reduce emissions.</Text>
+                  <Icon name="hand-pointer-o" size={24} color="#4caf50" style={styles.icon} />
+                </TouchableOpacity>
+              </ImageBackground>
+            </ScrollView>
+          </Animated.View>
+        </ScrollView>
+      </ImageBackground>
+    </Animated.View>
   );
 }
 
+
 const styles = StyleSheet.create({
   container: {
+    flex: 1,
+  },
+  imageBackground: {
     flex: 1,
   },
   contentContainer: {
@@ -57,6 +109,7 @@ const styles = StyleSheet.create({
     fontSize: 20,
     fontWeight: 'bold',
     marginBottom: 16,
+    marginTop: 10,
     textAlign: 'center',
     color: 'white',
   },
@@ -67,12 +120,12 @@ const styles = StyleSheet.create({
     textAlign: 'center',
   },
   infoContainer: {
-    flexDirection: 'row', // Arrange children horizontally
+    flexDirection: 'row',
     marginBottom: 20,
   },
   textContainer: {
-    flex: 1, // Takes the available space
-    marginRight: 8, // Adjust spacing as needed
+    flex: 1,
+    marginRight: 8, 
   },
   infoTitle: {
     fontSize: 18,
@@ -80,8 +133,8 @@ const styles = StyleSheet.create({
     marginBottom: 8,
   },
   infoImage: {
-    width: '40%', // Adjust width as needed
-    height: 200,  // Adjust height as needed
+    width: '40%', 
+    height: 200,  
     resizeMode: 'contain',
     marginBottom: 8,
   },
@@ -89,20 +142,37 @@ const styles = StyleSheet.create({
     fontSize: 14,
   },
   buttonRow: {
-    flexDirection: 'row',
-    justifyContent: 'space-between',
     marginBottom: 10,
   },
   button: {
     backgroundColor: '#4caf50',
-    padding: 10,
-    flex: 1,
-    margin: 5,
-    borderRadius: 10,
+    padding: 20,
+    margin: 10,
+    borderRadius: 20,
+    height: 150, 
+    shadowColor: '#000',
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.8,
+    shadowRadius: 2,
+    elevation: 5,
   },
-  buttonText: {
-    color: '#fff',
-    textAlign: 'center',
+  buttonTitle: {
+    color: '#000',
+    textAlign: 'left',
+    fontWeight: 'bold',
+    fontSize: 16,
+  },
+  buttonDescription: {
+    color: '#000',
+    textAlign: 'justify',
+    marginTop: 10,
+  },
+  icon: {
+    position: 'absolute',
+    top: 0,
+    right: 0,
+    zIndex: 1,
+    color: '#000',
   },
 });
 
