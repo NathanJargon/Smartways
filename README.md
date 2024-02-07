@@ -1,2 +1,2 @@
-# AutoCarb
-A carbon footprint tracker application
+# Karbon
+A karbon footprint tracker and emission logger application
