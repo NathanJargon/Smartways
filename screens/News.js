@@ -143,31 +143,31 @@ function News() {
       return new Date(dateString).toLocaleDateString(undefined, options);
     }
   
-
     return (
       <Animated.View style={{opacity: 1}}>
         <TouchableOpacity
           style={styles.articleContainer}
           onPress={() => openArticleUrl(item.url)}
         >
-            <ImageBackground 
-              source={require('../assets/articlebg.png')} 
-              style={[ styles.articleImage ]}
-              imageStyle={{ borderRadius: 8 }}
-            > 
-              <View style={styles.textContainer}>
-                <Text style={styles.articleTitle}>{String(item.title)}</Text>
-                <Text style={styles.articleDescription}>{truncateDescription(String(item.description), 20)}</Text>
-                <Text style={styles.articleDate}>{formatDateString(String(item.publishedAt))}</Text>
-                <Text style={styles.articleSource}>{String(item.source.name)}</Text>
-              </View>
-            </ImageBackground>
-          </TouchableOpacity>
-        </Animated.View>
-      );
-    }, (prevProps, nextProps) => {
-      return prevProps.item.id === nextProps.item.id;
-    });
+          <ImageBackground 
+            source={require('../assets/articlesbg.png')} 
+            style={[ styles.articleImage ]}
+            imageStyle={{ borderRadius: 8 }}
+          > 
+            <View style={styles.textContainer}>
+              <Text style={styles.articleTitle}>{String(item.title)}</Text>
+              <Text style={styles.articleDescription}>{truncateDescription(String(item.description), 20)}</Text>
+              <Text style={styles.articleDate}>{formatDateString(String(item.publishedAt))}</Text>
+              <Text style={styles.articleSource}>{String(item.source.name)}</Text>
+            </View>
+          </ImageBackground>
+        </TouchableOpacity>
+      </Animated.View>
+    );
+  }, (prevProps, nextProps) => {
+    return prevProps.item.id === nextProps.item.id;
+  });
+  
 
   useEffect(() => {
     fetchNews();
@@ -190,7 +190,7 @@ function News() {
         q: filters.keyword ? `carbon footprint emissions ${filters.keyword}` : 'carbon footprint emissions',
         apiKey: retryCount < 2 ? '74f5be0407c040c1b49cd69f1e6de50e' : '6d604f0b42614d0fabf0388461d91f6d',
         page: page,
-        pageSize: 2,
+        pageSize: 10,
         from: filters.startDate,
         to: filters.endDate,
       });
@@ -289,9 +289,10 @@ function News() {
   
   const handleScroll = (event) => {
     const currentOffset = event.nativeEvent.contentOffset.y;
-    setIsAtTop(currentOffset < 10); 
+    setIsAtTop(currentOffset < 12);
   };
 
+  
   return (
     <ImageBackground source={require('../assets/newsbg.png')} style={styles.backgroundImage}>
       <FlatList
@@ -312,14 +313,14 @@ function News() {
         ListFooterComponent={renderFooter}
       />
       {isFilterModalVisible && <FilterModal setFilters={setFilters} closeModal={closeFilterModal} modalVisible={isFilterModalVisible} />}
-      {page > maxPages && !isAtTop && (
+      {page > 3 && !isAtTop && (
         <TouchableOpacity
           style={styles.scrollToTopButton}
           onPress={scrollToTop}
           accessible={true}
           accessibilityLabel="Scroll to Top"
         >
-          <Icon name="arrow-up" size={10} color="#000" />
+          <Icon name="arrow-up" size={20} color="white" />
         </TouchableOpacity>
 
       )}
@@ -381,12 +382,12 @@ const styles = StyleSheet.create({
   },
   articleDate: {
     fontSize: 12,
-    color: '#32CD32',
+    color: '#FFFFFF',
     marginBottom: 4,
   },
   articleSource: {
     fontSize: 12,
-    color: '#32CD32', 
+    color: '#FFFFFF', 
   },
   filterContainer: {
     flexDirection: 'row',
@@ -451,7 +452,7 @@ const styles = StyleSheet.create({
     borderRadius: 5,
     padding: 10,
     marginBottom: 10,
-    borderColor: '#90EE90',
+    borderColor: 'white',
   },
   buttonText: {
     color: '#fff',
@@ -464,11 +465,13 @@ const styles = StyleSheet.create({
   },
   scrollToTopButton: {
     position: 'absolute',
-    bottom: 20,
-    right: 20,
-    backgroundColor: '#90EE90',
-    borderRadius: 5,
+    backgroundColor: '#4caf50',
+    margin: 20,
+    marginLeft: 300,
+    borderRadius: 100,
     padding: 10,
+    width: 100,
+    height: 40,
   },
   scrollToTopButtonText: {
     color: '#fff',

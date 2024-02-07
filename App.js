@@ -169,12 +169,12 @@ function CustomTabBar({ state, descriptors, navigation }) {
                     width: 40, 
                     height: 40, 
                     borderRadius: 20, 
-                    backgroundColor: 'rgba(11, 156, 49, 0.4)', 
+                    backgroundColor: 'white', 
                     alignItems: 'center', 
                     justifyContent: 'center', 
                   }}
                 >
-                  <Icon name="user" size={30} color="#222" />
+                  <Icon name="user" size={30} color="#000" />
                 </TouchableOpacity>
               </View>
             ),
@@ -202,7 +202,7 @@ function CustomTabBar({ state, descriptors, navigation }) {
                     width: 40, 
                     height: 40, 
                     borderRadius: 20, 
-                    backgroundColor: 'rgba(11, 156, 49, 0.4)', 
+                    backgroundColor: 'white', 
                     alignItems: 'center', 
                     justifyContent: 'center', 
                   }}
@@ -236,7 +236,7 @@ function CustomTabBar({ state, descriptors, navigation }) {
                   width: 40, 
                   height: 40, 
                   borderRadius: 20, 
-                  backgroundColor: 'rgba(11, 156, 49, 0.4)', 
+                  backgroundColor: 'white', 
                   alignItems: 'center', 
                   justifyContent: 'center', 
                 }}
@@ -268,7 +268,7 @@ function CustomTabBar({ state, descriptors, navigation }) {
                   width: 40, 
                   height: 40, 
                   borderRadius: 20, 
-                  backgroundColor: 'rgba(11, 156, 49, 0.4)',  
+                  backgroundColor: 'white',  
                   alignItems: 'center', 
                   justifyContent: 'center', 
                 }}
@@ -299,7 +299,7 @@ function CustomTabBar({ state, descriptors, navigation }) {
                   width: 40, 
                   height: 40, 
                   borderRadius: 20, 
-                  backgroundColor: 'rgba(11, 156, 49, 0.4)', 
+                  backgroundColor: 'white', 
                   alignItems: 'center', 
                   justifyContent: 'center', 
                 }}

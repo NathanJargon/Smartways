@@ -2,10 +2,13 @@ import React, { useState } from 'react';
 import { View, Text, StyleSheet, TouchableOpacity, Image, ScrollView, Dimensions, Animated } from 'react-native';
 import { ImageBackground } from 'react-native';
 import { FontAwesome as Icon } from '@expo/vector-icons';
+import { ProgressCircle } from 'react-native-svg-charts';
 
 function HomeScreen({ navigation }) {
   const [isStarted, setIsStarted] = useState(false);
   const [isWatched, setIsWatched] = useState(false);
+  const carbonFootprint = 456; 
+  const maxFootprint = 1000; 
 
   const handlePress = () => {
     if (!isStarted) {
@@ -37,17 +40,20 @@ function HomeScreen({ navigation }) {
             style={styles.logo}
             source={require('../assets/logo.png')}
           />
-          <Text style={styles.title}>Welcome to</Text>
-          <Text style={styles.title}>Karbon</Text>
-          <Text style={styles.subtitle}>
-            Less Carbon Footprint—More Life on Earth.
-          </Text>
   
-          <View style={styles.carbonFootprintBox}>
-            <Text style={styles.boxTitle}>Recent Carbon Footprint:</Text>
-            <Text style={styles.boxValue}>456</Text>
+            <View style={styles.carbonFootprintBox}>
+            <Text style={[styles.boxTitle, styles.absoluteBoxTitleTop1]}>You're on track to</Text>
+            <Text style={[styles.boxTitle, styles.absoluteBoxTitleTop2]}>decrease emissions by</Text>
+            <ProgressCircle
+              style={styles.progressCircle}
+              progress={carbonFootprint / maxFootprint}
+              progressColor={'#4caf50'}
+            >
+              <Text style={styles.percentageText}>{`${Math.round((carbonFootprint / maxFootprint) * 100)}%`}</Text>
+            </ProgressCircle>
+            <Text style={[styles.boxTitle, styles.absoluteBoxTitle2]}>this month</Text>
           </View>
-  
+
           <View style={styles.buttonContainer}>
 
             <TouchableOpacity
@@ -107,6 +113,19 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     justifyContent: 'space-between',
   },
+  progressCircle: {
+    height: 200,
+    justifyContent: 'center',
+    alignItems: 'center',
+  },
+
+  percentageText: {
+    fontSize: 50,
+    fontWeight: 'bold',
+    marginLeft: 70,
+    marginTop: 65,
+    color: '#4caf50',
+  },
   container: {
     flex: 1,
     justifyContent: 'center',
@@ -127,7 +146,7 @@ const styles = StyleSheet.create({
     width: 450,
     height: 450,
     marginRight: -30,
-    marginBottom: -130,
+    marginBottom: -180,
   },
   title: {
     fontSize: 32,
@@ -233,19 +252,37 @@ const styles = StyleSheet.create({
   },
   carbonFootprintBox: {
     borderColor: '#4caf50',
-    borderWidth: 2,
+    borderWidth: 0,
     padding: 10,
     margin: 10,
     marginLeft: 20,
     borderRadius: 20,
-    width: '50%',
+    width: '60%',
   },
   boxTitle: {
-    fontSize: 15,
+    fontSize: 20,
     fontWeight: 'bold',
     color: '#000',
     marginBottom: 10,
     textAlign: 'center',
+  },
+  absoluteBoxTitleTop1: {
+    position: 'absolute',
+    top: 40, 
+    left: 80,
+    fontSize: 12,
+  },
+  absoluteBoxTitleTop2: {
+    position: 'absolute',
+    top: 55, 
+    left: 65,
+    fontSize: 12,
+  },
+  absoluteBoxTitle2: {
+    position: 'absolute',
+    top: 145, 
+    left: 78,
+    fontSize: 20, 
   },
   boxValue: {
     fontSize: 34,

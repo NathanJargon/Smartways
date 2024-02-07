@@ -3,22 +3,13 @@ import { View, Text, StyleSheet, TextInput, TouchableOpacity, Animated, Switch, 
 import { useNavigation } from '@react-navigation/native';
 
 function CarbonFootprintScreen() {
-  const [electricBill, setElectricBill] = useState('');
-  const [gasBill, setGasBill] = useState('');
-  const [oilBill, setOilBill] = useState('');
-  const [yearlyMileage, setYearlyMileage] = useState('');
-  const [shortFlights, setShortFlights] = useState('');
-  const [longFlights, setLongFlights] = useState('');
-  const [recycleNewspaper, setRecycleNewspaper] = useState(false);
-  const [recycleAluminumTin, setRecycleAluminumTin] = useState(false);
+  const [litersValue, setLitersValue] = useState('');
+  const [kilometersValue, setKilometersValue] = useState('');
   const [animation, setAnimation] = useState(new Animated.Value(0));
 
-  const allInputsFilled = electricBill !== '' && gasBill !== '' && oilBill !== '' && yearlyMileage !== '' && shortFlights !== '' && longFlights !== '';
-
+  const allInputsFilled = litersValue !== '' && kilometersValue !== '';
   const startAnimation = () => {
     const totalCarbonFootprint = calculateCarbonFootprint();
-  
-    navigation.navigate('HomeScreen', { carbonFootprint: totalCarbonFootprint });
   
     Animated.timing(animation, {
       toValue: 1,
@@ -28,99 +19,41 @@ function CarbonFootprintScreen() {
   };
   
   const calculateCarbonFootprint = () => {
-    let total = 0;
-
-    const electricBillValue = Number(electricBill);
-    const gasBillValue = Number(gasBill);
-    const oilBillValue = Number(oilBill);
-    const yearlyMileageValue = Number(yearlyMileage);
-    const shortFlightsValue = Number(shortFlights);
-    const longFlightsValue = Number(longFlights);
-
-    total += Number(electricBill) * 105;
-    total += Number(gasBill) * 105;
-    total += Number(oilBill) * 113;
-    total += Number(yearlyMileage) * .79;
-    total += Number(shortFlights) * 1100;
-    total += Number(longFlights) * 4400;
-    if (!recycleNewspaper) total += 184;
-    if (!recycleAluminumTin) total += 166;
-    return total;
+    const gallons = parseFloat(litersValue) * 0.264172;
+    const miles = parseFloat(kilometersValue) * 0.62137;
+  
+    const milesPerGallon = miles / gallons;
+  
+    const totalCarbonFootprint = ((8.89 * Math.pow(10, -3)) / gallons) * (1 / 22.9) * (1 / 0.993);
+  
+    return totalCarbonFootprint.toFixed(3);
   };
 
   return (
     <ImageBackground source={require('../assets/assessbg.png')} style={styles.backgroundImage}>
-    <View style={styles.container}>
-      <View style={styles.row}>
-        <View style={styles.inputContainer}>
-          <Text style={styles.label}>Monthly Electric Bill</Text>
-          <TextInput
-            style={styles.input}
-            value={electricBill}
-            onChangeText={setElectricBill}
-            placeholder="Electric Bill"
-            keyboardType="numeric"
-          />
-          <Text style={styles.label}>Monthly Gas Bill</Text>
-          <TextInput
-            style={styles.input}
-            value={gasBill}
-            onChangeText={setGasBill}
-            placeholder="Gas Bill"
-            keyboardType="numeric"
-          />
-        </View>
-        <View style={styles.inputContainer}>
-          <Text style={styles.label}>Monthly Oil Bill</Text>
-          <TextInput
-            style={styles.input}
-            value={oilBill}
-            onChangeText={setOilBill}
-            placeholder="Oil Bill"
-            keyboardType="numeric"
-          />
-          <Text style={styles.label}>Yearly Mileage</Text>
-          <TextInput
-            style={styles.input}
-            value={yearlyMileage}
-            onChangeText={setYearlyMileage}
-            placeholder="Yearly Mileage"
-            keyboardType="numeric"
-          />
-        </View>
+      <View style={styles.container}>
+        <View style={styles.row}>
+      <View style={styles.inputContainer}>
+        <Text style={styles.label}>Gallon</Text>
+        <TextInput
+          style={styles.input}
+          value={litersValue}
+          onChangeText={setLitersValue}
+          placeholder="Liters"
+          keyboardType="numeric"
+        />
       </View>
-      <View style={styles.row}>
-        <View style={styles.inputContainer}>
-          <Text style={styles.label}>Short Flights (4 hours or less)</Text>
-          <TextInput
-            style={styles.input}
-            value={shortFlights}
-            onChangeText={setShortFlights}
-            placeholder="Short Flights"
-            keyboardType="numeric"
-          />
-          <Text style={styles.label}>Has Recycled Newspaper?</Text>
-          <Switch
-            value={recycleNewspaper}
-            onValueChange={setRecycleNewspaper}
-          />
-        </View>
-        <View style={styles.inputContainer}>
-          <Text style={styles.label}>Long Flights (4 hours or more)</Text>
-          <TextInput
-            style={styles.input}
-            value={longFlights}
-            onChangeText={setLongFlights}
-            placeholder="Long Flights"
-            keyboardType="numeric"
-          />
-          <Text style={styles.label}>Has Recycled Aluminum and Tin?</Text>
-          <Switch
-            value={recycleAluminumTin}
-            onValueChange={setRecycleAluminumTin}
-          />
-        </View>
+      <View style={styles.inputContainer}>
+        <Text style={styles.label}>Miles</Text>
+        <TextInput
+          style={styles.input}
+          value={kilometersValue}
+          onChangeText={setKilometersValue}
+          placeholder="Kilometers"
+          keyboardType="numeric"
+        />
       </View>
+    </View>
       <TouchableOpacity
         style={[styles.button, allInputsFilled && styles.buttonGlow]}
         onPress={startAnimation}
@@ -128,8 +61,17 @@ function CarbonFootprintScreen() {
       >
         <Text style={styles.buttonText}>Calculate Carbon Footprint</Text>
       </TouchableOpacity>
+
       <Animated.View style={{ opacity: animation }}>
-        <Text>Your total carbon footprint is: {calculateCarbonFootprint()}</Text>
+      <Text style={{ fontSize: 20 }}>
+        Your total carbon footprint is:
+      </Text>
+      <Text style={{ fontSize: 20}}>{calculateCarbonFootprint()}</Text>
+      <Text style={{ fontSize: 20 }}>
+        metric tons CO
+        <Text style={{ fontSize: 10, bottom: -2 }}>2</Text>
+        E/mile
+      </Text>
       </Animated.View>
     </View>
     </ImageBackground>
@@ -141,6 +83,7 @@ const styles = StyleSheet.create({
     flex: 1,
     justifyContent: 'center',
     alignItems: 'center',
+    padding: 20,
   },
   backgroundImage: {
     flex: 1,
@@ -152,9 +95,10 @@ const styles = StyleSheet.create({
     justifyContent: 'space-between',
     width: '100%',
     paddingHorizontal: '10%',
+    marginTop: -200,
   },
   inputContainer: {
-    width: '45%',
+    width: '40%',
   },
   label: {
     marginBottom: 5,
@@ -180,6 +124,14 @@ const styles = StyleSheet.create({
   },
   buttonGlow: {
     backgroundColor: 'green',
+    shadowColor: '#00ff00',
+    shadowOffset: {
+      width: 0,
+      height: 2,
+    },
+    shadowOpacity: 0.5,
+    shadowRadius: 10,
+    elevation: 5,
   },
   buttonText: {
     color: '#fff',
