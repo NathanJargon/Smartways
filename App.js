@@ -53,7 +53,16 @@ function CarbonFootprintStack() {
 
 function CustomTabBar({ state, descriptors, navigation }) {
   return (
-    <View style={{ flexDirection: 'row', justifyContent: 'space-around', paddingBottom: 10 }}>
+    <View style={{ 
+      flexDirection: 'row', 
+      justifyContent: 'space-around', 
+      paddingBottom: 10, 
+      backgroundColor: 'white',
+      borderTopLeftRadius: 15,
+      borderTopRightRadius: 15,
+      position: "absolute",
+      bottom: 0,
+    }}>
       {state.routes.map((route, index) => {
         const { options } = descriptors[route.key];
         const label =
@@ -61,8 +70,10 @@ function CustomTabBar({ state, descriptors, navigation }) {
             ? options.tabBarLabel
             : options.title !== undefined
             ? options.title
-            : route.name === 'Carbon Footprint Calculator'
+            : route.name === 'Karbon Calculator'
             ? 'Calculate'
+            : route.name === 'Real Time Karbon Updates'
+            ? 'Real Time'
             : route.name;
 
         const isFocused = state.index === index;
@@ -112,7 +123,7 @@ function CustomTabBar({ state, descriptors, navigation }) {
                 </View>
               ) : label === 'Education' || label === 'Learn' ? (
                 <Icon name="book" size={30} color={isFocused ? '#4caf50' : '#222' } />
-              ) : label === 'Carbon Footprint Calculator' || label === 'Calculate' ? (
+              ) : label === 'Karbon Calculator' || label === 'Calculate' ? (
                 <Icon name="calculator" size={30} color={isFocused ? '#4caf50' : '#222'} />
               ) : label === 'News' || label === 'Articles' ? (
                 <Icon name="newspaper-o" size={30} color={isFocused ? '#4caf50' : '#222'} />
@@ -158,30 +169,22 @@ function CustomTabBar({ state, descriptors, navigation }) {
                     width: 40, 
                     height: 40, 
                     borderRadius: 20, 
-                    backgroundColor: '#f8f8f8', 
+                    backgroundColor: 'rgba(11, 156, 49, 0.4)', 
                     alignItems: 'center', 
                     justifyContent: 'center', 
                   }}
                 >
                   <Icon name="user" size={30} color="#222" />
                 </TouchableOpacity>
-                <TouchableOpacity
-                  accessibilityRole="button"
-                  onPress={() => navigation.navigate('Gamification')}
-                  style={{ 
-                    marginRight: 10, 
-                    width: 40, 
-                    height: 40, 
-                    borderRadius: 20, 
-                    backgroundColor: '#f8f8f8', 
-                    alignItems: 'center', 
-                    justifyContent: 'center', 
-                  }}
-                >
-                  <Icon name="money" size={30} color="#222" />
-                </TouchableOpacity>
               </View>
             ),
+            headerStyle: {
+              backgroundColor: 'rgba(11, 156, 49, 0.4)', 
+            },
+            headerTintColor: '#000',
+            headerTitleStyle: {
+              fontWeight: 'bold',
+            },
           })}
         />
 
@@ -199,32 +202,25 @@ function CustomTabBar({ state, descriptors, navigation }) {
                     width: 40, 
                     height: 40, 
                     borderRadius: 20, 
-                    backgroundColor: '#f8f8f8', 
+                    backgroundColor: 'rgba(11, 156, 49, 0.4)', 
                     alignItems: 'center', 
                     justifyContent: 'center', 
                   }}
                 >
                   <Icon name="user" size={30} color="#222" />
                 </TouchableOpacity>
-                <TouchableOpacity
-                  accessibilityRole="button"
-                  onPress={() => navigation.navigate('Gamification')}
-                  style={{ 
-                    marginRight: 10, 
-                    width: 40, 
-                    height: 40, 
-                    borderRadius: 20, 
-                    backgroundColor: '#f8f8f8', 
-                    alignItems: 'center', 
-                    justifyContent: 'center', 
-                  }}
-                >
-                  <Icon name="money" size={30} color="#222" />
-                </TouchableOpacity>
               </View>
             ),
+            headerStyle: {
+              backgroundColor: 'rgba(11, 156, 49, 0.4)', 
+            },
+            headerTintColor: '#000',
+            headerTitleStyle: {
+              fontWeight: 'bold',
+            },
           })}
         />
+
 
       <Tab.Screen 
         name="Home" 
@@ -240,20 +236,27 @@ function CustomTabBar({ state, descriptors, navigation }) {
                   width: 40, 
                   height: 40, 
                   borderRadius: 20, 
-                  backgroundColor: '#f8f8f8', 
+                  backgroundColor: 'rgba(11, 156, 49, 0.4)', 
                   alignItems: 'center', 
                   justifyContent: 'center', 
                 }}
               >
-                <Icon name="user" size={30} color="#222" />
-              </TouchableOpacity>
-            </View>
-          ),
-        })}
-      />
+                  <Icon name="user" size={30} color="#222" />
+                </TouchableOpacity>
+              </View>
+            ),
+            headerStyle: {
+              backgroundColor: 'rgba(11, 156, 49, 0.4)', 
+            },
+            headerTintColor: '#000',
+            headerTitleStyle: {
+              fontWeight: 'bold',
+            },
+          })}
+        />
                 
         <Tab.Screen 
-          name="Carbon Footprint Calculator" 
+          name="Karbon Calculator" 
           component={CarbonFootprintStack} 
           options={({ navigation }) => ({ 
             headerRight: () => (
@@ -265,7 +268,7 @@ function CustomTabBar({ state, descriptors, navigation }) {
                   width: 40, 
                   height: 40, 
                   borderRadius: 20, 
-                  backgroundColor: '#f8f8f8', 
+                  backgroundColor: 'rgba(11, 156, 49, 0.4)',  
                   alignItems: 'center', 
                   justifyContent: 'center', 
                 }}
@@ -273,12 +276,45 @@ function CustomTabBar({ state, descriptors, navigation }) {
               <Icon name="user" size={30} color="#222" />
             </TouchableOpacity>
             ),
+            headerStyle: {
+              backgroundColor: 'rgba(11, 156, 49, 0.4)', 
+            },
+            headerTintColor: '#000',
+            headerTitleStyle: {
+              fontWeight: 'bold',
+            },
           })}
         />
           
         <Tab.Screen 
-          name="Real Time" 
+          name="Real Time Karbon Updates" 
           component={RealTimeScreen} 
+          options={({ navigation }) => ({ 
+            headerRight: () => (
+              <TouchableOpacity
+                accessibilityRole="button"
+                onPress={() => navigation.navigate('Profile')}
+                style={{ 
+                  marginRight: 10, 
+                  width: 40, 
+                  height: 40, 
+                  borderRadius: 20, 
+                  backgroundColor: 'rgba(11, 156, 49, 0.4)', 
+                  alignItems: 'center', 
+                  justifyContent: 'center', 
+                }}
+              >
+              <Icon name="user" size={30} color="#222" />
+            </TouchableOpacity>
+            ),
+            headerStyle: {
+              backgroundColor: 'rgba(11, 156, 49, 0.4)', 
+            },
+            headerTintColor: '#000',
+            headerTitleStyle: {
+              fontWeight: 'bold',
+            },
+          })}
         />
 
         </Tab.Navigator>

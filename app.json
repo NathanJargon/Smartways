@@ -1,8 +1,8 @@
 {
   "expo": {
-    "name": "autocarb",
-    "slug": "autocarb",
-    "version": "1.0.0",
+    "name": "Karbon",
+    "slug": "Karbon",
+    "version": "120.0",
     "orientation": "portrait",
     "icon": "./assets/icon.png",
     "userInterfaceStyle": "light",

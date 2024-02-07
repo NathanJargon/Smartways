@@ -188,7 +188,7 @@ function News() {
   
       const cacheKey = JSON.stringify({
         q: filters.keyword ? `carbon footprint emissions ${filters.keyword}` : 'carbon footprint emissions',
-        apiKey: retryCount < 2 ? '6d604f0b42614d0fabf0388461d91f6d' : '74f5be0407c040c1b49cd69f1e6de50e',
+        apiKey: retryCount < 2 ? '74f5be0407c040c1b49cd69f1e6de50e' : '6d604f0b42614d0fabf0388461d91f6d',
         page: page,
         pageSize: 2,
         from: filters.startDate,
@@ -289,7 +289,7 @@ function News() {
   
   const handleScroll = (event) => {
     const currentOffset = event.nativeEvent.contentOffset.y;
-    setIsAtTop(currentOffset < 10);
+    setIsAtTop(currentOffset < 10); 
   };
 
   return (
@@ -331,6 +331,7 @@ function News() {
 const styles = StyleSheet.create({
   container: {
     padding: 16,
+    paddingBottom: 100,
   },
   backgroundImage: {
     flex: 1,
@@ -339,7 +340,7 @@ const styles = StyleSheet.create({
   refreshInstruction: {
     fontWeight: 'bold',
     textAlign: 'center',
-    color: 'white',
+    color: '#cefad0',
     fontSize: 16,
     padding: 10,
   },

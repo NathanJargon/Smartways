@@ -38,7 +38,7 @@ function HomeScreen({ navigation }) {
             source={require('../assets/logo.png')}
           />
           <Text style={styles.title}>Welcome to</Text>
-          <Text style={styles.title}>AutoCarb</Text>
+          <Text style={styles.title}>Karbon</Text>
           <Text style={styles.subtitle}>
             Less Carbon Footprint—More Life on Earth.
           </Text>
@@ -113,7 +113,7 @@ const styles = StyleSheet.create({
     alignItems: 'center',
   },
   contentContainer: {
-    marginTop: -170,
+    marginTop: -250,
     marginLeft: -29,
     flex: 1,
     justifyContent: 'center',
