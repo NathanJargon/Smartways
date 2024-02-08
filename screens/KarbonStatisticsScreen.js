@@ -30,7 +30,7 @@ const KarbonStatisticsScreen = (props) => {
     <View style={styles.roundedBox}>
       <View style={styles.buttonContainer}>
         <Icon style={styles.icon1} name="chevron-left" size={20} onPress={() => setDate(prevDate => new Date(new Date(prevDate).setDate(new Date(prevDate).getDate() - 1)))} />
-        <Text style= {{ fontSize: 20, fontWeight: 'bold' }} >{day} {month}</Text>
+        <Text style= {{ fontSize: 20, fontFamily: "Montserrat-Light" }} >{day} {month}</Text>
         <Icon style={styles.icon2} name="chevron-right" size={20} onPress={() => setDate(prevDate => new Date(new Date(prevDate).setDate(new Date(prevDate).getDate() + 1)))} />
       </View>
     </View>
@@ -45,13 +45,14 @@ const KarbonStatisticsScreen = (props) => {
         </TouchableOpacity>
       </View>
 
-      <Text style={ styles.header }>Your {period} Record</Text>
+      <Text style={ styles.header1 }>Your {period} Record</Text>
+      <Text style={ styles.header2 }>of Emission</Text>
 
       <LineChart
         data={{ ...data, labels }}
         width={screenWidth-60}
-        height={350}
-        yAxisLabel="$"
+        height={320}
+        yAxisLabel=""
         chartConfig={{
           backgroundColor: "#e26a00",
           backgroundGradientFrom: "#fb8c00",
@@ -65,28 +66,37 @@ const KarbonStatisticsScreen = (props) => {
         style={{
           marginVertical: 8,
           borderRadius: 16,
-          marginBottom: 70,
+          marginBottom: 40,
         }}
       />
 
       <TouchableOpacity style={styles.roundBoxBelowGraph} onPress={() => {
         props.navigation.navigate('Karbon Leaderboard');
       }}>
-        <Text style={styles.belowText}>Community Leaderboard</Text>
+        <View style={{ left: 30, top: -3 }}>
+          <Icon name="trophy" size={32} color="gold" />
+        </View>
+        <Text style={styles.belowText1}>Community</Text>
+        <Text style={styles.belowText2}>Leaderboard</Text>
       </TouchableOpacity>
 
-      <View style={styles.cardContainer}>
+      <TouchableOpacity
+        onPress={() => {
+          props.navigation.navigate('Profile');
+        }}
+        style={styles.cardContainer}
+      >
         <View style={styles.profileContainer}>
           <Icon name="user" size={50} color="#000" />
         </View>
-
         <View style={styles.nameContainer}>
           <Text style={styles.nameText}>User Name</Text>
         </View>
-      </View>
+      </TouchableOpacity>
     </View>
   );
 };
+
 
 const styles = StyleSheet.create({
   container: {
@@ -104,22 +114,36 @@ const styles = StyleSheet.create({
     borderRadius: 50,
     backgroundColor: '#e26a00', 
   },
-  belowText: { // roundedBlowBelowGraph
+  belowText1: { // roundedBlowBelowGraph
     fontSize: 19,
-    fontWeight: 'bold',
+    bottom: 40,
+    left: 80,
+    fontFamily: 'Montserrat-Light',
     color: 'black',
-    textAlign: 'center',
   },
-  header: {
+  belowText2: { // roundedBlowBelowGraph
+    fontSize: 19,
+    fontFamily: 'Montserrat-Light',
+    color: 'black',
+    bottom: 40,
+    left: 80,
+  },
+  header1: {
     position: 'absolute',
     top: 100,
     fontSize: 27,
-    fontWeight: 'bold',
+    fontFamily: 'Montserrat-Light',
+  },
+  header2: {
+    position: 'absolute',
+    top: 130,
+    fontSize: 27,
+    fontFamily: 'Montserrat-Light',
   },
   periodButton: {
     position: 'absolute',
     top: 18,
-    left: 120,
+    left: 110,
     paddingHorizontal: 10,
     borderRadius: 10,
   },
@@ -127,8 +151,8 @@ const styles = StyleSheet.create({
     color: 'black', 
     textAlign: 'center',
     fontSize: 27,
-    fontWeight: 'bold',
     padding: 10,
+    fontFamily: 'Codec',
   },
   roundedBox: {
     position: 'absolute',
@@ -149,31 +173,36 @@ const styles = StyleSheet.create({
   },
   cardContainer: {
     position: 'absolute',
-    bottom: 85, 
     flexDirection: 'row',
     width: '90%',
     height: 70,
     alignSelf: 'center',
-    marginTop: 20,
+    top: 550, // Adjust this value as needed
     backgroundColor: '#fff',
     borderRadius: 10,
     padding: 10,
-    justifyContent: 'space-between',
-  },
-  profileContainer: {
-    flex: 1,
-    justifyContent: 'center',
+    justifyContent: 'flex-start',
     alignItems: 'center',
   },
+  
   nameContainer: {
     flex: 3,
     justifyContent: 'center',
+    marginLeft: 10, // Add this line if you want some space between the icon and the text
+  },
+  profileContainer: {
+    justifyContent: 'center',
+    alignItems: 'center',
+    marginLeft: 50,
   },
   nameText: {
+    position: 'absolute',
     fontSize: 20,
-    fontWeight: 'bold',
+    fontFamily: 'Montserrat-Light',
+    color: 'black',
     padding: 10,
-    marginLeft: 50,
+    marginLeft: 30,
+    marginBottom: 0,
   },
   datePickerContainer: {
     flexDirection: 'row',

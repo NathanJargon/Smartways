@@ -1,12 +1,12 @@
 import React, { useState, useEffect, useRef } from 'react';
-import { View, Text, StyleSheet, Button, Alert } from 'react-native';
+import { View, Text, StyleSheet, Button, Alert, TouchableOpacity } from 'react-native';
 import MapView, { Marker, PROVIDER_GOOGLE, Polyline } from 'react-native-maps';
 import MapViewDirections from 'react-native-maps-directions';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import * as Location from 'expo-location';
 import { FontAwesome as Icon } from '@expo/vector-icons';
 
-const RealTimeScreen = () => {
+const KarbonMap = (props) => {
   const apiKey = 'AIzaSyCxLGmhSPj8MZ-K-JVMae_90_rz7s-3S4M'; // Replace with your actual Google Maps API key
 
   const philippinesRegion = {
@@ -26,7 +26,17 @@ const RealTimeScreen = () => {
   const [selectedPlaces, setSelectedPlaces] = useState([]);
   const [dynamicPlaces, setDynamicPlaces] = useState([]);
   const [region, setRegion] = useState(philippinesRegion);
+  const [distanceCount, setDistanceCount] = useState(0);
+  const [approximateCarbonEmission, setApproximateCarbonEmission] = useState(0);
+  const [lastAlertTime, setLastAlertTime] = useState(null);
   const markerRefs = useRef([]);
+
+  let totalDistance = 0;
+  let totalEmissions = 0;
+
+  let previousLocation = null;
+
+  const modeOfTransportation = 'driving';
 
   const averageCoordinate = selectedPlaces.reduce(
     (average, place, index, array) => {
@@ -93,19 +103,34 @@ const RealTimeScreen = () => {
   };
   
 
-  const handleGetDirections = async () => {
+  const calculateAndUpdateDistanceAndEmission = async () => {
     try {
-      setLoading(true);
-  
+      /*
       if (!userLocation) {
-        alert('Please turn on your location to get directions.');
+        const currentTime = new Date().getTime();
+        const thirtyMinutes = 50 * 60 * 1000; 
+  
+        if (!lastAlertTime || currentTime - lastAlertTime >= thirtyMinutes) {
+          alert('Please turn on your location to get directions.');
+          setLastAlertTime(currentTime);
+        }
+  
         return;
-      }
+      }  
   
       if (selectedPlaces.length === 0) {
-        alert('Please select a place first by pressing on the map.');
+        const currentTime = new Date().getTime();
+        const thirtyMinutes = 50 * 60 * 1000; 
+  
+        if (!lastAlertTime || currentTime - lastAlertTime >= thirtyMinutes) {
+          alert('Please select a place first by pressing on the map.');
+          setLastAlertTime(currentTime);
+        }
+  
         return;
       }
+
+      */
   
       const place = selectedPlaces[selectedPlaces.length - 1];
   
@@ -116,9 +141,9 @@ const RealTimeScreen = () => {
         '&mode=driving' +
         `&key=${apiKey}`
       );
-    
+  
       const directionsData = await directionsResponse.json();
-    
+  
       if (directionsData.routes && directionsData.routes.length > 0) {
         const newDirections = decodePolyline(directionsData.routes[0].overview_polyline.points);
         setDirections(newDirections);
@@ -129,7 +154,7 @@ const RealTimeScreen = () => {
   
         // Calculate emission status
         const distance = directionsData.routes[0].legs[0].distance.value; // distance in meters
-        const emissionStatus = calculateEmissionStatus(distance); // implement this function
+        const emissionStatus = calculateEmissionStatus(distance);
         setEmissionStatus(emissionStatus);
   
         // Calculate traffic level
@@ -138,14 +163,34 @@ const RealTimeScreen = () => {
         const trafficLevel = calculateTrafficLevel(duration, durationInTraffic);
         setTrafficLevel(trafficLevel);
   
+        // Update distance count and approximate carbon emission
+        totalDistance += distance / 1000; // convert meters to kilometers
+        totalEmissions += calculateCarbonEmission(distance, modeOfTransportation);
+  
         await AsyncStorage.setItem('cachedDirections', JSON.stringify(newDirections));
       }
     } catch (error) {
-      console.error('Error fetching directions:', error.message);
+    }
+  };
+
+
+  const handleGetDirections = async () => {
+    try {
+      setLoading(true);
+      await calculateAndUpdateDistanceAndEmission();
     } finally {
       setLoading(false);
     }
   };
+  
+  // Periodically update distance and emission
+  useEffect(() => {
+    const interval = setInterval(async () => {
+      await calculateAndUpdateDistanceAndEmission();
+    }, 1 * 60 * 1000); 
+
+    return () => clearInterval(interval);
+  }, []);
 
   // Calculate emission status based on distance
   const calculateEmissionStatus = (distance) => {
@@ -169,6 +214,14 @@ const RealTimeScreen = () => {
       return 'Heavy';
     }
   };
+
+
+  const calculateCarbonEmission = (distance) => {
+    const emissionFactor = 0.12; 
+    const carbonEmission = distance * emissionFactor;
+    return carbonEmission;
+  };
+
 
   useEffect(() => {
     if (selectedPlaces.length > 0) {
@@ -244,7 +297,7 @@ const RealTimeScreen = () => {
       </MapView>
 
       <View style={styles.infoContainer}>
-      <Text style={[styles.infoTitle, { textAlign: 'center', marginBottom: 5, fontSize: 10, textDecorationLine: 'underline' }]}>Approximate Data</Text>
+      <Text style={[styles.infoTitle, { textAlign: 'center', marginBottom: 5, fontSize: 10, textDecorationLine: 'underline' }]}>Navigation Data</Text>
         <View style={styles.infoItem}>
           <Text style={styles.infoTitle}>Emission Status:</Text>
           <Text style={styles.infoValue}>{emissionStatus}</Text>
@@ -264,16 +317,25 @@ const RealTimeScreen = () => {
       </View>
     </View>
 
-    <View style={styles.backBox} />
-
-    <View style={styles.cardContainer}>
-      <View style={styles.profileContainer}>
-        <Icon name="user" size={50} color="#000" />
-      </View>
-      <View style={styles.nameContainer}>
-        <Text style={styles.nameText}>User Name</Text>
-      </View>
+    <View style={styles.backBox}>
+      <Text style={styles.backBoxText}>Distance Count Today: {totalDistance} km</Text>
+      <Text style={styles.backBoxText}>Carbon Emission Today: {totalEmissions} gCO2</Text>
     </View>
+
+
+    <TouchableOpacity
+        onPress={() => {
+          props.navigation.navigate('Profile');
+        }}
+        style={styles.cardContainer}
+      >
+        <View style={styles.profileContainer}>
+          <Icon name="user" size={50} color="#000" />
+        </View>
+        <View style={styles.nameContainer}>
+          <Text style={styles.nameText}>User Name</Text>
+        </View>
+      </TouchableOpacity>
     </View>
   );
 };
@@ -332,6 +394,13 @@ const styles = StyleSheet.create({
     borderRadius: 8,
     overflow: 'hidden',
   },
+  backBoxText: {
+    fontSize: 12,
+    padding: 7,
+    color: 'black',
+    textAlign: 'center',
+    fontFamily: 'Montserrat-Light',
+  },
   header: {
     fontSize: 24,
     fontWeight: 'bold',
@@ -351,15 +420,16 @@ const styles = StyleSheet.create({
     flexDirection: 'column',
     marginBottom: 10, 
     textAlign: 'center',
-    fontWeight: 'bold',
+    fontFamily: 'Codec',
   },
   infoTitle: {
-    fontWeight: 'bold',
+    fontFamily: 'Codec',
     fontSize: 10,
   },
   infoValue: {
     textAlign: 'center',
     fontSize: 10,
+    fontFamily: 'Montserrat-Light',
   },
   mapContainer: {
     marginTop: 50,
@@ -376,31 +446,35 @@ const styles = StyleSheet.create({
   },
   cardContainer: {
     position: 'absolute',
-    bottom: 85, 
     flexDirection: 'row',
     width: '90%',
     height: 70,
     alignSelf: 'center',
-    marginTop: 20,
+    top: 550, // Adjust this value as needed
     backgroundColor: '#fff',
     borderRadius: 10,
     padding: 10,
-    justifyContent: 'space-between',
+    justifyContent: 'flex-start',
+    alignItems: 'center',
   },
   profileContainer: {
-    flex: 1,
     justifyContent: 'center',
     alignItems: 'center',
+    marginLeft: 50,
   },
   nameContainer: {
     flex: 3,
     justifyContent: 'center',
+    marginLeft: 10, // Add this line if you want some space between the icon and the text
   },
   nameText: {
+    position: 'absolute',
     fontSize: 20,
-    fontWeight: 'bold',
+    fontFamily: 'Montserrat-Light',
+    color: 'black',
     padding: 10,
-    marginLeft: 50,
+    marginLeft: 30,
+    marginBottom: 0,
   },
   backBox: {
     position: 'absolute',
@@ -408,10 +482,10 @@ const styles = StyleSheet.create({
     width: '70%',
     height: 80,
     alignSelf: 'center',
-    backgroundColor: '#fff',
+    backgroundColor: 'rgba(255, 255, 255, 0.5)',
     borderRadius: 10,
-    opacity: 0.5,
+    opacity: 1,
   },
 });
 
-export default RealTimeScreen;
+export default KarbonMap;

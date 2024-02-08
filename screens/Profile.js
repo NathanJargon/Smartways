@@ -77,17 +77,6 @@ function Profile({ imageUrl = '', coverImageUrl = '' }) {
         </TouchableOpacity>
       </View>
     </ListItem>
-
-
-
-    <View style={styles.buttonsContainer}>
-          <TouchableOpacity onPress={() => {}} style={styles.inContainer}>
-            <Text style={styles.pointsText}>Sign Up</Text>
-          </TouchableOpacity>
-          <TouchableOpacity onPress={() => {}} style={styles.inContainer}>
-            <Text style={styles.pointsText}>Sign In</Text>
-          </TouchableOpacity>
-        </View>
       </View>
     </View>
   </ImageBackground>

@@ -2,6 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { View, Text, StyleSheet, TextInput, TouchableOpacity, Animated, Switch, ImageBackground, KeyboardAvoidingView, Platform, Keyboard } from 'react-native';
 import { useNavigation } from '@react-navigation/native';
 import { useFonts } from 'expo-font';
+import JapanFishPalette from './JapanFishPalette.js';
 
 function CarbonFootprintScreen() {
   let [fontsLoaded, error] = useFonts({
@@ -33,7 +34,7 @@ function CarbonFootprintScreen() {
     const milesPerGallon = miles / gallons;
 
     const totalCarbonFootprint = ((8.89 * Math.pow(10, -3)) / gallons) * (1 / milesPerGallon) * (1 / 0.993);
-
+    //console.log(totalCarbonFootprint);
     return totalCarbonFootprint.toFixed(3);
   };
 
@@ -108,12 +109,7 @@ function CarbonFootprintScreen() {
         <Text style={styles.text22}>total of</Text>
         <Text style={styles.text3}>{carbonFootprint}</Text>
         <Text style={styles.text4}>
-          metric tons
-        </Text>
-        <Text style={styles.text4}>
-          CO
-          <Text style={styles.text5}>2</Text>
-          E/mile
+          GHGs
         </Text>
       </Animated.View>
 
@@ -150,7 +146,7 @@ function CarbonFootprintScreen() {
       <Text style={{ fontSize: 20 }}>
         Your total carbon footprint is:
       </Text>
-      <Text style={{ fontSize: 20}}>{carbonFootprint}</Text>
+      <Text style={{ fontSize: 20, }}>{carbonFootprint}</Text>
       <Text style={{ fontSize: 20 }}>
         metric tons CO
         <Text style={{ fontSize: 10, bottom: -2 }}>2</Text>
@@ -179,24 +175,28 @@ const styles = StyleSheet.create({
   },
   text21: {
     paddingTop: 10,
-    fontSize: 20,
+    fontSize: 25,
     color: 'white',
     textAlign: 'center',
+    fontFamily: 'Codec',
   },
   text22: {
-    fontSize: 20,
+    fontSize: 25,
     color: 'white',
     textAlign: 'center',
+    fontFamily: 'Codec',
   },
   text3: {
-    fontSize: 60,
+    fontSize: 50,
     color: 'white',
     textAlign: 'center',
+    fontFamily: 'Codec',
   },
   text4: {
-    fontSize: 20,
+    fontSize: 25,
     color: 'white',
     textAlign: 'center',
+    fontFamily: 'Codec',
   },
   text5: {
     fontSize: 10,
@@ -211,7 +211,7 @@ const styles = StyleSheet.create({
   inputBox: {
     width: '53%',
     height: 200,
-    backgroundColor: '#f0f0f0',
+    backgroundColor: JapanFishPalette.text6,
     borderRadius: 10,
     padding: 12,
     borderWidth: 1,
@@ -235,9 +235,9 @@ const styles = StyleSheet.create({
   },
   label: {
     marginBottom: 5,
-    fontWeight: 'bold',
     textAlign: 'center',
-    fontSize: 15,
+    fontSize: 20,
+    fontFamily: 'Codec',
   },
   input: {
     width: '100%',
@@ -268,6 +268,10 @@ const styles = StyleSheet.create({
     shadowRadius: 10,
     elevation: 5,
   },
+  buttonText: {
+    fontSize: 13,
+    fontFamily: 'Montserrat-Light',
+  }
 });
 
 export default CarbonFootprintScreen;

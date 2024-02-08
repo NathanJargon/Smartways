@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import { View, Text, StyleSheet, TouchableOpacity, Image, ScrollView, Dimensions, Animated } from 'react-native';
 import { ImageBackground } from 'react-native';
-import DetailedColorPalette from './JapanFishPalette';
+import JapanFishPalette from './JapanFishPalette';
 
 
 function HomeScreen({ navigation }) {
@@ -31,7 +31,8 @@ function HomeScreen({ navigation }) {
             <Text style={styles.text33}>carbon footprint</Text>
           </View>
           <View style={styles.box4}>
-            <Text style={styles.text4}>App settings</Text>
+            <Text style={styles.text41}>Edit your</Text>
+            <Text style={styles.text42}>personal profile</Text>
           </View>
         </View>
       </ScrollView>
@@ -44,7 +45,6 @@ const styles = StyleSheet.create({
     flex: 1,
     alignItems: 'center',
     justifyContent: 'center',
-    backgroundColor: DetailedColorPalette.background,
   },
   scrollContainer: {
     flexGrow: 1,
@@ -56,90 +56,107 @@ const styles = StyleSheet.create({
   box1: {
     width: 140,
     height: 170,
-    backgroundColor: DetailedColorPalette.primary,
+    backgroundColor: JapanFishPalette.text4,
     margin: 15,
-    borderRadius: 10,
+    borderRadius: 12,
   },
   text11: {
     position: 'absolute',
     bottom: 35,
     left: 15,
-    color: DetailedColorPalette.text,
+    color: JapanFishPalette.text10,
+    fontFamily: 'Montserrat-Light',
   },
   text12: {
     position: 'absolute',
     bottom: 15,
     left: 15,
-    color: DetailedColorPalette.text,
+    color: JapanFishPalette.text10,
+    fontFamily: 'Montserrat-Light',
   },
   box2: {
     width: 140,
     height: 170,
-    backgroundColor: DetailedColorPalette.secondary,
+    backgroundColor: JapanFishPalette.text3,
     margin: 15,
-    borderRadius: 10,
+    borderRadius: 12,
   },
   text21: {
     position: 'absolute',
     top: 10,
     right: 10,
-    color: DetailedColorPalette.text,
+    color: JapanFishPalette.text10,
+    fontFamily: 'Montserrat-Light',
   },
   text22: {
     position: 'absolute',
     top: 30,
     right: 10,
-    color: DetailedColorPalette.text,
+    color: JapanFishPalette.text10,
+    fontFamily: 'Montserrat-Light',
   },
   text23: {
     position: 'absolute',
     top: 50,
     right: 10,
-    color: DetailedColorPalette.text,
+    color: JapanFishPalette.text10,
+    fontFamily: 'Montserrat-Light',
   },
   text24: {
     position: 'absolute',
     top: 70,
     right: 10,
-    color: DetailedColorPalette.text,
+    color: JapanFishPalette.text10,
+    fontFamily: 'Montserrat-Light',
   },
   box3: {
     width: 140,
     height: 170,
-    backgroundColor: DetailedColorPalette.secondary,
+    backgroundColor: JapanFishPalette.text3,
     margin: 15,
-    borderRadius: 10,
+    borderRadius: 12,
   },
   text31: {
     position: 'absolute',
     top: 10,
-    left: 15,
-    color: DetailedColorPalette.text,
+    left: 12,
+    color: JapanFishPalette.text10,
+    fontFamily: 'Montserrat-Light',
   },
   text32: {
     position: 'absolute',
     top: 30,
     left: 15,
-    color: DetailedColorPalette.text,
+    color: JapanFishPalette.text10,
+    fontFamily: 'Montserrat-Light',
   },
   text33: {
     position: 'absolute',
     top: 50,
     left: 15,
-    color: DetailedColorPalette.text,
+    color: JapanFishPalette.text3,
+    fontFamily: 'Montserrat-Light',
   },
   box4: {
     width: 140,
     height: 170,
-    backgroundColor: DetailedColorPalette.button,
+    backgroundColor: JapanFishPalette.text4,
     margin: 15,
-    borderRadius: 10,
+    borderRadius: 12,
   },
-  text4: {
+  text41: {
+    position: 'absolute',
+    bottom: 30,
+    left: 10,
+    color: JapanFishPalette.text10,
+    fontFamily: 'Montserrat-Light',
+  },
+  text42: {
     position: 'absolute',
     bottom: 10,
     left: 10,
-    color: DetailedColorPalette.text,
+    color: JapanFishPalette.text10,
+    fontFamily: 'Montserrat-Light',
   },
 });
 
