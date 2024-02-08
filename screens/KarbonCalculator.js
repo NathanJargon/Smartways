@@ -172,7 +172,7 @@ const styles = StyleSheet.create({
   },
   text1: {
     fontSize: 45,
-    color: 'red',
+    color: 'white',
     textAlign: 'center',
     fontFamily: 'Roc',
     paddingTop: 30,
@@ -180,28 +180,28 @@ const styles = StyleSheet.create({
   text21: {
     paddingTop: 10,
     fontSize: 20,
-    color: 'blue',
+    color: 'white',
     textAlign: 'center',
   },
   text22: {
     fontSize: 20,
-    color: 'blue',
+    color: 'white',
     textAlign: 'center',
   },
   text3: {
     fontSize: 60,
-    color: 'green',
+    color: 'white',
     textAlign: 'center',
   },
   text4: {
     fontSize: 20,
-    color: 'purple',
+    color: 'white',
     textAlign: 'center',
   },
   text5: {
     fontSize: 10,
     bottom: -2,
-    color: 'orange',
+    color: 'white',
     textAlign: 'center',
   },  
   rightMargin: {

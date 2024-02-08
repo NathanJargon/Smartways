@@ -1,4 +1,8 @@
-import React from 'react';
+import React, { useState, useEffect } from 'react';
+
+import { firebaseApp, auth } from './screens/FirebaseConfig';
+import { getAuth, signInWithEmailAndPassword } from 'firebase/auth'; 
+
 import { View, TouchableOpacity, Text, Image } from 'react-native';
 import { NavigationContainer, useNavigation } from '@react-navigation/native';
 import { createBottomTabNavigator } from '@react-navigation/bottom-tabs';
@@ -9,6 +13,7 @@ import JapanFishPalette from './screens/JapanFishPalette.js';
 import KarbonStatistics from './screens/KarbonStatisticsScreen.js';
 import KarbonCalculator from './screens/KarbonCalculator.js';
 import EducationScreen from './screens/EducationScreen';
+import KarbonLeaderboard from './screens/KarbonLeaderboard.js';
 import KarbonMap from './screens/KarbonMapScreen.js';
 import HomeScreen from './screens/HomeScreen.js';
 
@@ -39,20 +44,11 @@ function HomeStack() {
   );
 }
 
-function EducationStack() {
+function KarbonStatisticsStack() {
   return (
-    <Stack.Navigator initialRouteName="EducationHome">
-      <Stack.Screen name="EducationHome" component={EducationScreen} options={{ title: 'Education', headerShown: false }} />
-      <Stack.Screen name="Step1" component={Step1} options={{ title: 'First' }} />
-      <Stack.Screen name="Step2" component={Step2} options={{ title: 'Second' }} />
-    </Stack.Navigator>
-  );
-}
-
-function CarbonFootprintStack() {
-  return (
-    <Stack.Navigator initialRouteName="CarbonFootprint">
-      <Stack.Screen name="CarbonFootprint" component={CarbonFootprintScreen} options={{ headerShown: false }} />
+    <Stack.Navigator initialRouteName="KarbonStatistics">
+      <Stack.Screen name="KarbonStatistics" component={KarbonStatistics} options={{ headerShown: false }} />
+      <Stack.Screen name="Karbon Leaderboard" component={KarbonLeaderboard} options={{ headerShown: false }}/>
     </Stack.Navigator>
   );
 }
@@ -137,6 +133,7 @@ function CustomTabBar({ state, descriptors, navigation }) {
 
 
 export default function App() {
+  const [userName, setUserName] = useState(null);
   let [fontsLoaded] = useFonts({
     'Codec': require('./assets/fonts/Codec.ttf'),
     'Horizon': require('./assets/fonts/Horizon.ttf'),
@@ -144,10 +141,27 @@ export default function App() {
     'Roc': require('./assets/fonts/Roc.otf')
   });
 
+  useEffect(() => {
+    const fetchUserName = async () => {
+      try {
+        const user = auth.currentUser;
+
+        if (user) {
+          setUserName(user.displayName || null);
+        }
+      } catch (error) {
+        console.error('Error fetching user data:', error);
+      }
+    };
+
+    fetchUserName(); 
+  }, []);  
+
+  const Tab = createBottomTabNavigator();
+
   if (!fontsLoaded) {
     return <View><Text>Loading...</Text></View>;
   }
-    const Tab = createBottomTabNavigator();
   
     return (
       <NavigationContainer>
@@ -161,17 +175,19 @@ export default function App() {
             headerTitle: '',
             headerStyle: { height: 250 }, 
             headerRight: () => (
-              <TouchableOpacity onPress={() => {Profile}} style={{ position: 'absolute', right: 15, top: 15 }}>
+              <TouchableOpacity onPress={() => {Profile}} style={{ position: 'absolute', right: 15, top: 20 }}>
                 <Icon name="user" size={40} style={{ marginRight: 10, }} />
               </TouchableOpacity>
             ),
             headerLeft: () => (
               <View style={{ marginLeft: 10 }}>
-                <Text style={{ fontFamily: 'Codec', fontSize: 30, bottom: 15, fontWeight: 'bold' }}>Welcome, name!</Text>
-                <Text style={{ fontFamily: 'Roc', left: 60, fontSize: 40, textAlign: 'center', top: 0, fontWeight: 'bold' }}>Welcome to</Text>
-                <Text style={{ fontFamily: 'Roc', left: 60, fontSize: 40, textAlign: 'center', top: 0 }}>KARBON</Text>
-                <Text style={{ fontFamily: 'Montserrat-Light', left: 60, fontSize: 10, textAlign: 'center', top: 10, fontWeight: 'bold' }}>Your journey to a sustainable</Text>
-                <Text style={{ fontFamily: 'Montserrat-Light', left: 60, fontSize: 10, textAlign: 'center', top: 10, fontWeight: 'bold' }}>tomorrow starts here.</Text>
+                <Text style={{ position: 'absolute', fontFamily: 'Codec', fontSize: 20, top: -30, fontWeight: 'bold' }}>
+                  {userName ? `Welcome, ${userName}!` : 'Welcome, namePlaceholder!'}
+                </Text>
+                <Text style={{ fontFamily: 'Roc', left: 60, fontSize: 40, textAlign: 'center', top: 12, fontWeight: 'bold' }}>Welcome to</Text>
+                <Text style={{ fontFamily: 'Roc', left: 60, fontSize: 40, textAlign: 'center', top: 12 }}>KARBON</Text>
+                <Text style={{ fontFamily: 'Montserrat-Light', left: 60, fontSize: 15, textAlign: 'center', top: 20, fontWeight: 'bold' }}>Your journey to a sustainable</Text>
+                <Text style={{ fontFamily: 'Montserrat-Light', left: 60, fontSize: 15, textAlign: 'center', top: 20, fontWeight: 'bold' }}>tomorrow starts here.</Text>
               </View>
             ),
           }}
@@ -191,10 +207,9 @@ export default function App() {
 
       <Tab.Screen 
         name="Karbon Statistics" 
-        component={KarbonStatistics} 
+        component={KarbonStatisticsStack} 
         options={{ headerShown: false }}
       />
-
         </Tab.Navigator>
       </NavigationContainer>
     );
