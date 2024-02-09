@@ -13,6 +13,12 @@ import {
   passwordValidator,
   nameValidator,
 } from '../core/utils';
+import { auth } from '../screens/FirebaseConfig';
+import { getAuth, createUserWithEmailAndPassword } from 'firebase/auth'; 
+import { doc, setDoc } from 'firebase/firestore';
+import { db } from '../screens/FirebaseConfig';
+import { Alert } from 'react-native';
+import moment from 'moment';
 
 type Props = {
   navigation: Navigation;
@@ -28,14 +34,44 @@ const RegisterScreen = ({ navigation }: Props) => {
     const emailError = emailValidator(email.value);
     const passwordError = passwordValidator(password.value);
 
+    if (name.value.length < 5 || name.value.length > 8) {
+      Alert.alert('Invalid Username', 'Username must be 5-8 characters long.');
+      setName({ ...name, error: 'Username must be 5-8 characters long.' });
+      return;
+    }
+  
     if (emailError || passwordError || nameError) {
       setName({ ...name, error: nameError });
       setEmail({ ...email, error: emailError });
       setPassword({ ...password, error: passwordError });
       return;
     }
-
-    navigation.navigate('Main');
+  
+    createUserWithEmailAndPassword(auth, email.value, password.value)
+      .then((userCredential) => {
+        // Registration successful, save additional user information in Firestore
+        const user = userCredential.user;
+        setDoc(doc(db, 'users', user.uid), {
+          id: user.uid,
+          name: name.value,
+          email: email.value,
+          password: password.value,
+          bio: '',
+          phone: '',
+          profile: '',
+          emissionlogs: [{}],
+          lastPressedDate: moment().format('YYYY-MM-DD'),
+        });
+  
+        // Navigate to the main screen
+        navigation.navigate('Main');
+      })
+      .catch((error) => {
+        // Registration failed, update state to show error message
+        setName({ ...name, error: error.message });
+        setEmail({ ...email, error: error.message });
+        setPassword({ ...password, error: error.message });
+      });
   };
 
   return (
@@ -53,6 +89,7 @@ const RegisterScreen = ({ navigation }: Props) => {
         onChangeText={text => setName({ value: text, error: '' })}
         error={!!name.error}
         errorText={name.error}
+        placeholder="5-8 characters"
       />
 
       <TextInput
@@ -95,6 +132,7 @@ const RegisterScreen = ({ navigation }: Props) => {
 const styles = StyleSheet.create({
   label: {
     color: theme.colors.secondary,
+    fontFamily: 'Montserrat-Light'
   },
   button: {
     marginTop: 24,
@@ -104,8 +142,8 @@ const styles = StyleSheet.create({
     marginTop: 4,
   },
   link: {
-    fontWeight: 'bold',
     color: theme.colors.primary,
+    fontFamily: 'Montserrat-Light'
   },
 });
 

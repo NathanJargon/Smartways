@@ -9,6 +9,8 @@ import BackButton from '../components/BackButton';
 import { theme } from '../core/theme';
 import { emailValidator, passwordValidator } from '../core/utils';
 import { Navigation } from '../types';
+import { auth } from '../screens/FirebaseConfig';
+import { getAuth, signInWithEmailAndPassword } from 'firebase/auth'; 
 
 type Props = {
   navigation: Navigation;
@@ -21,15 +23,23 @@ const LoginScreen = ({ navigation }: Props) => {
   const _onLoginPressed = () => {
     const emailError = emailValidator(email.value);
     const passwordError = passwordValidator(password.value);
-
+  
     if (emailError || passwordError) {
       setEmail({ ...email, error: emailError });
       setPassword({ ...password, error: passwordError });
       return;
     }
-
-    navigation.navigate('Main');
+  
+    signInWithEmailAndPassword(auth, email.value, password.value)
+      .then((userCredential) => {
+        navigation.navigate('Main');
+      })
+      .catch((error) => {
+        setEmail({ ...email, error: error.message });
+        setPassword({ ...password, error: error.message });
+      });
   };
+
 
   return (
     <Background>
@@ -96,9 +106,10 @@ const styles = StyleSheet.create({
   },
   label: {
     color: theme.colors.secondary,
+    fontFamily: 'Montserrat-Light'
   },
   link: {
-    fontWeight: 'bold',
+    fontFamily: 'Montserrat-Light',
     color: theme.colors.primary,
   },
 });

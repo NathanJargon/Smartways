@@ -1,16 +1,12 @@
 import React, { useState, useEffect } from 'react';
 
-import { firebaseApp, auth } from './screens/FirebaseConfig';
-import { getAuth, signInWithEmailAndPassword } from 'firebase/auth'; 
-
-import { View, TouchableOpacity, Text, Image } from 'react-native';
+import { View, TouchableOpacity, Text, Image, ImageBackground } from 'react-native';
 import { NavigationContainer, useNavigation } from '@react-navigation/native';
 import { createBottomTabNavigator } from '@react-navigation/bottom-tabs';
 import { createStackNavigator } from '@react-navigation/stack';
 import { FontAwesome as Icon } from '@expo/vector-icons';
 import { useFonts } from 'expo-font';
 import { AppLoading } from 'expo';
-import JapanFishPalette from './screens/JapanFishPalette.js';
 import KarbonStatistics from './screens/KarbonStatisticsScreen.js';
 import KarbonCalculator from './screens/KarbonCalculator.js';
 import EducationScreen from './screens/EducationScreen';
@@ -44,7 +40,7 @@ const RootStack = createStackNavigator();
 
 function RootStackScreen() {
   return (
-    <RootStack.Navigator initialRouteName="HomeScreen">
+    <RootStack.Navigator initialRouteName="Main">
       <RootStack.Screen name="HomeScreen" component={LoginHomeScreen} options={{ headerShown: false }} />
       <RootStack.Screen name="LoginScreen" component={LoginScreen} options={{ headerShown: false }} />
       <RootStack.Screen name="RegisterScreen" component={RegisterScreen} options={{ headerShown: false }} />
@@ -60,8 +56,20 @@ function HomeStack() {
     <Stack.Navigator initialRouteName="HomeStack">
       <Stack.Screen name="HomeStack" component={HomeScreen} options={{ headerShown: false }} />
       <Stack.Screen name="Profile" component={Profile} options={{ headerShown: false }} />
-      <Stack.Screen name="CarbonFootprintScreen" component={KarbonCalculator} />
+      <Stack.Screen name="Calculator" component={KarbonCalculator} options={{ headerShown: false }} />
       <Stack.Screen name="Details" component={KarbonStatistics} options={{ headerShown: false }} />
+    </Stack.Navigator>
+  );
+}
+
+function HomeScreenStack() {
+  return (
+    <Stack.Navigator initialRouteName="Home">
+      <Stack.Screen name="Dashboard" component={HomeScreen} options={{ headerShown: false }} />
+      <Stack.Screen name="Profile" component={Profile} options={{ headerShown: false }} />
+      <Stack.Screen name="Calculator" component={KarbonCalculator} options={{ headerShown: false }} />
+      <Stack.Screen name="Statistics" component={KarbonStatistics} options={{ headerShown: false }} />
+      <Stack.Screen name="Map" component={KarbonMap} options={{ headerShown: false }} />
     </Stack.Navigator>
   );
 }
@@ -88,17 +96,16 @@ function KarbonStatisticsStack() {
 
 function CustomTabBar({ state, descriptors, navigation }) {
   return (
-    <View style={{ 
-      flexDirection: 'row', 
-      justifyContent: 'space-around', 
-      paddingBottom: 10, 
-      backgroundColor: 'white',
-      borderTopLeftRadius: 15,
-      borderTopRightRadius: 15,
-      backgroundColor: JapanFishPalette.text6,
-      position: "absolute",
-      bottom: 0,
-    }}>
+    <ImageBackground 
+      source={require('./assets/nav1.png')} 
+      style={{
+        borderTopLeftRadius: 5,
+        borderTopRightRadius: 5,
+        bottom: 0,
+        overflow: 'hidden'
+      }} 
+    >
+      <View style={{ flexDirection: 'row', marginTop: 'auto', bottom: 5 }}>
       {state.routes.map((route, index) => {
         const { options } = descriptors[route.key];
         const label =
@@ -117,10 +124,13 @@ function CustomTabBar({ state, descriptors, navigation }) {
             canPreventDefault: true,
           });
 
-          if (!isFocused && !event.defaultPrevented) {
-            navigation.navigate(route.name);
-          }
-        };
+        if (!isFocused && !event.defaultPrevented) {
+          navigation.reset({
+            index: 0,
+            routes: [{ name: route.name }],
+          });
+        }
+      };
 
         const onLongPress = () => {
           navigation.emit({
@@ -162,28 +172,11 @@ function CustomTabBar({ state, descriptors, navigation }) {
         );
       })}
     </View>
+    </ImageBackground>
   );
 }
 
 function MainTabNavigator() {
-  const [userName, setUserName] = useState(null);
-
-  useEffect(() => {
-    const fetchUserName = async () => {
-      try {
-        const user = auth.currentUser;
-
-        if (user) {
-          setUserName(user.displayName || null);
-        }
-      } catch (error) {
-        console.error('Error fetching user data:', error);
-      }
-    };
-
-    fetchUserName(); 
-  }, []);  
-
   const Tab = createBottomTabNavigator();
 
   return (
@@ -191,29 +184,11 @@ function MainTabNavigator() {
 
     <Tab.Screen 
       name="Home" 
-      component={HomeStack} 
+      component={HomeScreenStack} 
       options={{
-        headerShown: true,
+        headerShown: false,
         headerTitle: '',
-        headerStyle: { height: 250, backgroundColor: JapanFishPalette.text6 }, 
-        headerRight: () => (
-          <TouchableOpacity onPress={() => {Profile}} style={{ position: 'absolute', right: 15, top: 20 }}>
-            <Icon name="user" size={40} style={{ marginRight: 10, }} />
-          </TouchableOpacity>
-        ),
-        headerLeft: () => (
-          <View style={{ marginLeft: 10 }}>
-            <Text style={{ position: 'absolute', fontFamily: 'Codec', fontSize: 18, top: -20, }}>
-              {userName ? `Welcome, ${userName}!` : 'Welcome, nameaaaaa!'}
-            </Text>
-            <Text style={{ fontFamily: 'Roc', left: 50, fontSize: 40, textAlign: 'center', top: 20, }}>Welcome to</Text>
-            <Text style={{ fontFamily: 'Roc', left: 50, fontSize: 40, textAlign: 'center', top: 20 }}>KARBON</Text>
-            <Text style={{ fontFamily: 'Montserrat-Light', left: 55, fontSize: 15, textAlign: 'center', top: 25, }}>Your journey to a sustainable</Text>
-            <Text style={{ fontFamily: 'Montserrat-Light', left: 55, fontSize: 15, textAlign: 'center', top: 25, }}>tomorrow starts here.</Text>
-          </View>
-        ),
-      }}
-    />
+      }}/>
 
   <Tab.Screen 
     name="Karbon Calculator" 

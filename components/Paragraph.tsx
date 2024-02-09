@@ -17,6 +17,7 @@ const styles = StyleSheet.create({
     color: theme.colors.secondary,
     textAlign: 'center',
     marginBottom: 14,
+    fontFamily: 'Montserrat-Light'
   },
 });
 

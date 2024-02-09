@@ -1,8 +1,14 @@
 import React, { useState, useEffect } from 'react';
-import { View, Text, StyleSheet, TextInput, TouchableOpacity, Animated, Switch, ImageBackground, KeyboardAvoidingView, Platform, Keyboard } from 'react-native';
+import { View, Text, StyleSheet, TextInput, TouchableOpacity, Animated, Switch, ImageBackground, KeyboardAvoidingView, Platform, Keyboard, Image } from 'react-native';
 import { useNavigation } from '@react-navigation/native';
 import { useFonts } from 'expo-font';
 import JapanFishPalette from './JapanFishPalette.js';
+import Background from '../components/Background';
+import AsyncStorage from '@react-native-async-storage/async-storage';
+import { auth, db, collection } from '../screens/FirebaseConfig';
+import { doc, getDoc, updateDoc, arrayUnion, FieldValue, collectionGroup, getDocs } from 'firebase/firestore';
+import { getAuth, signInWithEmailAndPassword } from 'firebase/auth'; 
+import moment from 'moment';
 
 function CarbonFootprintScreen() {
   let [fontsLoaded, error] = useFonts({
@@ -12,13 +18,6 @@ function CarbonFootprintScreen() {
     'Roc': require('../assets/fonts/Roc.otf')
   });
   
-  if (!fontsLoaded) {
-    console.log("Fonts are not loaded");
-  }
-  
-  if (error) {
-    console.error("Error loading fonts: ", error);
-  }
   
   const [litersValue, setLitersValue] = useState('');
   const [kilometersValue, setKilometersValue] = useState('');
@@ -26,6 +25,9 @@ function CarbonFootprintScreen() {
   const allInputsFilled = litersValue !== '' && kilometersValue !== '';
   const [glowAnim] = useState(new Animated.Value(0));
   const [carbonFootprint, setCarbonFootprint] = useState(0);
+  const [lastPressedDate, setLastPressedDate] = useState(null);
+
+
 
   const calculateCarbonFootprint = () => {
     const gallons = parseFloat(litersValue) * 0.264172;
@@ -38,12 +40,43 @@ function CarbonFootprintScreen() {
     return totalCarbonFootprint.toFixed(3);
   };
 
+  useEffect(() => {
+    const fetchLastPressedDate = async () => {
+      const date = await AsyncStorage.getItem('lastPressedDate');
+      setLastPressedDate(date);
+    };
+  
+    fetchLastPressedDate();
+  }, []);
 
-  const handleCalculate = () => {
+  const handleCalculate = async () => {
     Keyboard.dismiss();
     const totalCarbonFootprint = calculateCarbonFootprint();
     setCarbonFootprint(totalCarbonFootprint);
     startGlowAnimation();
+  
+    // Get the current date
+    const currentDate = moment().format('YYYY-MM-DD');
+  
+    // Check if the calculate button was already pressed today
+    if (!lastPressedDate || !moment(lastPressedDate).isSame(currentDate, 'day')) {
+      // If it wasn't pressed today, then push the data to the emission log
+      // and update the last pressed date
+  
+      const uid = auth.currentUser.uid;
+  
+      // Push data to the user's emission log and update the last pressed date
+      const emissionLog = { day: currentDate, value: totalCarbonFootprint };
+      const userDoc = doc(db, 'users', uid);
+      await updateDoc(userDoc, {
+        emissionlogs: arrayUnion(emissionLog),
+        lastPressedDate: currentDate
+      });
+  
+      // Save the current date as the last pressed date in AsyncStorage
+      await AsyncStorage.setItem('lastPressedDate', currentDate);
+      setLastPressedDate(currentDate);
+    }
   };
 
   const startAnimation = () => {
@@ -97,8 +130,14 @@ function CarbonFootprintScreen() {
     };
   }, []);
 
+  
   return (
-    <ImageBackground source={require('../assets/assessbg.png')} style={styles.backgroundImage}>
+    <Background style={styles.backgroundImage}>
+
+
+      <Image source={require('../assets/assessbg.png')} style={styles.topImage} />
+
+
       <KeyboardAvoidingView
         behavior={Platform.OS === "ios" ? "padding" : "height"}
         style={{ flex: 1 }}
@@ -114,33 +153,43 @@ function CarbonFootprintScreen() {
       </Animated.View>
 
       <View style={styles.container}>
-            <View style={styles.row}>
-        <View style={[styles.inputBox, styles.rightMargin]}>
-          <Text style={styles.label}>Gallon</Text>
-          <TextInput
-            style={styles.input}
-            value={litersValue}
-            onChangeText={setLitersValue}
-            placeholder="Liters"
-            keyboardType="numeric"
-          />
+        <View style={styles.row}>
+        <View style={[styles.rightMargin]}>
+          <ImageBackground source={require('../assets/nav7.png')} style={styles.imageBackground}>
+            <Text style={styles.label1}>Gallon</Text>
+            <TextInput
+              style={styles.input}
+              value={litersValue}
+              onChangeText={setLitersValue}
+              placeholder="Liters"
+              keyboardType="numeric"
+            />
+          </ImageBackground>
         </View>
-        <View style={styles.inputBox}>
-          <Text style={styles.label}>Miles</Text>
-          <TextInput
-            style={styles.input}
-            value={kilometersValue}
-            onChangeText={setKilometersValue}
-            placeholder="Kilometers"
-            keyboardType="numeric"
-          />
+
+        <View>
+          <ImageBackground source={require('../assets/nav5.png')} style={styles.imageBackground2}>
+            <Text style={styles.label2}>Miles</Text>
+            <TextInput
+              style={styles.input2}
+              value={kilometersValue}
+              onChangeText={setKilometersValue}
+              placeholder="Kilometers"
+              keyboardType="numeric"
+            />
+          </ImageBackground>
         </View>
       </View>
-    <Animated.View style={[styles.button, allInputsFilled && buttonGlow]}>
-      <TouchableOpacity onPress={handleCalculate} disabled={!allInputsFilled}>
-        <Text style={styles.buttonText}>Calculate Carbon Emission</Text>
+      <Animated.View style={[styles.button, allInputsFilled && buttonGlow]}>
+      <TouchableOpacity
+        onPress={handleCalculate}
+        disabled={!allInputsFilled}
+      >
+        <Text style={styles.buttonText}>Calculate and Record</Text>
       </TouchableOpacity>
-    </Animated.View>
+      </Animated.View>
+
+      <Text style={styles.lowerText}>Can only record once a day!</Text>
 
       <Animated.View style={{ opacity: animation }}>
       <Text style={{ fontSize: 20 }}>
@@ -155,7 +204,7 @@ function CarbonFootprintScreen() {
       </Animated.View>
     </View>
     </KeyboardAvoidingView>
-    </ImageBackground>
+    </Background>
   );
 }
 
@@ -164,14 +213,86 @@ const styles = StyleSheet.create({
     flex: 1,
     justifyContent: 'flex-end',
     alignItems: 'center',
-    padding: 10,
+    padding: 5,
+    top: 70,
+  },
+  lowerText: {
+    fontSize: 15,
+    color: 'black',
+    textAlign: 'center',
+    fontFamily: 'Montserrat-Light',
+    paddingTop: 10,
+  },
+  input: {
+    width: '100%',
+    height: 40,
+    borderColor: 'black',
+    borderWidth: 1,
+    paddingHorizontal: 10,
+    borderRadius: 10,
+    marginBottom: 10,
+  },
+  input2: {
+    width: '90%',
+    height: 40,
+    borderColor: 'black',
+    borderWidth: 1,
+    paddingHorizontal: 10,
+    borderRadius: 10,
+    marginBottom: 10,
+  },
+  label1: {
+    marginBottom: 5,
+    textAlign: 'center',
+    fontSize: 20,
+    fontFamily: 'Codec',
+  },
+  label2: {
+    marginBottom: 5,
+    textAlign: 'center',
+    fontSize: 20,
+    fontFamily: 'Codec',
+  },
+  row: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    width: '100%',
+    paddingHorizontal: '10%',
+  },
+  imageBackground: {
+    width: 150,
+    height: 200,
+    borderRadius: 10,
+    padding: 12,
+    borderWidth: 1,
+    borderColor: '#ddd',
+    justifyContent: 'center',
+    alignItems: 'center',
+    borderRadius: 20,
+    overflow: 'hidden',
+  },
+  imageBackground2: {
+    width: 150,
+    height: 200,
+    borderRadius: 10,
+    padding: 12,
+    borderWidth: 1,
+    borderColor: '#ddd',
+    justifyContent: 'center',
+    alignItems: 'center',
+    borderRadius: 20,
+    overflow: 'hidden',
+  },
+  topImage: {
+    position: 'absolute',
+    bottom: -750,
   },
   text1: {
     fontSize: 45,
     color: 'white',
     textAlign: 'center',
     fontFamily: 'Roc',
-    paddingTop: 30,
+    paddingTop: 10,
   },
   text21: {
     paddingTop: 10,
@@ -224,36 +345,15 @@ const styles = StyleSheet.create({
     width: '100%',
     height: '100%',
   },
-  row: {
-    flexDirection: 'row',
-    justifyContent: 'space-between',
-    width: '100%',
-    paddingHorizontal: '10%',
-  },
   inputContainer: {
     width: '40%',
-  },
-  label: {
-    marginBottom: 5,
-    textAlign: 'center',
-    fontSize: 20,
-    fontFamily: 'Codec',
-  },
-  input: {
-    width: '100%',
-    height: 40,
-    borderColor: '#4caf50',
-    borderWidth: 1,
-    paddingHorizontal: 10,
-    borderRadius: 10,
-    marginBottom: 10,
   },
   button: {
     width: '60%',
     height: 50,
     justifyContent: 'center',
     alignItems: 'center',
-    backgroundColor: '#74D178',
+    backgroundColor: '#7ED957',
     marginTop: 20,
     borderRadius: 20,
   },
@@ -269,8 +369,9 @@ const styles = StyleSheet.create({
     elevation: 5,
   },
   buttonText: {
-    fontSize: 13,
-    fontFamily: 'Montserrat-Light',
+    fontSize: 12,
+    top: 2,
+    fontFamily: 'Codec',
   }
 });
 

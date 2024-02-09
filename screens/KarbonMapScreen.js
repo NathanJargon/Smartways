@@ -1,10 +1,14 @@
 import React, { useState, useEffect, useRef } from 'react';
-import { View, Text, StyleSheet, Button, Alert, TouchableOpacity } from 'react-native';
+import { View, Text, StyleSheet, Button, Alert, TouchableOpacity, ImageBackground, Image } from 'react-native';
 import MapView, { Marker, PROVIDER_GOOGLE, Polyline } from 'react-native-maps';
 import MapViewDirections from 'react-native-maps-directions';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import * as Location from 'expo-location';
 import { FontAwesome as Icon } from '@expo/vector-icons';
+import { auth, db } from '../screens/FirebaseConfig';
+import { getAuth, signInWithEmailAndPassword } from 'firebase/auth'; 
+import { doc, getDoc, onSnapshot } from 'firebase/firestore';
+
 
 const KarbonMap = (props) => {
   const apiKey = 'AIzaSyCxLGmhSPj8MZ-K-JVMae_90_rz7s-3S4M'; // Replace with your actual Google Maps API key
@@ -37,6 +41,74 @@ const KarbonMap = (props) => {
   let previousLocation = null;
 
   const modeOfTransportation = 'driving';
+
+  const [userName, setUserName] = useState(null);
+  const [userProfileImage, setUserProfileImage] = useState(null);
+
+
+  useEffect(() => {
+    const user = auth.currentUser;
+    if (user) {
+      const userDoc = doc(db, 'users', user.uid);
+  
+      const unsubscribe = onSnapshot(userDoc, (doc) => {
+        const userProfile = doc.data().profile || null;
+        setUserProfileImage(userProfile);
+      });
+  
+      // Clean up the subscription on unmount
+      return () => unsubscribe();
+    }
+  }, []);
+  
+  
+  useEffect(() => {
+    const fetchUserName = async () => {
+      try {
+        const user = auth.currentUser;
+        if (user) {
+          const userDoc = doc(db, 'users', user.uid);
+          const userSnap = await getDoc(userDoc);
+  
+          if (userSnap.exists()) {
+            const userName = userSnap.data().name || null;
+            const userProfile = userSnap.data().profile || null;
+  
+            // Store the data in AsyncStorage
+            await AsyncStorage.setItem('userName', userName);
+            await AsyncStorage.setItem('userProfile', userProfile);
+  
+            setUserName(userName);
+            setUserProfileImage(userProfile);
+          }
+        }
+      } catch (error) {
+      }
+    };
+  
+    fetchUserName(); 
+  }, []);
+
+  const getUserNameAndProfile = async () => {
+    try {
+      const cachedUserName = await AsyncStorage.getItem('userName');
+      const cachedUserProfile = await AsyncStorage.getItem('userProfile');
+  
+      if (cachedUserName !== null && cachedUserProfile !== null) {
+        // The data is cached, use it
+        setUserName(cachedUserName);
+        setUserProfileImage(cachedUserProfile);
+      } else {
+        // The data is not cached, fetch it
+        fetchUserName();
+      }
+    } catch (error) {
+    }
+  };
+  
+  useEffect(() => {
+    getUserNameAndProfile();
+  }, []);
 
   const averageCoordinate = selectedPlaces.reduce(
     (average, place, index, array) => {
@@ -82,7 +154,6 @@ const KarbonMap = (props) => {
           setDirections(JSON.parse(cachedDirections));
         }
       } catch (error) {
-        console.error('Error loading cached directions:', error.message);
       } finally {
         setLoading(false);
       }
@@ -242,9 +313,14 @@ const KarbonMap = (props) => {
   };
 
   return (
-    <View style={styles.container}>
-      <View style={styles.mapContainer}>
-      <MapView
+        <ImageBackground
+        source={require('../assets/background_dot.png')}
+        resizeMode="repeat"
+        style={{ flex: 1, width: '100%' }}
+      >
+      <View style={styles.container}>
+        <View style={styles.mapContainer}>
+          <MapView
             provider={PROVIDER_GOOGLE}
             style={styles.map}
             region={region}
@@ -329,14 +405,21 @@ const KarbonMap = (props) => {
         }}
         style={styles.cardContainer}
       >
-        <View style={styles.profileContainer}>
-          <Icon name="user" size={50} color="#000" />
-        </View>
-        <View style={styles.nameContainer}>
-          <Text style={styles.nameText}>User Name</Text>
-        </View>
-      </TouchableOpacity>
-    </View>
+        <ImageBackground source={require('../assets/nav7.png')} style={styles.profileBox}>
+          <View style={styles.profileContainer}>
+            {userProfileImage ? (
+              <Image source={{ uri: userProfileImage }} style={{ position: 'absolute', right: 250, top: 10, width: 50, height: 50, borderRadius: 25 }} />
+            ) : (
+              <Icon name="user" size={50} style={{ position: 'absolute', right: 250, top: 10 }} color="#000" />
+            )}
+          </View>
+          <View style={styles.nameContainer}>
+            <Text style={styles.nameText}>{userName ? `Going somewhere, ${userName}?` : 'Username!'}</Text>
+          </View>
+          </ImageBackground>
+        </TouchableOpacity>
+      </View>
+    </ImageBackground>
   );
 };
 
@@ -386,12 +469,27 @@ const styles = StyleSheet.create({
   container: {
     flex: 1,
   },
+  nameText: {
+    position: 'absolute',
+    fontSize: 15,
+    fontFamily: 'Montserrat-Light',
+    color: 'black',
+    padding: 10,
+    left: 100,
+  },
   buttonContainer: {
     position: 'absolute',
     left: 5,
     bottom: 5,
     width: '50%',
     borderRadius: 8,
+    overflow: 'hidden',
+  },
+  profileBox: {
+    right: 10,
+    width: 330,
+    height: 70,
+    borderRadius: 20,
     overflow: 'hidden',
   },
   backBoxText: {
@@ -435,9 +533,9 @@ const styles = StyleSheet.create({
     marginTop: 50,
     marginLeft: 20, 
     width: '90%', 
-    height: '60%',
+    height: '65%',
     borderWidth: 15,
-    borderColor: 'green',
+    borderColor: 'rgba(102, 204, 153, 1)',
     borderRadius: 30,
     overflow: 'hidden'
   },
@@ -467,20 +565,11 @@ const styles = StyleSheet.create({
     justifyContent: 'center',
     marginLeft: 10, // Add this line if you want some space between the icon and the text
   },
-  nameText: {
-    position: 'absolute',
-    fontSize: 20,
-    fontFamily: 'Montserrat-Light',
-    color: 'black',
-    padding: 10,
-    marginLeft: 30,
-    marginBottom: 0,
-  },
   backBox: {
     position: 'absolute',
-    bottom: 140,
+    bottom: 60,
     width: '70%',
-    height: 80,
+    height: 100,
     alignSelf: 'center',
     backgroundColor: 'rgba(255, 255, 255, 0.5)',
     borderRadius: 10,

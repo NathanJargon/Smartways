@@ -9,6 +9,10 @@ import TextInput from '../components/TextInput';
 import { theme } from '../core/theme';
 import Button from '../components/Button';
 import { Navigation } from '../types';
+import { auth, db } from '../screens/FirebaseConfig';
+import { getAuth, signInWithEmailAndPassword, signOut, sendPasswordResetEmail } from 'firebase/auth'; 
+import { doc, getDoc, updateDoc } from 'firebase/firestore';
+import { Alert } from 'react-native';
 
 type Props = {
   navigation: Navigation;
@@ -17,15 +21,20 @@ type Props = {
 const ForgotPasswordScreen = ({ navigation }: Props) => {
   const [email, setEmail] = useState({ value: '', error: '' });
 
-  const _onSendPressed = () => {
+  const _onSendPressed = async () => {
     const emailError = emailValidator(email.value);
 
     if (emailError) {
-      setEmail({ ...email, error: emailError });
+      Alert.alert('Error', emailError);
       return;
     }
-
-    navigation.navigate('LoginScreen');
+  
+    try {
+      await sendPasswordResetEmail(auth, email.value);
+      navigation.navigate('LoginScreen');
+    } catch (error) {
+      Alert.alert('Error', error.message);
+    }
   };
 
   return (
@@ -74,6 +83,7 @@ const styles = StyleSheet.create({
   label: {
     color: theme.colors.secondary,
     width: '100%',
+    fontFamily: 'Montserrat-Light'
   },
 });
 

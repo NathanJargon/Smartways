@@ -1,47 +1,175 @@
-import React, { useState } from 'react';
-import { View, Text, StyleSheet, FlatList } from 'react-native';
+import React, { useEffect, useState } from 'react';
+import { View, Text, StyleSheet, FlatList, Image, Modal, TouchableOpacity } from 'react-native';
 import { Card, Icon } from 'react-native-elements';
 import { useNavigation } from '@react-navigation/native';
+import { auth, db } from '../screens/FirebaseConfig';
+import { getAuth, signInWithEmailAndPassword } from 'firebase/auth'; 
+import { doc, getDoc, onSnapshot } from 'firebase/firestore';
+import { collection, getDocs, query, orderBy, collectionGroup } from 'firebase/firestore';
+import { LineChart, Grid, XAxis, YAxis } from 'react-native-svg-charts';
+import * as shape from 'd3-shape';
+
 
 function KarbonLeaderboard() {
-    const [users, setUsers] = useState([
-      { name: 'User 1', emission: 10, rank: 1 },
-      { name: 'User 2', emission: 20, rank: 2 },
-      { name: 'User 3', emission: 30, rank: 3 },
-      { name: 'User 4', emission: 40, rank: 4 },
-      { name: 'User 5', emission: 50, rank: 5 },
-      { name: 'User 6', emission: 60, rank: 6 },
-      { name: 'User 7', emission: 70, rank: 7 },
-      { name: 'User 8', emission: 80, rank: 8 },
-      // Add more users as needed
-    ]);
+  const [rankedUsers, setRankedUsers] = useState([]);
+  const [topUsers, setTopUsers] = useState([]);
+  const [selectedUser, setSelectedUser] = useState(null);
+  const [isModalVisible, setModalVisible] = useState(false);
+  const [isLoading, setIsLoading] = useState(true); // Add this line
 
-  const middleIndex = Math.floor(users.length / 2);
+  useEffect(() => {
+    const fetchData = async () => {
+      try {
+        setIsLoading(true); // Set loading to true when fetching starts
+        const usersCollectionRef = collection(db, 'users');
+        const querySnapshot = await getDocs(usersCollectionRef);
+
+        const usersData = [];
+        querySnapshot.forEach((userDoc) => {
+          const userData = userDoc.data();
+        
+          // Ensure that userData includes the 'emissionlogs' property and it is an array
+          if ('emissionlogs' in userData && Array.isArray(userData.emissionlogs)) {
+            const logs = userData.emissionlogs.map(log => ({ ...log, name: userData.name }));
+            const totalEmission = logs.reduce((total, log) => total + Number(log.value), 0);
+            usersData.push({ name: userData.name, profile: userData.profile, emission: parseFloat(totalEmission.toFixed(2)), emissionlogs: userData.emissionlogs });
+          }
+        });
+
+        // Order users by total emission from lowest to highest
+        const rankedUsers = usersData.sort((a, b) => a.emission - b.emission).map((user, index) => ({
+          ...user,
+          rank: index + 1,
+        }));
+
+        // Set state with ranked users
+        setRankedUsers(rankedUsers);
+
+        // Create topUsers array
+        const topUsers = rankedUsers.length >= 3 ? [rankedUsers[1], rankedUsers[0], rankedUsers[2]] : rankedUsers.slice(0, 3);
+        setTopUsers(topUsers);
+
+        // Print ranked users to the console
+        // console.log(rankedUsers);
+      } catch (error) {
+        console.error('Error fetching user documents:', error);
+      } finally {
+        setIsLoading(false); // Set loading to false when fetching ends
+      }
+    };
+
+    fetchData();
+  }, []);
+
+
   const navigation = useNavigation();
-  const orderedUsers = [...users];
-  orderedUsers.splice(middleIndex, 0, orderedUsers.splice(0, 1)[0]);
 
   function getOrdinalSuffix(rank) {
     let j = rank % 10,
         k = rank % 100;
-    if (j == 1 && k != 11) {
-        return rank + "st";
+    if (j === 1 && k !== 11) {
+      return rank + "st";
     }
-    if (j == 2 && k != 12) {
-        return rank + "nd";
+    if (j === 2 && k !== 12) {
+      return rank + "nd";
     }
-    if (j == 3 && k != 13) {
-        return rank + "rd";
+    if (j === 3 && k !== 13) {
+      return rank + "rd";
     }
     return rank + "th";
   }
 
-  const topUsers = [users[1], users[0], users[2]];
+  const CustomModal = ({ isVisible, closeModal, selectedUser }) => {
+    // Check if selectedUser is not null and if user.profile is available, otherwise use a default profile icon
+    const hasProfileIcon = selectedUser && selectedUser.profile && selectedUser.profile !== '';
+    const profileIconName = hasProfileIcon ? 'user' : selectedUser?.profile;
+    const profileIconType = hasProfileIcon ? 'font-awesome' : 'custom'; // Replace with the actual icon type if using a different library
+    
+    // Decide whether to render an Icon or an Image based on the type of profile
+    const profileComponent = hasProfileIcon ? (
+      <Image source={{ uri: selectedUser?.profile }} style={styles.profileImage1} />
+    ) : (
+      <Icon name={'user'} type={'font-awesome'} size={80} color="black" style={styles.profileIcon} />
+    );
+  
+    // console.log(selectedUser);
+    
+    const EmissionChart = ({ emissionLogs }) => {
+      if (!emissionLogs || !Array.isArray(emissionLogs)) {
+        return <Text>No emission data available</Text>;
+      }
+
+      const data = [].concat(...emissionLogs.map(log => Number(log.value)));
+      // console.log(data);
+    
+      return (
+        <View style={{ marginTop: 20, left: 50, flexDirection: 'row', alignItems: 'center', justifyContent: 'center' }}>
+          <YAxis
+            data={data}
+            contentInset={{ top: 20, bottom: 20 }}
+            svg={{ fill: 'grey', fontSize: 10 }}
+            numberOfTicks={10}
+            formatLabel={(value) => `${value}`}
+          />
+          <View style={{ flex: 1, marginLeft: 10 }}>
+            <LineChart
+              style={{ height: 200, width: 200 }}
+              data={data}
+              svg={{ stroke: 'rgb(134, 65, 244)' }}
+              contentInset={{ top: 20, bottom: 20 }}
+              curve={shape.curveNatural}
+            >
+              <Grid />
+            </LineChart>
+            <XAxis
+              style={{ marginHorizontal: -10 }}
+              data={data}
+              formatLabel={(value, index) => index}
+              contentInset={{ left: 10, right: 100 }}
+              svg={{ fontSize: 10, fill: 'grey' }}
+            />
+          </View>
+        </View>
+      );
+    };
+    
+
+    return (
+      <Modal
+        animationType="slide"
+        transparent={true}
+        visible={isVisible}
+        onRequestClose={closeModal}
+      >
+        <View style={styles.modalContainer}>
+          <View style={styles.modalContent}>
+            {profileComponent}
+  
+            <Text style={styles.userName}>{selectedUser?.name}</Text>
+            <Text style={styles.emissionInfo}>{selectedUser?.emission} kgCO2</Text>
+  
+            {/* Add the line chart if emissionlogs is defined */}
+            {selectedUser?.emissionlogs ? (
+              <EmissionChart emissionLogs={selectedUser?.emissionlogs} />
+            ) : (
+              <Text>No emission data available</Text>
+            )}
+  
+            {/* Close button */}
+            <Text style={styles.closeButton} onPress={closeModal}>Close</Text>
+          </View>
+        </View>
+      </Modal>
+    );
+  };
+
+
 
   return (
+    isLoading ? <Text>Loading...</Text> : (
     <View>
         <View style={{ flexDirection: 'row', left: 15  }}>
-            <View style={{ flexDirection: 'row', left: -5, top: 45  }}>
+            <View style={{ flexDirection: 'row', left: -5, top: 48  }}>
                 <Icon
                     name='arrow-left'
                     type='font-awesome'
@@ -58,53 +186,146 @@ function KarbonLeaderboard() {
         <Text style={styles.headerBottom1}>Compete with your friends and get the lowest</Text>
         <Text style={styles.headerBottom2}>carbon footprint in your circle!</Text>
       </View>
-        <View style={styles.rankContainer}>
-        {topUsers.map((user, i) => (
-            <Card containerStyle={[styles.rankCard, i === 1 && styles.middleCard]} key={i}>
+
+      
+      <View style={styles.rankContainer}>
+      {topUsers.map((user, i) => (
+        <Card containerStyle={[styles.rankCard, i === 1 && styles.middleCard]} key={i}>
+          {user.profile && user.profile !== '' ? (
+            // If a profile exists and is not an empty string, display the profile image
+            <Image source={{ uri: user.profile }} style={{ width: 40, height: 40, borderRadius: 10, }} />
+          ) : (
+            // If no profile or an empty string, display the user icon
             <Icon
-                name='user'
-                type='font-awesome'
-                size={40}
-                color='#517fa4'
+              name='user'
+              type='font-awesome'
+              size={40}
+              color='#517fa4'
             />
-            <Icon name='star' type='font-awesome' color='#517fa4' size={15} style={{ left: 20, }} />
-            <Text style={styles.rankText}>{getOrdinalSuffix(user.rank)}</Text>
-            <Text style={styles.name}>{user.name}</Text>
-            <Text style={styles.emission}>{user.emission} kgCO2</Text>
-            </Card>
+          )}
+
+            
+              <TouchableOpacity onPress={() => {
+              setSelectedUser({
+                ...user,
+                type: 'topUser',
+                profile: user.profile,
+                name: user.name,
+                emission: user.emission,
+                emissionlogs: user.emissionlogs,
+              });
+              setModalVisible(true);
+            }}>
+              <Icon name='star' type='font-awesome' color='#517fa4' size={15} style={{ left: 17, }} />
+              <Text style={styles.rankText}>{getOrdinalSuffix(user.rank)}</Text>
+              <Text style={styles.name}>{user.name}</Text>
+              <Text style={styles.emission}>{user.emission} kgCO2</Text>
+            </TouchableOpacity>
+
+
+          </Card>
         ))}
-        </View>
+      </View>
+
+      
       <View style={styles.TableBox}>
       <FlatList
-        data={users.slice(3, 8)}
+        data={rankedUsers.slice(3, 8)}
         keyExtractor={(item) => item.name}
         renderItem={({ item, index, separators }) => (
-            <View>
+          <View>
+
+
+            <TouchableOpacity onPress={() => {
+              setSelectedUser(item);
+              setModalVisible(true);
+            }}>
+
             <View style={styles.tableRow}>
-                <View style={styles.iconContainer}>
-                    <View style={styles.iconStyle1}>
-                    <Icon name='star' type='font-awesome' color='#517fa4' size={30} />
-                    </View>
-                    <View style={styles.iconStyle2}>
-                    <Icon name='user' type='font-awesome' color='#517fa4' size={40} />
-                    </View>
+              <View style={styles.iconContainer}>
+                <View style={styles.iconStyle1}>
+                  <Icon name='star' type='font-awesome' color='#517fa4' size={30} />
                 </View>
-                <View style={styles.tableCell}>
+                <View style={styles.iconStyle2}>
+                  {item.profile && item.profile !== '' ? (
+                    // If a profile exists and is not an empty string, display the profile image
+                    <Image source={{ uri: item.profile }} style={styles.profileImage} />
+                  ) : (
+                    // If no profile or an empty string, display the user icon
+                    <Icon name='user' type='font-awesome' color='#517fa4' size={40} />
+                  )}
+                </View>
+              </View>
+              <View style={styles.tableCell}>
                 <Text style={styles.tableBoxText1}>{item.name}</Text>
                 <Text style={styles.tableBoxText2}>{item.emission} kgCO2</Text>
-                </View>
-            </View>
-            {index !== users.slice(3, 8).length - 1 && <View style={styles.bottomBorder} />}
-            </View>
-          )}
-        />
+              </View>
+              </View>
+            </TouchableOpacity>
+
+
+
+
+            {index !== rankedUsers.slice(3, 8).length - 1 && <View style={styles.bottomBorder} />}
+          </View>
+        )}
+      />
       </View>
+      <CustomModal isVisible={isModalVisible} closeModal={() => setModalVisible(false)} selectedUser={selectedUser} />
     </View>
+    )
   );
 }
 
 
 const styles = StyleSheet.create({
+
+
+  modalContainer: {
+    flex: 1,
+    justifyContent: 'center',
+    alignItems: 'center',
+    backgroundColor: 'rgba(0, 0, 0, 0.5)', // Transparent background
+  },
+  modalContent: {
+    backgroundColor: 'white',
+    padding: 20,
+    borderRadius: 10,
+    alignItems: 'center',
+  },
+  profileImage: {
+    width: 80,
+    height: 80,
+    borderRadius: 40,
+    marginBottom: 10,
+  },
+  profileImage1: {
+    width: 120,
+    height: 120,
+    borderRadius: 40,
+    marginBottom: 10,
+  },
+  userName: {
+    fontSize: 18,
+    fontFamily: 'Codec',
+    marginBottom: 5,
+  },
+  emissionInfo: {
+    fontSize: 16,
+    marginBottom: 10,
+    fontFamily: 'Montserrat-Light',
+  },
+  closeButton: {
+    fontSize: 16,
+    color: 'blue',
+    marginTop: 10,
+    textAlign: 'center',
+  },
+
+
+
+
+
   headerContainer: {
     borderRadius: 30,
     backgroundColor: 'black',
@@ -118,7 +339,11 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     alignItems: 'center',
   },
-
+  profileImage: {
+    width: 40, // Set your desired width
+    height: 40, // Set your desired height
+    borderRadius: 10,
+  },
   iconStyle1: {
     marginLeft: 20,
     padding: 0,
@@ -153,12 +378,14 @@ const styles = StyleSheet.create({
     justifyContent: 'space-between',
     paddingHorizontal: 20,
     paddingHorizontal: 10,
+    right: 0,
   },
   rankCard: {
     borderRadius: 20, 
     alignItems: 'center',
     height: 180,
     marginHorizontal: 4, 
+    width: 105,
     top: 5,
   },
   middleCard: {

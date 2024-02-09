@@ -1,11 +1,65 @@
-import React, { useState } from 'react';
-import { View, Text, StyleSheet, Image, TouchableOpacity, ImageBackground } from 'react-native';
+import React, { useState, useEffect } from 'react';
+import { View, Text, StyleSheet, Image, TouchableOpacity, ImageBackground, Modal, TextInput, Button } from 'react-native';
 import * as ImagePicker from 'expo-image-picker';
 import { ListItem, Icon } from 'react-native-elements';
+import Background from '../components/Background';
+import { auth, db } from '../screens/FirebaseConfig';
+import { getAuth, signInWithEmailAndPassword, signOut } from 'firebase/auth'; 
+import { doc, getDoc, updateDoc } from 'firebase/firestore';
+import { FontAwesome as FontIcon } from '@expo/vector-icons';
+import AsyncStorage from '@react-native-async-storage/async-storage';
+import { useNavigation, CommonActions } from '@react-navigation/native';
+import * as FileSystem from 'expo-file-system';
+import { getStorage, ref, uploadBytesResumable, getDownloadURL } from "firebase/storage";
+
 
 function Profile({ imageUrl = '', coverImageUrl = '' }) {
+  const navigation = useNavigation();
   const [profileImage, setProfileImage] = useState(imageUrl);
   const [coverImage, setCoverImage] = useState(coverImageUrl);
+  const [userName, setUserName] = useState(null);
+  const [userProfileImage, setUserProfileImage] = useState(null);
+  const [userBio, setUserBio] = useState(null);
+  const [userEmail, setUserEmail] = useState(null);
+  const [userPhone, setUserPhone] = useState(null);
+  const [isModalVisible, setModalVisible] = useState(false);
+  const [inputValue, setInputValue] = useState('');
+  const [editingField, setEditingField] = useState('');
+  const modalBackground = require('../assets/newsmodalbg.png');
+
+
+  const openModal = (field, value) => {
+    setEditingField(field);
+    setInputValue(value);
+    setModalVisible(true);
+  };
+
+  const handleSave = async () => {
+    const user = auth.currentUser;
+    if (user) {
+      const userDoc = doc(db, 'users', user.uid);
+      switch (editingField) {
+        case 'userName':
+          setUserName(inputValue);
+          await updateDoc(userDoc, { name: inputValue });
+          break;
+        case 'userBio':
+          setUserBio(inputValue);
+          await updateDoc(userDoc, { bio: inputValue });
+          break;
+        case 'userPhone':
+          setUserPhone(inputValue);
+          await updateDoc(userDoc, { phone: inputValue });
+          break;
+        default:
+          break;
+      }
+    }
+    setModalVisible(false);
+  };
+
+
+
 
   const selectImage = async (setImage, aspect) => {
     const { status } = await ImagePicker.requestMediaLibraryPermissionsAsync();
@@ -13,36 +67,149 @@ function Profile({ imageUrl = '', coverImageUrl = '' }) {
       alert('Sorry, we need camera roll permissions to make this work!');
       return;
     }
-
+  
     let result = await ImagePicker.launchImageLibraryAsync({
       mediaTypes: ImagePicker.MediaTypeOptions.All,
       allowsEditing: true,
       aspect: aspect,
       quality: 1,
     });
-
+  
     if (!result.canceled && result.assets && result.assets.length > 0) {
-      setImage(result.assets[0].uri);
+      const newImageUri = result.assets[0].uri;
+      setImage(newImageUri);
+      setUserProfileImage(newImageUri);
+      const user = auth.currentUser;
+      if (user) {
+        const userDoc = doc(db, 'users', user.uid);
+        await updateDoc(userDoc, { profile: newImageUri });
+      }
+
+      uploadImage(newImageUri);
     }
   };
 
+  const uploadImage = async (uri) => {
+    try {
+      console.log('Initializing Firebase Storage...');
+      const storage = getStorage();
+      const reference = ref(storage, 'images/imageName');
+  
+      console.log('Fetching image data...');
+      const blob = await FileSystem.readAsStringAsync(uri, { encoding: FileSystem.EncodingType.Base64 });
+  
+      console.log('Uploading image...');
+      const uploadTask = uploadBytesResumable(reference, blob, {
+        contentType: 'image/jpeg',
+      });
+  
+      uploadTask.on('state_changed', snapshot => {
+        console.log(`${snapshot.bytesTransferred} transferred out of ${snapshot.totalBytes}`);
+      });
+  
+      await uploadTask;
+  
+      console.log('Getting download URL...');
+      const url = await getDownloadURL(reference);
+  
+      console.log('Image URL: ', url);
+      return url;
+    } catch (error) {
+      console.error('Error uploading image: ', error);
+    }
+  };
+
+
+  useEffect(() => {
+    const fetchUserName = async () => {
+      try {
+        const user = auth.currentUser;
+        if (user) {
+          const userDoc = doc(db, 'users', user.uid);
+          const userSnap = await getDoc(userDoc);
+  
+          if (userSnap.exists()) {
+            const userName = userSnap.data().name || null;
+            const userProfile = userSnap.data().profile || null;
+            const userBio = userSnap.data().bio || null;
+            const userEmail = userSnap.data().email || null;
+            const userPhone = userSnap.data().phone || null;
+          
+            // Store the data in AsyncStorage
+            await AsyncStorage.setItem('userName', userName);
+            await AsyncStorage.setItem('userProfile', userProfile);
+            await AsyncStorage.setItem('userBio', userBio);
+            await AsyncStorage.setItem('userEmail', userEmail);
+            await AsyncStorage.setItem('userPhone', userPhone);
+          
+            setUserName(userName);
+            setUserProfileImage(userProfile);
+            setUserBio(userBio);
+            setUserEmail(userEmail);
+            setUserPhone(userPhone);
+          }
+        }
+      } catch (error) {
+      }
+    };
+  
+    fetchUserName(); 
+  }, []);
+
+  const getUserNameAndProfile = async () => {
+    try {
+      const cachedUserName = await AsyncStorage.getItem('userName');
+      const cachedUserProfile = await AsyncStorage.getItem('userProfile');
+      const cachedUserBio = await AsyncStorage.getItem('userBio');
+      const cachedUserEmail = await AsyncStorage.getItem('userEmail');
+      const cachedUserPhone = await AsyncStorage.getItem('userPhone');
+      
+      if (cachedUserName !== null && cachedUserProfile !== null && cachedUserBio !== null && cachedUserEmail !== null && cachedUserPhone !== null) {
+        // The data is cached, use it
+        setUserName(cachedUserName);
+        setUserProfileImage(cachedUserProfile);
+        setUserBio(cachedUserBio);
+        setUserEmail(cachedUserEmail);
+        setUserPhone(cachedUserPhone);
+      } else {
+        // The data is not cached, fetch it
+        fetchUserName();
+      }
+    } catch (error) {
+    }
+  };
+  
+  useEffect(() => {
+    getUserNameAndProfile();
+  }, []);
+
   return (
-    <ImageBackground source={require('../assets/profilebg.png')} style={styles.backgroundImage}>
+    <Background style={styles.backgroundImage}>
       <View style={styles.container}>
       <View style={styles.content}>
-        <TouchableOpacity onPress={() => selectImage(setProfileImage, [1, 1])}>
-          {profileImage ? (
-            <Image
-              style={styles.profileImage}
-              source={{ uri: profileImage }}
-            />
+      <TouchableOpacity onPress={() => selectImage(setProfileImage, [1, 1])}>
+        {userProfileImage ? (
+            <Image source={{ uri: userProfileImage }} style={{ width: 140, height: 140, borderRadius: 20 }} />
           ) : (
-            <View style={styles.iconContainer}>
-              <Icon name="person" size={50} color="white" />
-            </View>
+            <FontIcon name="user" size={100} style={{ marginRight: 10, color: 'white' }} />
           )}
-        </TouchableOpacity>
-        <Text style={styles.userName}>Environmentalist</Text>
+      </TouchableOpacity>
+      <View style={styles.userNameContainer}>
+        <View style={styles.userNameRow}>
+          <Text style={styles.userName}>
+          {userName ? `${userName}` : 'Environmentalist'}
+          </Text>
+          <TouchableOpacity onPress={() => openModal('userName', userName)}>
+          <Icon name='edit' size={15} />
+          </TouchableOpacity>
+        </View>
+        <View style={styles.userNameRow}>
+          <Text style={styles.userDescription}>{userBio ? `${userBio}` : 'I love nature and will save nature!'}</Text>
+          <TouchableOpacity onPress={() => openModal('userBio', userBio)}>
+        <Icon name='edit' size={15} />
+      </TouchableOpacity>
+        </View>
+      </View>
 
 
         <ListItem
@@ -60,10 +227,7 @@ function Profile({ imageUrl = '', coverImageUrl = '' }) {
           <Icon name='email' />
           <Text style={styles.listItemDescription}>Email</Text>
         </View>
-        <Text style={styles.listItemValue}>user@example.com</Text>
-        <TouchableOpacity onPress={() => {}}>
-          <Icon name='edit' size={15} />
-        </TouchableOpacity>
+        <Text style={styles.listItemValue}>{userEmail ? `${userEmail}` : 'user@example.com'}</Text>
       </View>
 
       <View style={{ flexDirection: 'row', alignItems: 'center', marginBottom: 25 }}>
@@ -71,15 +235,68 @@ function Profile({ imageUrl = '', coverImageUrl = '' }) {
           <Icon name='phone' />
           <Text style={styles.listItemDescription2}>Phone</Text>
         </View>
-        <Text style={styles.listItemValue}>+1234567890</Text>
-        <TouchableOpacity onPress={() => {}}>
-          <Icon name='edit' size={15} />
-        </TouchableOpacity>
+        <Text style={styles.listItemValue}>{userPhone ? `${userPhone}` : '+1234567890'}</Text>
+        <TouchableOpacity onPress={() => openModal('userPhone', userPhone)}>
+        <Icon name='edit' size={15} />
+      </TouchableOpacity>
       </View>
     </ListItem>
       </View>
     </View>
-  </ImageBackground>
+
+    <TouchableOpacity
+      style={styles.logoutButton}
+      onPress={async () => {
+        await signOut(auth);
+        // Reset navigation state
+        navigation.dispatch(
+          CommonActions.reset({
+            index: 0,
+            routes: [{ name: 'HomeScreen' }],
+          })
+        );
+      }}
+    >
+      <Text style={styles.logoutButtonText}>Logout</Text>
+    </TouchableOpacity>
+
+    <Modal visible={isModalVisible} animationType="slide" transparent={true}>
+      <View style={styles.overlay}>
+        <ImageBackground source={modalBackground} style={styles.modalBackground}>
+          <View style={styles.modalView}>
+            <TextInput
+              value={inputValue}
+              onChangeText={(text) => {
+                let maxLength;
+                switch (editingField) {
+                  case 'userName':
+                    maxLength = 8;
+                    break;
+                  case 'userBio':
+                    maxLength = 15;
+                    break;
+                  case 'userPhone':
+                    maxLength = 10; // standard length for phone numbers
+                    break;
+                  default:
+                    maxLength = 100; // default length
+                    break;
+                }
+                if (text.length <= maxLength) {
+                  setInputValue(text);
+                }
+              }}
+              style={styles.modalInput}
+            />
+            <TouchableOpacity style={styles.saveButton} onPress={handleSave}>
+              <Text style={styles.saveButtonText}>Save</Text>
+            </TouchableOpacity>
+          </View>
+        </ImageBackground>
+      </View>
+    </Modal>
+
+    </Background>
   );
 }
 
@@ -87,6 +304,104 @@ const styles = StyleSheet.create({
   backgroundImage: {
     flex: 1,
     resizeMode: 'cover', 
+  },
+  overlay: {
+    flex: 1,
+    backgroundColor: 'rgba(0, 0, 0, 0.5)', // semi-transparent background
+    justifyContent: 'center',
+    alignItems: 'center',
+  },
+  modalBackground: {
+    width: 300,
+    height: 185,
+    borderRadius: 20,
+    overflow: 'hidden'
+
+  },
+  modalView: {
+    backgroundColor: 'transparent', // Change this line
+    borderRadius: 20,
+    padding: 35,
+    alignItems: 'center',
+    shadowColor: '#000',
+    shadowOffset: {
+      width: 0,
+      height: 2,
+    },
+    shadowOpacity: 0.25,
+    shadowRadius: 4,
+    elevation: 5,
+  },
+  modalText: {
+    fontFamily: 'Montserrat-Light',
+    fontSize: 20,
+    marginBottom: 15,
+    textAlign: "center"
+  },
+  buttonContainer: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    marginTop: 20,
+  },
+  button: {
+    borderWidth: 1,
+    borderColor: '#90EE90', 
+    padding: 10,
+    borderRadius: 5,
+    margin: 10,
+  },
+  inputLabel: {
+    fontFamily: 'Montserrat-Light',
+    fontSize: 16,
+    padding: 5,
+    color: '#000',
+  },
+  modalInput: {
+    height: 40,
+    width: 200,
+    borderColor: 'gray',
+    borderWidth: 1,
+    borderRadius: 5,
+    marginBottom: 10,
+  },
+  saveButton: {
+    backgroundColor: '#2196F3',
+    borderRadius: 20,
+    padding: 10,
+    elevation: 2,
+    marginTop: 15,
+  },
+  saveButtonText: {
+    color: 'white',
+    top: 2,
+    fontFamily: 'Codec',
+    textAlign: 'center',
+  },
+  input: {
+    height: 60,
+    width: 150,
+    textAlign: 'center',
+    borderColor: 'gray',
+    borderWidth: 1,
+    borderRadius: 5,
+    padding: 10,
+    marginBottom: 10,
+    borderColor: 'white',
+  },
+  userNameRow: {
+    flexDirection: 'row',
+    alignItems: 'center',
+  },
+  userNameContainer: {
+    alignItems: 'center',
+    justifyContent: 'space-between',
+    width: '100%',
+    padding: 10,
+  },
+  userDescription: {
+    fontSize: 14,
+    color: '#888',
+    marginRight: 10,
   },
   inContainer: {
     borderColor: '#4caf50',
@@ -178,6 +493,19 @@ const styles = StyleSheet.create({
   listItemValue: {
     marginLeft: 'auto',
     marginRight: 10,
+    fontSize: 10,
+  },
+  logoutButton: {
+    backgroundColor: '#ff6347',
+    padding: 10,
+    borderRadius: 5,
+    alignItems: 'center',
+    marginTop: 20,
+    bottom: 70,
+  },
+  logoutButtonText: {
+    color: '#fff',
+    fontSize: 18,
   },
 });
 export default Profile;
