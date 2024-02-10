@@ -91,34 +91,24 @@ function Profile({ imageUrl = '', coverImageUrl = '' }) {
 
   const uploadImage = async (uri) => {
     try {
-      console.log('Initializing Firebase Storage...');
+      const filename = uri.substring(uri.lastIndexOf("/") + 1);
       const storage = getStorage();
-      const reference = ref(storage, 'images/imageName');
+      const storageRef = ref(storage, filename);
   
-      console.log('Fetching image data...');
-      const blob = await FileSystem.readAsStringAsync(uri, { encoding: FileSystem.EncodingType.Base64 });
+      const response = await fetch(uri);
+      const blob = await response.blob();
   
-      console.log('Uploading image...');
-      const uploadTask = uploadBytesResumable(reference, blob, {
-        contentType: 'image/jpeg',
-      });
+      const uploadTask = uploadBytesResumable(storageRef, blob);
   
-      uploadTask.on('state_changed', snapshot => {
-        console.log(`${snapshot.bytesTransferred} transferred out of ${snapshot.totalBytes}`);
-      });
+      const snapshot = await uploadTask;
   
-      await uploadTask;
-  
-      console.log('Getting download URL...');
-      const url = await getDownloadURL(reference);
-  
-      console.log('Image URL: ', url);
-      return url;
+      const downloadURL = await getDownloadURL(snapshot.ref);
+      return downloadURL;
     } catch (error) {
-      console.error('Error uploading image: ', error);
+      console.error("Error during image upload:", error);
+      return "";
     }
   };
-
 
   useEffect(() => {
     const fetchUserName = async () => {

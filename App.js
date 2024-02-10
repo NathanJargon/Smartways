@@ -40,7 +40,7 @@ const RootStack = createStackNavigator();
 
 function RootStackScreen() {
   return (
-    <RootStack.Navigator initialRouteName="Main">
+    <RootStack.Navigator initialRouteName="HomeScreen">
       <RootStack.Screen name="HomeScreen" component={LoginHomeScreen} options={{ headerShown: false }} />
       <RootStack.Screen name="LoginScreen" component={LoginScreen} options={{ headerShown: false }} />
       <RootStack.Screen name="RegisterScreen" component={RegisterScreen} options={{ headerShown: false }} />
@@ -221,7 +221,7 @@ export default function App() {
   });
 
   if (!fontsLoaded) {
-    return <View><Text>Loading...</Text></View>;
+    return null;
   }
 
   return (

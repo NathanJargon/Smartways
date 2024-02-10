@@ -166,7 +166,7 @@ function KarbonLeaderboard() {
 
 
   return (
-    isLoading ? <Text>Loading...</Text> : (
+    isLoading ? null : (
     <View>
         <View style={{ flexDirection: 'row', left: 15  }}>
             <View style={{ flexDirection: 'row', left: -5, top: 48  }}>

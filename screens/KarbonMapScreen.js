@@ -28,23 +28,14 @@ const KarbonMap = (props) => {
   const [trafficLevel, setTrafficLevel] = useState('Light'); 
   const [timeToReach, setTimeToReach] = useState('10 min'); 
   const [selectedPlaces, setSelectedPlaces] = useState([]);
-  const [dynamicPlaces, setDynamicPlaces] = useState([]);
   const [region, setRegion] = useState(philippinesRegion);
-  const [distanceCount, setDistanceCount] = useState(0);
-  const [approximateCarbonEmission, setApproximateCarbonEmission] = useState(0);
-  const [lastAlertTime, setLastAlertTime] = useState(null);
   const markerRefs = useRef([]);
-
   let totalDistance = 0;
   let totalEmissions = 0;
-
-  let previousLocation = null;
-
   const modeOfTransportation = 'driving';
-
   const [userName, setUserName] = useState(null);
   const [userProfileImage, setUserProfileImage] = useState(null);
-
+  const [isLoaded, setIsLoaded] = useState(false);
 
   useEffect(() => {
     const user = auth.currentUser;
@@ -123,10 +114,17 @@ const KarbonMap = (props) => {
     const getLocation = async () => {
       let { status } = await Location.requestForegroundPermissionsAsync();
       if (status !== 'granted') {
-        Alert.alert('Permission to access location was denied');
+        Alert.alert(
+          'Location Permission Required',
+          'This app needs location permissions to work correctly. Please go to settings and enable location permission for this app.',
+          [
+            { text: 'Go to Settings', onPress: () => Linking.openSettings() },
+            { text: 'Cancel', onPress: () => {}, style: 'cancel' },
+          ]
+        );
         return;
       }
-
+  
       let location = await Location.getCurrentPositionAsync({});
       setUserLocation(location.coords);
       setRegion({
@@ -136,7 +134,7 @@ const KarbonMap = (props) => {
         longitudeDelta: 0.0421,
       });
     };
-
+  
     getLocation();
     setEmissionStatus('Low');
     setTrafficLevel('Light');
@@ -176,33 +174,7 @@ const KarbonMap = (props) => {
 
   const calculateAndUpdateDistanceAndEmission = async () => {
     try {
-      /*
-      if (!userLocation) {
-        const currentTime = new Date().getTime();
-        const thirtyMinutes = 50 * 60 * 1000; 
-  
-        if (!lastAlertTime || currentTime - lastAlertTime >= thirtyMinutes) {
-          alert('Please turn on your location to get directions.');
-          setLastAlertTime(currentTime);
-        }
-  
-        return;
-      }  
-  
-      if (selectedPlaces.length === 0) {
-        const currentTime = new Date().getTime();
-        const thirtyMinutes = 50 * 60 * 1000; 
-  
-        if (!lastAlertTime || currentTime - lastAlertTime >= thirtyMinutes) {
-          alert('Please select a place first by pressing on the map.');
-          setLastAlertTime(currentTime);
-        }
-  
-        return;
-      }
 
-      */
-  
       const place = selectedPlaces[selectedPlaces.length - 1];
   
       const directionsResponse = await fetch(
@@ -210,6 +182,7 @@ const KarbonMap = (props) => {
         `origin=${userLocation.latitude},${userLocation.longitude}` +
         `&destination=${place.latitude},${place.longitude}` +
         '&mode=driving' +
+        '&alternatives=true' + 
         `&key=${apiKey}`
       );
   
@@ -311,6 +284,21 @@ const KarbonMap = (props) => {
       return newPlaces;
     });
   };
+
+  useEffect(() => {
+    const loadAllData = async () => {
+      await getUserNameAndProfile();
+      await calculateAndUpdateDistanceAndEmission();
+      setIsLoaded(true);
+    };
+
+    loadAllData();
+  }, []);
+
+  if (!isLoaded) {
+    return null; // or return a loading spinner
+  }
+
 
   return (
         <ImageBackground
