@@ -11,9 +11,7 @@
       "resizeMode": "cover",
       "backgroundColor": "#ffffff"
     },
-    "assetBundlePatterns": [
-      "**/*"
-    ],
+    "assetBundlePatterns": ["**/*"],
     "ios": {
       "supportsTablet": true
     },
@@ -21,17 +19,19 @@
       "package": "com.quantumquill.karbon",
       "googleServicesFile": "google-services.json",
       "adaptiveIcon": {
-        "foregroundImage": "./assets/adaptive-icon.png",
+        "foregroundImage": "./assets/icon.png",
         "backgroundColor": "#ffffff"
+      },
+      "config": {
+        "googleMaps": {
+          "apiKey": "AIzaSyCxLGmhSPj8MZ-K-JVMae_90_rz7s-3S4M"
+        }
       }
     },
     "web": {
       "favicon": "./assets/favicon.png"
     },
-    "plugins": [
-      "expo-font",
-      "@react-native-firebase/app"
-    ],
+    "plugins": ["expo-font", "@react-native-firebase/app"],
     "extra": {
       "eas": {
         "projectId": "f2e55073-bee0-40ad-8e3f-6432c09c541d"

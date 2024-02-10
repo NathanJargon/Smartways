@@ -1,0 +1,29 @@
+{
+  "project_info": {
+    "project_number": "658020520807",
+    "project_id": "karbon-413610",
+    "storage_bucket": "karbon-413610.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:658020520807:android:fc220a154fbf783e3455c2",
+        "android_client_info": {
+          "package_name": "com.quantumquill.karbon"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyCoYtvWEWefhE6PAWpqGsI6C3H9skcw36U"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}

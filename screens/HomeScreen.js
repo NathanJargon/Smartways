@@ -15,6 +15,9 @@ function HomeScreen({ navigation }) {
 
   const [fadeAnim] = useState(new Animated.Value(1));
   const [elevationAnim] = useState(new Animated.Value(0));
+  const [userName, setUserName] = useState(null);
+  const [userProfileImage, setUserProfileImage] = useState(null);
+  const [loading, setLoading] = useState(true);
 
   useEffect(() => {
     Animated.timing(elevationAnim, {
@@ -31,7 +34,10 @@ function HomeScreen({ navigation }) {
   
       const unsubscribe = onSnapshot(userDoc, (doc) => {
         const userProfile = doc.data().profile || null;
+        const userName = doc.data().name || null;
+  
         setUserProfileImage(userProfile);
+        setUserName(userName);
       });
   
       // Clean up the subscription on unmount
@@ -54,55 +60,33 @@ function HomeScreen({ navigation }) {
     });
   };
 
-  const [userName, setUserName] = useState(null);
-  const [userProfileImage, setUserProfileImage] = useState(null);
-
   useEffect(() => {
-    const fetchUserName = async () => {
+    const fetchUserData = async () => {
       try {
-        const user = auth.currentUser;
-        if (user) {
-          const userDoc = doc(db, 'users', user.uid);
+        const jsonValue = await AsyncStorage.getItem('user');
+        if (jsonValue != null) {
+          const userData = JSON.parse(jsonValue);
+          const userDoc = doc(db, 'users', userData.user.uid);
           const userSnap = await getDoc(userDoc);
   
           if (userSnap.exists()) {
             const userName = userSnap.data().name || null;
             const userProfile = userSnap.data().profile || null;
   
-            // Store the data in AsyncStorage
-            await AsyncStorage.setItem('userName', userName);
-            await AsyncStorage.setItem('userProfile', userProfile);
-  
             setUserName(userName);
             setUserProfileImage(userProfile);
+            setLoading(false);
           }
+        } else {
+          fetchUserName(); // Fetch from Firestore if not in AsyncStorage
         }
-      } catch (error) {
+      } catch(e) {
+        // error reading value
+        console.error(e);
       }
-    };
-  
-    fetchUserName(); 
-  }, []);
-
-  const getUserNameAndProfile = async () => {
-    try {
-      const cachedUserName = await AsyncStorage.getItem('userName');
-      const cachedUserProfile = await AsyncStorage.getItem('userProfile');
-  
-      if (cachedUserName !== null && cachedUserProfile !== null) {
-        // The data is cached, use it
-        setUserName(cachedUserName);
-        setUserProfileImage(cachedUserProfile);
-      } else {
-        // The data is not cached, fetch it
-        fetchUserName();
-      }
-    } catch (error) {
     }
-  };
   
-  useEffect(() => {
-    getUserNameAndProfile();
+    fetchUserData();
   }, []);
 
   
@@ -115,14 +99,14 @@ function HomeScreen({ navigation }) {
           {userProfileImage ? (
             <Image source={{ uri: userProfileImage }} style={{ width: 40, height: 40, borderRadius: 20 }} />
           ) : (
-            <Icon name="user" size={40} style={{ marginRight: 10, color: 'white' }} />
+            <Image source={{ uri: userProfileImage }} style={{ width: 40, height: 40, borderRadius: 20 }} />
           )}
         </TouchableOpacity>
   
         {/* Welcome Message to the Left */}
         <View style={styles.welcomeContainer}>
         <Text style={styles.welcomeText}>
-          {userName ? `Welcome, ${userName}!` : 'Welcome, username!'}
+          {userName ? `Welcome, ${userName}!` : 'Welcome,'}
         </Text>
           <Text style={styles.logoText}>Welcome to</Text>
           <Text style={styles.logoTextBig}>KARBON</Text>

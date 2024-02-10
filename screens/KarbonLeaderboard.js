@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from 'react';
-import { View, Text, StyleSheet, FlatList, Image, Modal, TouchableOpacity } from 'react-native';
+import { View, Text, StyleSheet, FlatList, Image, Modal, TouchableOpacity, ImageBackground } from 'react-native';
 import { Card, Icon } from 'react-native-elements';
 import { useNavigation } from '@react-navigation/native';
 import { auth, db } from '../screens/FirebaseConfig';
@@ -27,13 +27,24 @@ function KarbonLeaderboard() {
         const usersData = [];
         querySnapshot.forEach((userDoc) => {
           const userData = userDoc.data();
+          
+          let totalEmission = 100; // Default to 100
+          let emissionlogs = [{ day: "2024-01-01", value: "100" }]; // Default log
         
-          // Ensure that userData includes the 'emissionlogs' property and it is an array
-          if ('emissionlogs' in userData && Array.isArray(userData.emissionlogs)) {
-            const logs = userData.emissionlogs.map(log => ({ ...log, name: userData.name }));
-            const totalEmission = logs.reduce((total, log) => total + Number(log.value), 0);
-            usersData.push({ name: userData.name, profile: userData.profile, emission: parseFloat(totalEmission.toFixed(2)), emissionlogs: userData.emissionlogs });
+          if ('emissionlogs' in userData && Array.isArray(userData.emissionlogs) && userData.emissionlogs.length > 0) {
+            const logs = userData.emissionlogs.filter(log => 'value' in log).map(log => ({ ...log, name: userData.name }));
+            if (logs.length > 0) {
+              totalEmission = logs.reduce((total, log) => total + Number(log.value), 0);
+              emissionlogs = logs;
+            }
           }
+        
+          // Fetch bio, email, and phone
+          const bio = userData.bio || '';
+          const email = userData.email || '';
+          const phone = userData.phone || '';
+        
+          usersData.push({ name: userData.name, profile: userData.profile, emission: parseFloat(totalEmission.toFixed(2)), emissionlogs: emissionlogs, bio, email, phone });
         });
 
         // Order users by total emission from lowest to highest
@@ -144,17 +155,32 @@ function KarbonLeaderboard() {
         <View style={styles.modalContainer}>
           <View style={styles.modalContent}>
             {profileComponent}
-  
+    
             <Text style={styles.userName}>{selectedUser?.name}</Text>
-            <Text style={styles.emissionInfo}>{selectedUser?.emission} kgCO2</Text>
-  
+            <Text style={styles.userBio}>{selectedUser?.bio}</Text>
+    
+            <View style={styles.infoContainer}>
+              <Text style={styles.infoTitle}>Email:</Text>
+              <Text style={styles.infoContent}>{selectedUser?.email}</Text>
+            </View>
+    
+            <View style={styles.infoContainer}>
+              <Text style={styles.infoTitle}>Phone:</Text>
+              <Text style={styles.infoContent}>{selectedUser?.phone}</Text>
+            </View>
+    
+            <View style={styles.infoContainer}>
+              <Text style={styles.infoTitle}>Emission:</Text>
+              <Text style={styles.infoContent}>{selectedUser?.emission} kgCO2</Text>
+            </View>
+    
             {/* Add the line chart if emissionlogs is defined */}
             {selectedUser?.emissionlogs ? (
               <EmissionChart emissionLogs={selectedUser?.emissionlogs} />
             ) : (
               <Text>No emission data available</Text>
             )}
-  
+    
             {/* Close button */}
             <Text style={styles.closeButton} onPress={closeModal}>Close</Text>
           </View>
@@ -189,46 +215,41 @@ function KarbonLeaderboard() {
 
       
       <View style={styles.rankContainer}>
-      {topUsers.map((user, i) => (
-        <Card containerStyle={[styles.rankCard, i === 1 && styles.middleCard]} key={i}>
-          {user.profile && user.profile !== '' ? (
-            // If a profile exists and is not an empty string, display the profile image
-            <Image source={{ uri: user.profile }} style={{ width: 40, height: 40, borderRadius: 10, }} />
-          ) : (
-            // If no profile or an empty string, display the user icon
-            <Icon
-              name='user'
-              type='font-awesome'
-              size={40}
-              color='#517fa4'
-            />
-          )}
-
-            
-              <TouchableOpacity onPress={() => {
-              setSelectedUser({
-                ...user,
-                type: 'topUser',
-                profile: user.profile,
-                name: user.name,
-                emission: user.emission,
-                emissionlogs: user.emissionlogs,
-              });
-              setModalVisible(true);
-            }}>
-              <Icon name='star' type='font-awesome' color='#517fa4' size={15} style={{ left: 17, }} />
-              <Text style={styles.rankText}>{getOrdinalSuffix(user.rank)}</Text>
-              <Text style={styles.name}>{user.name}</Text>
-              <Text style={styles.emission}>{user.emission} kgCO2</Text>
-            </TouchableOpacity>
-
-
-          </Card>
-        ))}
-      </View>
+  {topUsers.map((user, i) => (
+    <ImageBackground source={require('../assets/nav7.png')} style={[styles.rankCard, i === 1 && styles.middleCard]} key={i}>
+      {user.profile && user.profile !== '' ? (
+        <Image source={{ uri: user.profile }} style={{ width: 40, height: 40, borderRadius: 10, top: 2, }} />
+      ) : (
+        <Icon
+          name='user'
+          type='font-awesome'
+          size={40}
+          color='#517fa4'
+        />
+      )}
+      <TouchableOpacity onPress={() => {
+        setSelectedUser({
+          ...user,
+          type: 'topUser',
+          profile: user.profile,
+          name: user.name,
+          emission: user.emission,
+          emissionlogs: user.emissionlogs,
+        });
+        setModalVisible(true);
+      }}>
+        <Icon name='star' type='font-awesome' color='#517fa4' size={15} style={{ left: 13, top: 2 }} />
+        <Text style={styles.rankText}>{getOrdinalSuffix(user.rank)}</Text>
+        <Text style={styles.name}>{user.name}</Text>
+        <Text style={styles.emission}>{user.emission} kgCO2</Text>
+      </TouchableOpacity>
+    </ImageBackground>
+  ))}
+</View>
 
       
-      <View style={styles.TableBox}>
+
+      <ImageBackground source={require('../assets/nav4.png')} style={styles.TableBox}>
       <FlatList
         data={rankedUsers.slice(3, 8)}
         keyExtractor={(item) => item.name}
@@ -270,7 +291,7 @@ function KarbonLeaderboard() {
           </View>
         )}
       />
-      </View>
+      </ImageBackground>
       <CustomModal isVisible={isModalVisible} closeModal={() => setModalVisible(false)} selectedUser={selectedUser} />
     </View>
     )
@@ -280,6 +301,39 @@ function KarbonLeaderboard() {
 
 const styles = StyleSheet.create({
 
+
+
+  infoContainer: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    marginBottom: 10,
+  },
+  infoTitle: {
+    fontWeight: 'bold',
+    marginRight: 10,
+  },
+  infoContent: {
+    flex: 1,
+    textAlign: 'left',
+  },
+
+
+
+  userEmail:{
+    fontSize: 16,
+    marginBottom: 10,
+    fontFamily: 'Montserrat-Light',
+  },
+  userBio: {
+    fontSize: 16,
+    marginBottom: 10,
+    fontFamily: 'Montserrat-Light',
+  },
+  userPhone: {
+    fontSize: 16,
+    marginBottom: 10,
+    fontFamily: 'Montserrat-Light',
+  },
 
   modalContainer: {
     flex: 1,
@@ -328,7 +382,7 @@ const styles = StyleSheet.create({
 
   headerContainer: {
     borderRadius: 30,
-    backgroundColor: 'black',
+    backgroundColor: 'orange',
     width: '80%',
     padding: 10,
     top: 20,
@@ -382,15 +436,16 @@ const styles = StyleSheet.create({
   },
   rankCard: {
     borderRadius: 20, 
+    overflow: 'hidden',
     alignItems: 'center',
     height: 180,
     marginHorizontal: 4, 
     width: 105,
-    top: 5,
+    top: 35,
   },
   middleCard: {
     height: 200, 
-    top: -10,
+    top: 10,
   },
   rankText: {
     fontSize: 15,
@@ -399,23 +454,21 @@ const styles = StyleSheet.create({
     textAlign: 'center',
   },
   name: {
-    fontSize: 15,
+    fontSize: 12,
     textAlign: 'center',
     fontFamily: 'Codec',
   },
   emission: {
-    fontSize: 15,
+    fontSize: 13,
     fontFamily: 'Montserrat-Light',
   },
   TableBox: {
-    minHeight: 300, 
-    width: '95%',
-    backgroundColor: 'white', 
-    margin: 10, 
-    borderRadius: 10,
-    bottom: 50, 
-    alignSelf: 'center',
-    padding: 10,
+    height: 330,
+    bottom: 40,
+    left: 10,
+    width: 340,
+    borderRadius: 20,
+    overflow: 'hidden'
   },
 
   tableRow: {

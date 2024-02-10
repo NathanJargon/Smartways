@@ -13,7 +13,7 @@ import EducationScreen from './screens/EducationScreen';
 import KarbonLeaderboard from './screens/KarbonLeaderboard.js';
 import KarbonMap from './screens/KarbonMapScreen.js';
 import HomeScreen from './screens/HomeScreen.js';
-
+import AsyncStorage from '@react-native-async-storage/async-storage';
 import Profile from './screens/Profile';
 import Step1 from './screens/Step1';
 import Step2 from './screens/Step2';
@@ -211,8 +211,8 @@ function MainTabNavigator() {
   );
 }
 
-export default function App() {
-  
+function NavigationHandler() {
+  const navigation = useNavigation();
   let [fontsLoaded] = useFonts({
     'Codec': require('./assets/fonts/Codec.ttf'),
     'Horizon': require('./assets/fonts/Horizon.ttf'),
@@ -220,13 +220,32 @@ export default function App() {
     'Roc': require('./assets/fonts/Roc.otf')
   });
 
+  useEffect(() => {
+    if (!fontsLoaded) return;
+
+    AsyncStorage.getItem('user').then((userDataString) => {
+      if (userDataString) {
+        const userData = JSON.parse(userDataString);
+        const currentTime = new Date().getTime();
+        // Check if less than 30 minutes have passed
+        if (currentTime - userData.loginTime < 30 * 60 * 1000) {
+          navigation.navigate('Main');
+        }
+      }
+    });
+  }, [fontsLoaded, navigation]);
+
   if (!fontsLoaded) {
     return null;
   }
 
+  return <RootStackScreen />;
+}
+
+export default function App() {
   return (
     <NavigationContainer>
-      <RootStackScreen />
+      <NavigationHandler />
     </NavigationContainer>
   );
 }

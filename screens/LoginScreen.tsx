@@ -11,6 +11,7 @@ import { emailValidator, passwordValidator } from '../core/utils';
 import { Navigation } from '../types';
 import { auth } from '../screens/FirebaseConfig';
 import { getAuth, signInWithEmailAndPassword } from 'firebase/auth'; 
+import AsyncStorage from '@react-native-async-storage/async-storage';
 
 type Props = {
   navigation: Navigation;
@@ -31,13 +32,20 @@ const LoginScreen = ({ navigation }: Props) => {
     }
   
     signInWithEmailAndPassword(auth, email.value, password.value)
-      .then((userCredential) => {
-        navigation.navigate('Main');
-      })
-      .catch((error) => {
-        setEmail({ ...email, error: error.message });
-        setPassword({ ...password, error: error.message });
-      });
+    .then(async (userCredential) => {
+      // Store user data and current time
+      const userData = {
+        user: userCredential.user,
+        uid: userCredential.user.uid, // Save user's UID
+        loginTime: new Date().getTime(),
+      };
+      await AsyncStorage.setItem('user', JSON.stringify(userData));
+      navigation.navigate('Main');
+    })
+    .catch((error) => {
+      setEmail({ ...email, error: error.message });
+      setPassword({ ...password, error: error.message });
+    });
   };
 
 

@@ -20,6 +20,7 @@ const KarbonStatisticsScreen = (props) => {
   const [isLoading, setIsLoading] = useState(true);
   const [userName, setUserName] = useState(null);
   const [userProfileImage, setUserProfileImage] = useState(null);
+  const [loading, setLoading] = useState(true);
 
   useEffect(() => {
     const user = auth.currentUser;
@@ -44,23 +45,21 @@ const KarbonStatisticsScreen = (props) => {
         if (user) {
           const userDoc = doc(db, 'users', user.uid);
           const userSnap = await getDoc(userDoc);
-  
+
           if (userSnap.exists()) {
             const userName = userSnap.data().name || null;
             const userProfile = userSnap.data().profile || null;
-  
-            // Store the data in AsyncStorage
-            await AsyncStorage.setItem('userName', userName);
-            await AsyncStorage.setItem('userProfile', userProfile);
-  
+
             setUserName(userName);
             setUserProfileImage(userProfile);
           }
         }
       } catch (error) {
+      } finally {
+        setLoading(false);
       }
     };
-  
+
     fetchUserName(); 
   }, []);
 
@@ -109,27 +108,14 @@ const KarbonStatisticsScreen = (props) => {
     fetchUserData(); 
   }, [date]);
 
-  const getUserNameAndProfile = async () => {
-    try {
-      const cachedUserName = await AsyncStorage.getItem('userName');
-      const cachedUserProfile = await AsyncStorage.getItem('userProfile');
+  if (loading) {
+    return (
+      <View style={{ flex: 1, justifyContent: 'center', alignItems: 'center' }}>
+        <Text style={{ fontWeight: 'bold' }}>Loading..</Text>
+      </View>
+    );
+  }
   
-      if (cachedUserName !== null && cachedUserProfile !== null) {
-        // The data is cached, use it
-        setUserName(cachedUserName);
-        setUserProfileImage(cachedUserProfile);
-      } else {
-        // The data is not cached, fetch it
-        fetchUserName();
-      }
-    } catch (error) {
-    }
-  };
-  
-  useEffect(() => {
-    getUserNameAndProfile();
-  }, []);
-
   return (
     <View style={styles.container}>
 
@@ -330,7 +316,7 @@ const styles = StyleSheet.create({
   },
   nameText: {
     position: 'absolute',
-    fontSize: 20,
+    fontSize: 15,
     fontFamily: 'Montserrat-Light',
     color: 'black',
     padding: 10,

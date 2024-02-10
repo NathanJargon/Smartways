@@ -26,7 +26,7 @@ function Profile({ imageUrl = '', coverImageUrl = '' }) {
   const [inputValue, setInputValue] = useState('');
   const [editingField, setEditingField] = useState('');
   const modalBackground = require('../assets/newsmodalbg.png');
-
+  const [loading, setLoading] = useState(true);
 
   const openModal = (field, value) => {
     setEditingField(field);
@@ -78,14 +78,15 @@ function Profile({ imageUrl = '', coverImageUrl = '' }) {
     if (!result.canceled && result.assets && result.assets.length > 0) {
       const newImageUri = result.assets[0].uri;
       setImage(newImageUri);
-      setUserProfileImage(newImageUri);
+  
+      const downloadUrl = await uploadImage(newImageUri);
+      setUserProfileImage(downloadUrl);
+  
       const user = auth.currentUser;
       if (user) {
         const userDoc = doc(db, 'users', user.uid);
-        await updateDoc(userDoc, { profile: newImageUri });
+        await updateDoc(userDoc, { profile: downloadUrl });
       }
-
-      uploadImage(newImageUri);
     }
   };
 
@@ -125,13 +126,6 @@ function Profile({ imageUrl = '', coverImageUrl = '' }) {
             const userEmail = userSnap.data().email || null;
             const userPhone = userSnap.data().phone || null;
           
-            // Store the data in AsyncStorage
-            await AsyncStorage.setItem('userName', userName);
-            await AsyncStorage.setItem('userProfile', userProfile);
-            await AsyncStorage.setItem('userBio', userBio);
-            await AsyncStorage.setItem('userEmail', userEmail);
-            await AsyncStorage.setItem('userPhone', userPhone);
-          
             setUserName(userName);
             setUserProfileImage(userProfile);
             setUserBio(userBio);
@@ -140,39 +134,20 @@ function Profile({ imageUrl = '', coverImageUrl = '' }) {
           }
         }
       } catch (error) {
+      } finally {
+        setLoading(false);
       }
     };
   
     fetchUserName(); 
   }, []);
 
-  const getUserNameAndProfile = async () => {
-    try {
-      const cachedUserName = await AsyncStorage.getItem('userName');
-      const cachedUserProfile = await AsyncStorage.getItem('userProfile');
-      const cachedUserBio = await AsyncStorage.getItem('userBio');
-      const cachedUserEmail = await AsyncStorage.getItem('userEmail');
-      const cachedUserPhone = await AsyncStorage.getItem('userPhone');
-      
-      if (cachedUserName !== null && cachedUserProfile !== null && cachedUserBio !== null && cachedUserEmail !== null && cachedUserPhone !== null) {
-        // The data is cached, use it
-        setUserName(cachedUserName);
-        setUserProfileImage(cachedUserProfile);
-        setUserBio(cachedUserBio);
-        setUserEmail(cachedUserEmail);
-        setUserPhone(cachedUserPhone);
-      } else {
-        // The data is not cached, fetch it
-        fetchUserName();
-      }
-    } catch (error) {
-    }
-  };
-  
-  useEffect(() => {
-    getUserNameAndProfile();
-  }, []);
 
+  if (loading) {
+    return null; // Or your custom loading component
+  }
+
+  
   return (
     <Background style={styles.backgroundImage}>
       <View style={styles.container}>

@@ -1,5 +1,5 @@
 import React, { useState, useEffect, useRef } from 'react';
-import { View, Text, StyleSheet, Button, Alert, TouchableOpacity, ImageBackground, Image } from 'react-native';
+import { View, Text, StyleSheet, Button, Alert, TouchableOpacity, ImageBackground, Image, Linking  } from 'react-native';
 import MapView, { Marker, PROVIDER_GOOGLE, Polyline } from 'react-native-maps';
 import MapViewDirections from 'react-native-maps-directions';
 import AsyncStorage from '@react-native-async-storage/async-storage';
@@ -26,15 +26,15 @@ const KarbonMap = (props) => {
   const [userLocation, setUserLocation] = useState(null);
   const [emissionStatus, setEmissionStatus] = useState('Low'); 
   const [trafficLevel, setTrafficLevel] = useState('Light'); 
-  const [timeToReach, setTimeToReach] = useState('10 min'); 
+  const [timeToReach, setTimeToReach] = useState('0 min'); 
   const [selectedPlaces, setSelectedPlaces] = useState([]);
   const [region, setRegion] = useState(philippinesRegion);
   const markerRefs = useRef([]);
   let totalDistance = 0;
   let totalEmissions = 0;
   const modeOfTransportation = 'driving';
-  const [userName, setUserName] = useState(null);
-  const [userProfileImage, setUserProfileImage] = useState(null);
+  const [userName, setUserName] = useState('');
+  const [userProfileImage, setUserProfileImage] = useState('');
   const [isLoaded, setIsLoaded] = useState(false);
 
   useEffect(() => {
@@ -51,113 +51,71 @@ const KarbonMap = (props) => {
       return () => unsubscribe();
     }
   }, []);
-  
-  
+
+
   useEffect(() => {
-    const fetchUserName = async () => {
+    const fetchUserAndProfile = async () => {
       try {
+        setLoading(true);
         const user = auth.currentUser;
         if (user) {
           const userDoc = doc(db, 'users', user.uid);
           const userSnap = await getDoc(userDoc);
-  
+
           if (userSnap.exists()) {
-            const userName = userSnap.data().name || null;
-            const userProfile = userSnap.data().profile || null;
-  
-            // Store the data in AsyncStorage
-            await AsyncStorage.setItem('userName', userName);
-            await AsyncStorage.setItem('userProfile', userProfile);
-  
-            setUserName(userName);
-            setUserProfileImage(userProfile);
+            const userData = userSnap.data();
+            
+            if (userData) {
+              const userName = userData.name || null;
+              const userProfile = userData.profile || null;
+          
+              setUserName(userName);
+              setUserProfileImage(userProfile);
+            }
           }
-        }
+        }          
       } catch (error) {
+        console.error("Error fetching user and profile: ", error);
+      } finally {
+        setLoading(false);
+        setIsLoaded(true);
       }
     };
   
-    fetchUserName(); 
+    fetchUserAndProfile(); 
   }, []);
 
-  const getUserNameAndProfile = async () => {
-    try {
-      const cachedUserName = await AsyncStorage.getItem('userName');
-      const cachedUserProfile = await AsyncStorage.getItem('userProfile');
-  
-      if (cachedUserName !== null && cachedUserProfile !== null) {
-        // The data is cached, use it
-        setUserName(cachedUserName);
-        setUserProfileImage(cachedUserProfile);
-      } else {
-        // The data is not cached, fetch it
-        fetchUserName();
-      }
-    } catch (error) {
-    }
-  };
-  
-  useEffect(() => {
-    getUserNameAndProfile();
-  }, []);
 
-  const averageCoordinate = selectedPlaces.reduce(
-    (average, place, index, array) => {
-      average.latitude += place.latitude / array.length;
-      average.longitude += place.longitude / array.length;
-      return average;
-    },
-    { latitude: 0, longitude: 0 }
-  );
-  
   useEffect(() => {
     const getLocation = async () => {
-      let { status } = await Location.requestForegroundPermissionsAsync();
-      if (status !== 'granted') {
-        Alert.alert(
-          'Location Permission Required',
-          'This app needs location permissions to work correctly. Please go to settings and enable location permission for this app.',
-          [
-            { text: 'Go to Settings', onPress: () => Linking.openSettings() },
-            { text: 'Cancel', onPress: () => {}, style: 'cancel' },
-          ]
-        );
-        return;
-      }
+      try {
+        let { status } = await Location.requestForegroundPermissionsAsync();
+        if (status !== 'granted') {
+          Alert.alert(
+            'Location Permission Required',
+            'This app needs location permissions to work correctly. Please go to settings and enable location permission for this app.',
+            [
+              { text: 'Go to Settings', onPress: () => Linking.openSettings() },
+              { text: 'Cancel', onPress: () => {}, style: 'cancel' },
+            ]
+          );
+          return;
+        }
   
-      let location = await Location.getCurrentPositionAsync({});
-      setUserLocation(location.coords);
-      setRegion({
-        latitude: location.coords.latitude,
-        longitude: location.coords.longitude,
-        latitudeDelta: 0.0922,
-        longitudeDelta: 0.0421,
-      });
+        let location = await Location.getCurrentPositionAsync({});
+        setUserLocation(location.coords);
+        setRegion({
+          latitude: location.coords.latitude,
+          longitude: location.coords.longitude,
+          latitudeDelta: 0.0922,
+          longitudeDelta: 0.0421,
+        });
+      } catch (error) {
+        console.error('Error getting location:', error);
+      }
     };
   
     getLocation();
-    setEmissionStatus('Low');
-    setTrafficLevel('Light');
-    setTimeToReach('10 min');
-  }, []);
-
-  useEffect(() => {
-    const getCachedDirections = async () => {
-      try {
-        setLoading(true);
-
-        const cachedDirections = await AsyncStorage.getItem('cachedDirections');
-
-        if (cachedDirections) {
-          setDirections(JSON.parse(cachedDirections));
-        }
-      } catch (error) {
-      } finally {
-        setLoading(false);
-      }
-    };
-
-    getCachedDirections();
     setEmissionStatus('Low');
     setTrafficLevel('Light');
     setTimeToReach('10 min');
@@ -167,56 +125,58 @@ const KarbonMap = (props) => {
     setSelectedPlace(null);
   };
 
-  const handleMarkerPress = (place) => {
-    setSelectedPlaces((prevPlaces) => [...prevPlaces, place]);
-  };
-  
 
   const calculateAndUpdateDistanceAndEmission = async () => {
     try {
-
       const place = selectedPlaces[selectedPlaces.length - 1];
   
-      const directionsResponse = await fetch(
-        `https://maps.googleapis.com/maps/api/directions/json?` +
-        `origin=${userLocation.latitude},${userLocation.longitude}` +
-        `&destination=${place.latitude},${place.longitude}` +
-        '&mode=driving' +
-        '&alternatives=true' + 
-        `&key=${apiKey}`
-      );
+      // Check if place is defined before trying to use its properties
+      if (place && userLocation) {
+        const directionsResponse = await fetch(
+          `https://maps.googleapis.com/maps/api/directions/json?` +
+          `origin=${userLocation.latitude},${userLocation.longitude}` +
+          `&destination=${place.latitude},${place.longitude}` +
+          '&mode=driving' +
+          '&alternatives=true' + 
+          `&key=${apiKey}`
+        );
+  
   
       const directionsData = await directionsResponse.json();
-  
-      if (directionsData.routes && directionsData.routes.length > 0) {
-        const newDirections = decodePolyline(directionsData.routes[0].overview_polyline.points);
-        setDirections(newDirections);
-  
-        // Set time to reach
-        const timeToReach = directionsData.routes[0].legs[0].duration.text;
-        setTimeToReach(timeToReach);
-  
-        // Calculate emission status
-        const distance = directionsData.routes[0].legs[0].distance.value; // distance in meters
-        const emissionStatus = calculateEmissionStatus(distance);
-        setEmissionStatus(emissionStatus);
-  
-        // Calculate traffic level
-        const duration = directionsData.routes[0].legs[0].duration ? directionsData.routes[0].legs[0].duration.value : 0; // duration in seconds
-        const durationInTraffic = directionsData.routes[0].legs[0].duration_in_traffic ? directionsData.routes[0].legs[0].duration_in_traffic.value : 0; // duration in traffic in seconds
-        const trafficLevel = calculateTrafficLevel(duration, durationInTraffic);
-        setTrafficLevel(trafficLevel);
-  
-        // Update distance count and approximate carbon emission
-        totalDistance += distance / 1000; // convert meters to kilometers
-        totalEmissions += calculateCarbonEmission(distance, modeOfTransportation);
-  
-        await AsyncStorage.setItem('cachedDirections', JSON.stringify(newDirections));
-      }
-    } catch (error) {
-    }
-  };
 
+      if (directionsData && directionsData.routes && directionsData.routes.length > 0) {
+        const route = directionsData.routes[0];
+        const legs = route.legs && route.legs.length > 0 ? route.legs[0] : null;
+  
+        if (legs) {
+          const newDirections = decodePolyline(route.overview_polyline.points);
+          setDirections(newDirections);
+  
+          // Set time to reach
+          const timeToReach = legs.duration.text;
+          setTimeToReach(timeToReach);
+  
+          // Calculate emission status
+          const distance = legs.distance.value; // distance in meters
+          const emissionStatus = calculateEmissionStatus(distance);
+          setEmissionStatus(emissionStatus);
+  
+          // Calculate traffic level
+          const duration = legs.duration ? legs.duration.value : 0; // duration in seconds
+          const durationInTraffic = legs.duration_in_traffic ? legs.duration_in_traffic.value : 0; // duration in traffic in seconds
+          const trafficLevel = calculateTrafficLevel(duration, durationInTraffic);
+          setTrafficLevel(trafficLevel);
+  
+          // Update distance count and approximate carbon emission
+          totalDistance += distance / 1000; // convert meters to kilometers
+          totalEmissions += calculateCarbonEmission(distance, modeOfTransportation);
+        }
+      }
+    }
+  } catch (error) {
+    console.error('Error in calculateAndUpdateDistanceAndEmission:', error);
+  }
+};
 
   const handleGetDirections = async () => {
     try {
@@ -276,7 +236,7 @@ const KarbonMap = (props) => {
   }, [selectedPlaces]);
 
   const handleMapPress = (coordinate) => {
-    setSelectedPlaces((prevPlaces) => {
+    setSelectedPlaces((prevPlaces = []) => {
       let newPlaces = [...prevPlaces, coordinate];
       if (newPlaces.length > 5) {
         newPlaces = newPlaces.slice(1);
@@ -285,20 +245,21 @@ const KarbonMap = (props) => {
     });
   };
 
+
   useEffect(() => {
     const loadAllData = async () => {
-      await getUserNameAndProfile();
-      await calculateAndUpdateDistanceAndEmission();
-      setIsLoaded(true);
+      if (userName && userProfileImage) {
+        await calculateAndUpdateDistanceAndEmission();
+        setIsLoaded(true);
+      }
     };
-
+  
     loadAllData();
-  }, []);
+  }, [userName, userProfileImage]);
 
   if (!isLoaded) {
     return null; // or return a loading spinner
   }
-
 
   return (
         <ImageBackground
@@ -463,7 +424,7 @@ const styles = StyleSheet.create({
     fontFamily: 'Montserrat-Light',
     color: 'black',
     padding: 10,
-    left: 100,
+    left: 80,
   },
   buttonContainer: {
     position: 'absolute',
