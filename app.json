@@ -2,20 +2,35 @@
   "expo": {
     "name": "Karbon",
     "slug": "Karbon",
+<<<<<<< HEAD
     "version": "1.0.0",
+=======
+    "version": "120.0",
+>>>>>>> 06dbe9169d2a3c1f004337136d3525fa1202e8f6
     "orientation": "portrait",
     "icon": "./assets/icon.png",
     "userInterfaceStyle": "light",
     "splash": {
+<<<<<<< HEAD
       "image": "./assets/splash2.png",
       "resizeMode": "cover",
       "backgroundColor": "#ffffff"
     },
     "assetBundlePatterns": ["**/*"],
+=======
+      "image": "./assets/splash.png",
+      "resizeMode": "contain",
+      "backgroundColor": "#ffffff"
+    },
+    "assetBundlePatterns": [
+      "**/*"
+    ],
+>>>>>>> 06dbe9169d2a3c1f004337136d3525fa1202e8f6
     "ios": {
       "supportsTablet": true
     },
     "android": {
+<<<<<<< HEAD
       "package": "com.quantumquill.karbon",
       "googleServicesFile": "google-services.json",
       "adaptiveIcon": {
@@ -27,14 +42,27 @@
           "apiKey": "AIzaSyCxLGmhSPj8MZ-K-JVMae_90_rz7s-3S4M"
         }
       }
+=======
+      "adaptiveIcon": {
+        "foregroundImage": "./assets/adaptive-icon.png",
+        "backgroundColor": "#ffffff"
+      },
+      "package": "com.synochrina.autocarb"
+>>>>>>> 06dbe9169d2a3c1f004337136d3525fa1202e8f6
     },
     "web": {
       "favicon": "./assets/favicon.png"
     },
+<<<<<<< HEAD
     "plugins": ["expo-font", "@react-native-firebase/app"],
     "extra": {
       "eas": {
         "projectId": "f2e55073-bee0-40ad-8e3f-6432c09c541d"
+=======
+    "extra": {
+      "eas": {
+        "projectId": "1a073ae9-5106-4c30-bc79-6b6e132493ec"
+>>>>>>> 06dbe9169d2a3c1f004337136d3525fa1202e8f6
       }
     }
   }

@@ -1,3 +1,4 @@
+<<<<<<< HEAD
 import React, { useState, useEffect } from 'react';
 import { View, Text, StyleSheet, Image, TouchableOpacity, ImageBackground, Modal, TextInput, Button } from 'react-native';
 import * as ImagePicker from 'expo-image-picker';
@@ -60,6 +61,16 @@ function Profile({ imageUrl = '', coverImageUrl = '' }) {
 
 
 
+=======
+import React, { useState } from 'react';
+import { View, Text, StyleSheet, Image, TouchableOpacity, ImageBackground } from 'react-native';
+import * as ImagePicker from 'expo-image-picker';
+import { ListItem, Icon } from 'react-native-elements';
+
+function Profile({ imageUrl = '', coverImageUrl = '' }) {
+  const [profileImage, setProfileImage] = useState(imageUrl);
+  const [coverImage, setCoverImage] = useState(coverImageUrl);
+>>>>>>> 06dbe9169d2a3c1f004337136d3525fa1202e8f6
 
   const selectImage = async (setImage, aspect) => {
     const { status } = await ImagePicker.requestMediaLibraryPermissionsAsync();
@@ -67,13 +78,18 @@ function Profile({ imageUrl = '', coverImageUrl = '' }) {
       alert('Sorry, we need camera roll permissions to make this work!');
       return;
     }
+<<<<<<< HEAD
   
+=======
+
+>>>>>>> 06dbe9169d2a3c1f004337136d3525fa1202e8f6
     let result = await ImagePicker.launchImageLibraryAsync({
       mediaTypes: ImagePicker.MediaTypeOptions.All,
       allowsEditing: true,
       aspect: aspect,
       quality: 1,
     });
+<<<<<<< HEAD
   
     if (!result.canceled && result.assets && result.assets.length > 0) {
       const newImageUri = result.assets[0].uri;
@@ -175,6 +191,31 @@ function Profile({ imageUrl = '', coverImageUrl = '' }) {
       </TouchableOpacity>
         </View>
       </View>
+=======
+
+    if (!result.canceled && result.assets && result.assets.length > 0) {
+      setImage(result.assets[0].uri);
+    }
+  };
+
+  return (
+    <ImageBackground source={require('../assets/profilebg.png')} style={styles.backgroundImage}>
+      <View style={styles.container}>
+      <View style={styles.content}>
+        <TouchableOpacity onPress={() => selectImage(setProfileImage, [1, 1])}>
+          {profileImage ? (
+            <Image
+              style={styles.profileImage}
+              source={{ uri: profileImage }}
+            />
+          ) : (
+            <View style={styles.iconContainer}>
+              <Icon name="person" size={50} color="white" />
+            </View>
+          )}
+        </TouchableOpacity>
+        <Text style={styles.userName}>Environmentalist</Text>
+>>>>>>> 06dbe9169d2a3c1f004337136d3525fa1202e8f6
 
 
         <ListItem
@@ -192,7 +233,14 @@ function Profile({ imageUrl = '', coverImageUrl = '' }) {
           <Icon name='email' />
           <Text style={styles.listItemDescription}>Email</Text>
         </View>
+<<<<<<< HEAD
         <Text style={styles.listItemValue}>{userEmail ? `${userEmail}` : 'user@example.com'}</Text>
+=======
+        <Text style={styles.listItemValue}>user@example.com</Text>
+        <TouchableOpacity onPress={() => {}}>
+          <Icon name='edit' size={15} />
+        </TouchableOpacity>
+>>>>>>> 06dbe9169d2a3c1f004337136d3525fa1202e8f6
       </View>
 
       <View style={{ flexDirection: 'row', alignItems: 'center', marginBottom: 25 }}>
@@ -200,6 +248,7 @@ function Profile({ imageUrl = '', coverImageUrl = '' }) {
           <Icon name='phone' />
           <Text style={styles.listItemDescription2}>Phone</Text>
         </View>
+<<<<<<< HEAD
         <Text style={styles.listItemValue}>{userPhone ? `${userPhone}` : '+1234567890'}</Text>
         <TouchableOpacity onPress={() => openModal('userPhone', userPhone)}>
         <Icon name='edit' size={15} />
@@ -262,6 +311,28 @@ function Profile({ imageUrl = '', coverImageUrl = '' }) {
     </Modal>
 
     </Background>
+=======
+        <Text style={styles.listItemValue}>+1234567890</Text>
+        <TouchableOpacity onPress={() => {}}>
+          <Icon name='edit' size={15} />
+        </TouchableOpacity>
+      </View>
+    </ListItem>
+
+
+
+    <View style={styles.buttonsContainer}>
+          <TouchableOpacity onPress={() => {}} style={styles.inContainer}>
+            <Text style={styles.pointsText}>Sign Up</Text>
+          </TouchableOpacity>
+          <TouchableOpacity onPress={() => {}} style={styles.inContainer}>
+            <Text style={styles.pointsText}>Sign In</Text>
+          </TouchableOpacity>
+        </View>
+      </View>
+    </View>
+  </ImageBackground>
+>>>>>>> 06dbe9169d2a3c1f004337136d3525fa1202e8f6
   );
 }
 
@@ -270,6 +341,7 @@ const styles = StyleSheet.create({
     flex: 1,
     resizeMode: 'cover', 
   },
+<<<<<<< HEAD
   overlay: {
     flex: 1,
     backgroundColor: 'rgba(0, 0, 0, 0.5)', // semi-transparent background
@@ -368,6 +440,8 @@ const styles = StyleSheet.create({
     color: '#888',
     marginRight: 10,
   },
+=======
+>>>>>>> 06dbe9169d2a3c1f004337136d3525fa1202e8f6
   inContainer: {
     borderColor: '#4caf50',
     borderWidth: 2,
@@ -458,6 +532,7 @@ const styles = StyleSheet.create({
   listItemValue: {
     marginLeft: 'auto',
     marginRight: 10,
+<<<<<<< HEAD
     fontSize: 10,
   },
   logoutButton: {
@@ -471,6 +546,8 @@ const styles = StyleSheet.create({
   logoutButtonText: {
     color: '#fff',
     fontSize: 18,
+=======
+>>>>>>> 06dbe9169d2a3c1f004337136d3525fa1202e8f6
   },
 });
 export default Profile;

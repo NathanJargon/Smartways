@@ -2,7 +2,10 @@ import React, { useRef, useEffect } from 'react';
 import { View, Text, StyleSheet, ScrollView, TouchableOpacity, Animated, ImageBackground, Image } from 'react-native';
 import { useFocusEffect } from '@react-navigation/native';
 import { FontAwesome as Icon } from '@expo/vector-icons';
+<<<<<<< HEAD
 import headerImage from '../assets/eduheaderbg.png';
+=======
+>>>>>>> 06dbe9169d2a3c1f004337136d3525fa1202e8f6
 
 function EducationScreen({ navigation }) {
   const initialFadeAnim = useRef(new Animated.Value(0)).current;
@@ -37,6 +40,7 @@ function EducationScreen({ navigation }) {
       resizeMode="cover"
     >
       
+<<<<<<< HEAD
       <Image source={headerImage} style={styles.headerImage} />
       <Text style={styles.learningMaterialsText}>Learning Materials</Text>
 
@@ -50,6 +54,22 @@ function EducationScreen({ navigation }) {
               )}
               scrollEventThrottle={16}
             >
+=======
+      <Text style={styles.header1}>Karbon Footprint</Text>
+      <Text style={styles.header2}>and Emission 101</Text>
+
+      <ScrollView 
+        horizontal 
+        contentContainerStyle={styles.buttonRow} 
+        showsHorizontalScrollIndicator={false}
+        onScroll={Animated.event(
+          [{ nativeEvent: { contentOffset: { x: scrollPosition } } }],
+          { useNativeDriver: false }
+        )}
+        scrollEventThrottle={16}
+      >
+
+>>>>>>> 06dbe9169d2a3c1f004337136d3525fa1202e8f6
 
             <View style={styles.buttonContainer}>
               <ImageBackground
@@ -63,7 +83,11 @@ function EducationScreen({ navigation }) {
                     source={require('../assets/step1bg.png')}
                     style={{ width: 260, height: 150, borderRadius: 8 }}
                   />
+<<<<<<< HEAD
                   <Text style={styles.buttonTitle}>Introduction to Carbon Emissions</Text>
+=======
+                  <Text style={styles.buttonTitle}>Introduction to Carbon Footprint</Text>
+>>>>>>> 06dbe9169d2a3c1f004337136d3525fa1202e8f6
                   <Text style={styles.buttonDescription}>Understanding carbon footprint is crucial. It's the total greenhouse gases, especially carbon dioxide, produced by human activities. Explore its impact on our planet.</Text>
                   <Icon name="hand-pointer-o" size={24} color="#4caf50" style={styles.icon} />
                 </TouchableOpacity>
@@ -131,7 +155,11 @@ function EducationScreen({ navigation }) {
               <Animated.View style={{ ...styles.arrowContainer, opacity: arrowOpacity }}>
                 <Icon 
                   name="arrow-right" 
+<<<<<<< HEAD
                   size={50} 
+=======
+                  size={30} 
+>>>>>>> 06dbe9169d2a3c1f004337136d3525fa1202e8f6
                   color="#000" 
                   style={styles.arrowIcon} 
                 />
@@ -146,6 +174,7 @@ const styles = StyleSheet.create({
   container: {
     flex: 1,
   },
+<<<<<<< HEAD
   learningMaterialsText: {
     position: 'absolute',
     fontSize: 20, 
@@ -168,6 +197,15 @@ const styles = StyleSheet.create({
     backgroundColor: 'transparent', // 'rgba(11, 156, 49, 1)', 
     padding: 10, 
     borderRadius: 15, 
+=======
+  arrowContainer: {
+    position: 'absolute', 
+    marginLeft: 310,
+    marginTop: 250,
+    backgroundColor: 'transparent', // 'rgba(11, 156, 49, 1)', 
+    padding: 10, // Add padding around the icon
+    borderRadius: 15, // Optional: round the corners of the container
+>>>>>>> 06dbe9169d2a3c1f004337136d3525fa1202e8f6
   },
   arrowIcon: {
     color: '#90EE90',
@@ -227,7 +265,11 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     justifyContent: 'flex-start', 
     marginBottom: 10,
+<<<<<<< HEAD
     marginTop: -200,
+=======
+    marginTop: -300,
+>>>>>>> 06dbe9169d2a3c1f004337136d3525fa1202e8f6
   },
   buttonContainer: {
     width: 320, // Set the width to 11% of the parent container
