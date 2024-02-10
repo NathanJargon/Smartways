@@ -91,30 +91,33 @@ function HomeScreen({ navigation }) {
 
   
   return (
-    <Background style={styles.container}>
+    <ImageBackground source={require('../assets/homebg.png')} style={styles.container}>
       <ImageBackground source={require('../assets/nav3.png')} style={styles.headerImage}>
 
-        {/* Profile User Icon to the Right */}
-        <TouchableOpacity onPress={() => { navigateToScreen('Profile') }} style={styles.profileIcon}>
-          {userProfileImage ? (
-            <Image source={{ uri: userProfileImage }} style={{ width: 40, height: 40, borderRadius: 20 }} />
-          ) : (
-            <Image source={{ uri: userProfileImage }} style={{ width: 40, height: 40, borderRadius: 20 }} />
-          )}
-        </TouchableOpacity>
-  
-        {/* Welcome Message to the Left */}
-        <View style={styles.welcomeContainer}>
-        <Text style={styles.welcomeText}>
-          {userName ? `Welcome, ${userName}!` : 'Welcome,'}
-        </Text>
-          <Text style={styles.logoText}>Welcome to</Text>
-          <Text style={styles.logoTextBig}>KARBON</Text>
-          <Text style={styles.subText1}>Your journey to a sustainable</Text>
-          <Text style={styles.subText2}>tomorrow starts here.</Text>
+        <View style={{ flexDirection: 'row', justifyContent: 'space-between', padding: 30 }}>
+          {/* Welcome Message to the Left */}
+          <View style={styles.welcomeContainer}>
+            <Text style={styles.welcomeText}>
+              {userName ? `Welcome, ${userName}!` : 'Welcome,'}
+            </Text>
+            <Text style={styles.logoText}>Welcome to</Text>
+            <Text style={styles.logoTextBig}>KARBON</Text>
+            <Text style={styles.subText1}>Your journey to a sustainable</Text>
+            <Text style={styles.subText2}>tomorrow starts here.</Text>
+          </View>
+
+          {/* Profile User Icon to the Right */}
+          <TouchableOpacity onPress={() => { navigateToScreen('Profile') }} style={styles.profileIcon}>
+            {userProfileImage ? (
+              <Image source={{ uri: userProfileImage }} style={{ width: 40, height: 40, borderRadius: 20 }} />
+            ) : (
+              <Image source={{ uri: userProfileImage }} style={{ width: 40, height: 40, borderRadius: 20 }} />
+            )}
+          </TouchableOpacity>
         </View>
+
+
       </ImageBackground>
-  
       <View style={{ marginTop: 120 }}>
         <ScrollView
           contentContainerStyle={[styles.scrollContainer]}
@@ -217,11 +220,42 @@ function HomeScreen({ navigation }) {
           </View>
         </ScrollView>
       </View>
-    </Background>
+    </ImageBackground>
   );
 }
 
 const styles = StyleSheet.create({
+  logoText: {
+    fontFamily: 'Montserrat-Light',
+    fontSize: 35,
+    marginLeft: 65,
+  },
+  logoTextBig: {
+    fontFamily: 'Roc',
+    fontSize: 50,
+    marginLeft: 60,
+  },
+  subText1: {
+    fontFamily: 'Montserrat-Light',
+    fontSize: 12,
+    marginLeft: 85,
+  },
+  subText2: {
+    fontFamily: 'Montserrat-Light',
+    fontSize: 12,
+    marginLeft: 110,
+  },
+  welcomeText: {
+    marginTop: 10,
+    paddingRight: 10,
+    fontFamily: 'Codec',
+    fontSize: 20,
+  }
+  ,
+  profileIcon: {
+    marginTop: 25,
+    marginRight: 15,
+  },
   container: {
     flex: 1,
     alignItems: 'center',
@@ -231,61 +265,11 @@ const styles = StyleSheet.create({
     top: 90,
     width: '120%',
     height: 225,
-  },
-  profileIcon: {
-    position: 'absolute',
-    right: 15,
-    top: 20,
-  },
+  },  
   welcomeContainer: {
     marginLeft: 10,
     marginTop: 20,
     paddingLeft: 10,
-  },
-  welcomeText: {
-    position: 'absolute',
-    fontFamily: 'Codec',
-    fontSize: 18,
-    top: 10,
-    color: 'black',
-  },
-  logoText: {
-    position: 'absolute',
-    fontFamily: 'Roc',
-    fontSize: 40,
-    left: 50,
-    top: 50,
-    marginTop: 5,
-    color: 'black',
-  },
-  logoTextBig: {
-    position: 'absolute',
-    fontFamily: 'Roc',
-    fontSize: 50,
-    left: 60,
-    top: 100,
-    textAlign: 'center',
-    color: 'black',
-  },
-  subText1: {
-    position: 'absolute',
-    fontFamily: 'Montserrat-Light',
-    fontSize: 15,
-    left: 70,
-    top: 150,
-    textAlign: 'center',
-    marginTop: 5,
-    color: 'black',
-  },
-  subText2: {
-    position: 'absolute',
-    fontFamily: 'Montserrat-Light',
-    fontSize: 15,
-    left: 95,
-    top: 170,
-    textAlign: 'center',
-    marginTop: 5,
-    color: 'black',
   },
   scrollContainer: {
     flexGrow: 1,

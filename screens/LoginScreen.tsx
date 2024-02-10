@@ -1,4 +1,4 @@
-import React, { memo, useState } from 'react';
+import React, { memo, useState, useEffect } from 'react';
 import { TouchableOpacity, StyleSheet, Text, View } from 'react-native';
 import Background from '../components/Background';
 import Logo from '../components/Logo';
@@ -12,6 +12,7 @@ import { Navigation } from '../types';
 import { auth } from '../screens/FirebaseConfig';
 import { getAuth, signInWithEmailAndPassword } from 'firebase/auth'; 
 import AsyncStorage from '@react-native-async-storage/async-storage';
+import { getFunctions, httpsCallable } from 'firebase/functions';
 
 type Props = {
   navigation: Navigation;
@@ -20,6 +21,18 @@ type Props = {
 const LoginScreen = ({ navigation }: Props) => {
   const [email, setEmail] = useState({ value: '', error: '' });
   const [password, setPassword] = useState({ value: '', error: '' });
+
+  const checkUserLoggedIn = async () => {
+    const userData = await AsyncStorage.getItem('user');
+    if (userData != null) {
+      navigation.navigate('Main');
+    }
+  };
+
+  useEffect(() => {
+    checkUserLoggedIn();
+  }, []);
+
 
   const _onLoginPressed = () => {
     const emailError = emailValidator(email.value);
@@ -33,6 +46,19 @@ const LoginScreen = ({ navigation }: Props) => {
   
     signInWithEmailAndPassword(auth, email.value, password.value)
     .then(async (userCredential) => {
+
+      // Send email
+      const functions = getFunctions();
+      const sendEmail = httpsCallable(functions, 'sendEmail');
+      sendEmail({ email: email.value })
+        .then((result) => {
+          console.log(result); // Handle result
+        })
+        .catch((error) => {
+          console.error(error); // Handle error
+        });
+
+
       // Store user data and current time
       const userData = {
         user: userCredential.user,

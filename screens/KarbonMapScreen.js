@@ -33,58 +33,7 @@ const KarbonMap = (props) => {
   let totalDistance = 0;
   let totalEmissions = 0;
   const modeOfTransportation = 'driving';
-  const [userName, setUserName] = useState('');
-  const [userProfileImage, setUserProfileImage] = useState('');
   const [isLoaded, setIsLoaded] = useState(false);
-
-  useEffect(() => {
-    const user = auth.currentUser;
-    if (user) {
-      const userDoc = doc(db, 'users', user.uid);
-  
-      const unsubscribe = onSnapshot(userDoc, (doc) => {
-        const userProfile = doc.data().profile || null;
-        setUserProfileImage(userProfile);
-      });
-  
-      // Clean up the subscription on unmount
-      return () => unsubscribe();
-    }
-  }, []);
-
-
-  useEffect(() => {
-    const fetchUserAndProfile = async () => {
-      try {
-        setLoading(true);
-        const user = auth.currentUser;
-        if (user) {
-          const userDoc = doc(db, 'users', user.uid);
-          const userSnap = await getDoc(userDoc);
-
-          if (userSnap.exists()) {
-            const userData = userSnap.data();
-            
-            if (userData) {
-              const userName = userData.name || null;
-              const userProfile = userData.profile || null;
-          
-              setUserName(userName);
-              setUserProfileImage(userProfile);
-            }
-          }
-        }          
-      } catch (error) {
-        console.error("Error fetching user and profile: ", error);
-      } finally {
-        setLoading(false);
-        setIsLoaded(true);
-      }
-    };
-  
-    fetchUserAndProfile(); 
-  }, []);
-
 
   useEffect(() => {
     const getLocation = async () => {
@@ -245,28 +194,18 @@ const KarbonMap = (props) => {
     });
   };
 
-
-  useEffect(() => {
-    const loadAllData = async () => {
-      if (userName && userProfileImage) {
-        await calculateAndUpdateDistanceAndEmission();
-        setIsLoaded(true);
-      }
-    };
-  
-    loadAllData();
-  }, [userName, userProfileImage]);
-
-  if (!isLoaded) {
-    return null; // or return a loading spinner
-  }
-
   return (
         <ImageBackground
         source={require('../assets/background_dot.png')}
         resizeMode="repeat"
         style={{ flex: 1, width: '100%' }}
       >
+
+    <Text style={styles.header}>KARBON MAP</Text>
+    <Text style={{ textAlign: 'center', fontSize: 10, fontFamily: 'Montserrat-Light', marginTop: -30 }}>to reduce carbon emissions.</Text>
+    <Text style={{ textAlign: 'center', fontSize: 10, fontFamily: 'Montserrat-Light', marginTop: -30 }}>Select the best route</Text>
+
+
       <View style={styles.container}>
         <View style={styles.mapContainer}>
           <MapView
@@ -336,38 +275,23 @@ const KarbonMap = (props) => {
           <Text style={styles.infoValue}>{timeToReach}</Text>
         </View>
       </View>
-
-      <View style={styles.buttonContainer}>
-        <Button title="Get Directions" onPress={handleGetDirections} disabled={loading} />
-      </View>
     </View>
-
-    <View style={styles.backBox}>
-      <Text style={styles.backBoxText}>Distance Count Today: {totalDistance} km</Text>
-      <Text style={styles.backBoxText}>Carbon Emission Today: {totalEmissions} gCO2</Text>
-    </View>
-
 
     <TouchableOpacity
-        onPress={() => {
-          props.navigation.navigate('Profile');
-        }}
-        style={styles.cardContainer}
-      >
-        <ImageBackground source={require('../assets/nav7.png')} style={styles.profileBox}>
-          <View style={styles.profileContainer}>
-            {userProfileImage ? (
-              <Image source={{ uri: userProfileImage }} style={{ position: 'absolute', right: 250, top: 10, width: 50, height: 50, borderRadius: 25 }} />
-            ) : (
-              <Icon name="user" size={50} style={{ position: 'absolute', right: 250, top: 10 }} color="#000" />
-            )}
-          </View>
-          <View style={styles.nameContainer}>
-            <Text style={styles.nameText}>{userName ? `Going somewhere, ${userName}?` : 'Username!'}</Text>
-          </View>
-          </ImageBackground>
-        </TouchableOpacity>
-      </View>
+      onPress={handleGetDirections}
+      disabled={loading}
+      style={[styles.cardContainer, { backgroundColor: 'transparent' }]}
+    >
+      <ImageBackground source={require('../assets/nav7.png')} style={styles.profileBox}>
+        <View style={styles.profileContainer}>
+          <Image source={require('../assets/icons/send.png')} style={styles.leaderboardIcon} />
+          <Text style={styles.leaderboardText}>GET DIRECTION</Text>
+        </View>
+      </ImageBackground>
+    </TouchableOpacity>
+
+
+  </View>
     </ImageBackground>
   );
 };
@@ -417,42 +341,58 @@ const decodePolyline = (encoded) => {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
+    justifyContent: 'flex-end',
+    marginBottom: 36,
   },
-  nameText: {
-    position: 'absolute',
-    fontSize: 15,
-    fontFamily: 'Montserrat-Light',
-    color: 'black',
-    padding: 10,
-    left: 80,
-  },
-  buttonContainer: {
-    position: 'absolute',
-    left: 5,
-    bottom: 5,
-    width: '50%',
-    borderRadius: 8,
-    overflow: 'hidden',
-  },
-  profileBox: {
-    right: 10,
-    width: 330,
+  cardContainer: {
+    flexDirection: 'row',
+    width: '90%',
     height: 70,
+    alignSelf: 'center',
+    borderRadius: 10,
+    justifyContent: 'center', // Change this
+    alignItems: 'center', // Change this
+  },
+  profileContainer: {
+    flexDirection: 'row',
+    justifyContent: 'center',
+    alignItems: 'center',
+  },
+  leaderboardIcon: {
+    width: 30,
+    height: 30,
+    marginRight: 10,
+  },
+  leaderboardText: {
+    fontSize: 18,
+    fontFamily: 'Codec',
+  },
+  leaderboardButton: {
+    width: '100%',
+    height: 60,
+    marginTop: 20,
+  },
+  leaderboardBackground: {
+    resizeMode: 'cover',
+    justifyContent: 'center',
+    alignItems: 'center',
+    flexDirection: 'row',
     borderRadius: 20,
     overflow: 'hidden',
   },
-  backBoxText: {
-    fontSize: 12,
-    padding: 7,
-    color: 'black',
-    textAlign: 'center',
-    fontFamily: 'Montserrat-Light',
+  profileBox: {
+    width: 230,
+    height: 60,
+    borderRadius: 20,
+    overflow: 'hidden',
+    justifyContent: 'center', // Add this line
+    alignItems: 'center', // Add this line
   },
   header: {
-    fontSize: 24,
-    fontWeight: 'bold',
+    fontSize: 30,
+    fontFamily: 'Codec',
     textAlign: 'center',
-    marginVertical: 16,
+    padding: 40,
   },
   infoContainer: {
     position: 'absolute',
@@ -479,50 +419,20 @@ const styles = StyleSheet.create({
     fontFamily: 'Montserrat-Light',
   },
   mapContainer: {
-    marginTop: 50,
-    marginLeft: 20, 
-    width: '90%', 
-    height: '65%',
-    borderWidth: 15,
-    borderColor: 'rgba(102, 204, 153, 1)',
-    borderRadius: 30,
-    overflow: 'hidden'
+    width: 300, 
+    height: 400, 
+    justifyContent: 'center',
+    alignItems: 'center',
+    borderWidth: 6, 
+    borderColor: 'green',
+    borderRadius: 10, 
+    marginLeft: 30,
+    marginBottom: 20,
+    borderRadius: 20,
+    overflow: 'hidden',
   },
   map: {
     ...StyleSheet.absoluteFillObject,
-  },
-  cardContainer: {
-    position: 'absolute',
-    flexDirection: 'row',
-    width: '90%',
-    height: 70,
-    alignSelf: 'center',
-    top: 550, // Adjust this value as needed
-    backgroundColor: '#fff',
-    borderRadius: 10,
-    padding: 10,
-    justifyContent: 'flex-start',
-    alignItems: 'center',
-  },
-  profileContainer: {
-    justifyContent: 'center',
-    alignItems: 'center',
-    marginLeft: 50,
-  },
-  nameContainer: {
-    flex: 3,
-    justifyContent: 'center',
-    marginLeft: 10, // Add this line if you want some space between the icon and the text
-  },
-  backBox: {
-    position: 'absolute',
-    bottom: 60,
-    width: '70%',
-    height: 100,
-    alignSelf: 'center',
-    backgroundColor: 'rgba(255, 255, 255, 0.5)',
-    borderRadius: 10,
-    opacity: 1,
   },
 });
 

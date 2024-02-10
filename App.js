@@ -228,7 +228,7 @@ function NavigationHandler() {
         const userData = JSON.parse(userDataString);
         const currentTime = new Date().getTime();
         // Check if less than 30 minutes have passed
-        if (currentTime - userData.loginTime < 30 * 60 * 1000) {
+        if (currentTime - userData.loginTime < 100000 * 60 * 1000) {
           navigation.navigate('Main');
         }
       }

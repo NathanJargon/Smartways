@@ -19,6 +19,8 @@ import { doc, setDoc } from 'firebase/firestore';
 import { db } from '../screens/FirebaseConfig';
 import { Alert } from 'react-native';
 import moment from 'moment';
+import { getFunctions, httpsCallable } from 'firebase/functions';
+
 
 type Props = {
   navigation: Navigation;
@@ -48,7 +50,7 @@ const RegisterScreen = ({ navigation }: Props) => {
     }
   
     createUserWithEmailAndPassword(auth, email.value, password.value)
-      .then((userCredential) => {
+      .then(async (userCredential) => {
         // Registration successful, save additional user information in Firestore
         const user = userCredential.user;
         setDoc(doc(db, 'users', user.uid), {
@@ -63,7 +65,16 @@ const RegisterScreen = ({ navigation }: Props) => {
           lastPressedDate: moment().format('YYYY-MM-DD'),
         });
   
-        // Navigate to the main screen
+        const functions = getFunctions();
+        const sendWelcomeEmail = httpsCallable(functions, 'sendWelcomeEmail');
+        sendWelcomeEmail({ email: email.value })
+          .then((result) => {
+            console.log(result); // Handle result
+          })
+          .catch((error) => {
+            console.error(error); // Handle error
+          });
+    
         navigation.navigate('Main');
       })
       .catch((error) => {

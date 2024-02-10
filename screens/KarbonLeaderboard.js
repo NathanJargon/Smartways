@@ -114,7 +114,7 @@ function KarbonLeaderboard() {
       // console.log(data);
     
       return (
-        <View style={{ marginTop: 20, left: 50, flexDirection: 'row', alignItems: 'center', justifyContent: 'center' }}>
+        <View style={{ marginTop: -10, left: 10, flexDirection: 'row', alignItems: 'center', justifyContent: 'center' }}>
           <YAxis
             data={data}
             contentInset={{ top: 20, bottom: 20 }}
@@ -135,7 +135,7 @@ function KarbonLeaderboard() {
             <XAxis
               style={{ marginHorizontal: -10 }}
               data={data}
-              formatLabel={(value, index) => index}
+              formatLabel={(value, index) => index % 5 === 0 ? index : ''} // Change this line
               contentInset={{ left: 10, right: 100 }}
               svg={{ fontSize: 10, fill: 'grey' }}
             />
@@ -157,20 +157,8 @@ function KarbonLeaderboard() {
             {profileComponent}
     
             <Text style={styles.userName}>{selectedUser?.name}</Text>
-            <Text style={styles.userBio}>{selectedUser?.bio}</Text>
     
             <View style={styles.infoContainer}>
-              <Text style={styles.infoTitle}>Email:</Text>
-              <Text style={styles.infoContent}>{selectedUser?.email}</Text>
-            </View>
-    
-            <View style={styles.infoContainer}>
-              <Text style={styles.infoTitle}>Phone:</Text>
-              <Text style={styles.infoContent}>{selectedUser?.phone}</Text>
-            </View>
-    
-            <View style={styles.infoContainer}>
-              <Text style={styles.infoTitle}>Emission:</Text>
               <Text style={styles.infoContent}>{selectedUser?.emission} kgCO2</Text>
             </View>
     
@@ -238,9 +226,11 @@ function KarbonLeaderboard() {
         });
         setModalVisible(true);
       }}>
-        <Icon name='star' type='font-awesome' color='#517fa4' size={15} style={{ left: 13, top: 2 }} />
         <Text style={styles.rankText}>{getOrdinalSuffix(user.rank)}</Text>
-        <Text style={styles.name}>{user.name}</Text>
+          <View style={{ flexDirection: 'row', alignItems: 'center', justifyContent: 'center' }}>
+            <Text style={styles.name}>{user.name}</Text>
+            {user.email ? <Icon name='star' type='font-awesome' color='green' size={20} style={{ margin: 2, top: -2 }} /> : null}
+          </View>
         <Text style={styles.emission}>{user.emission} kgCO2</Text>
       </TouchableOpacity>
     </ImageBackground>
@@ -265,7 +255,7 @@ function KarbonLeaderboard() {
             <View style={styles.tableRow}>
               <View style={styles.iconContainer}>
                 <View style={styles.iconStyle1}>
-                  <Icon name='star' type='font-awesome' color='#517fa4' size={30} />
+                  {item.email ? <Icon name='star' type='font-awesome' color='green'  size={30}  /> : null}
                 </View>
                 <View style={styles.iconStyle2}>
                   {item.profile && item.profile !== '' ? (
@@ -314,7 +304,7 @@ const styles = StyleSheet.create({
   },
   infoContent: {
     flex: 1,
-    textAlign: 'left',
+    textAlign: 'center',
   },
 
 
@@ -342,6 +332,8 @@ const styles = StyleSheet.create({
     backgroundColor: 'rgba(0, 0, 0, 0.5)', // Transparent background
   },
   modalContent: {
+    width: '80%',
+    height: '70%', 
     backgroundColor: 'white',
     padding: 20,
     borderRadius: 10,
@@ -454,7 +446,7 @@ const styles = StyleSheet.create({
     textAlign: 'center',
   },
   name: {
-    fontSize: 12,
+    fontSize: 11,
     textAlign: 'center',
     fontFamily: 'Codec',
   },
@@ -478,12 +470,12 @@ const styles = StyleSheet.create({
     width: '100%', 
   },
   bottomBorder: {
-    height: 5, 
-    backgroundColor: 'black',
-    borderTopLeftRadius: 10,
-    borderTopRightRadius: 10,
-    borderBottomLeftRadius: 10,
-    borderBottomRightRadius: 10,
+    height: 3, 
+    backgroundColor: 'green',
+    borderTopLeftRadius: 5,
+    borderTopRightRadius: 5,
+    borderBottomLeftRadius: 5,
+    borderBottomRightRadius: 5,
   },
   tableCell: {
     flexDirection: 'column',

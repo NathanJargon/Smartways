@@ -10,7 +10,7 @@ import { doc, getDoc, updateDoc, arrayUnion, FieldValue, collectionGroup, getDoc
 import { getAuth, signInWithEmailAndPassword } from 'firebase/auth'; 
 import moment from 'moment';
 
-function CarbonFootprintScreen() {
+function KarbonCalculator() {
   let [fontsLoaded, error] = useFonts({
     'Codec': require('../assets/fonts/Codec.ttf'),
     'Horizon': require('../assets/fonts/Horizon.ttf'),
@@ -55,28 +55,21 @@ function CarbonFootprintScreen() {
     setCarbonFootprint(totalCarbonFootprint);
     startGlowAnimation();
   
-    // Get the current date
+    // Separate the current date and time
     const currentDate = moment().format('YYYY-MM-DD');
+    const currentTime = moment().format('HH:mm');
   
-    // Check if the calculate button was already pressed today
-    if (!lastPressedDate || !moment(lastPressedDate).isSame(currentDate, 'day')) {
-      // If it wasn't pressed today, then push the data to the emission log
-      // and update the last pressed date
+    const uid = auth.currentUser.uid;
   
-      const uid = auth.currentUser.uid;
+    const emissionLog = { day: currentDate, value: totalCarbonFootprint, time: currentTime };
+    const userDoc = doc(db, 'users', uid);
+    await updateDoc(userDoc, {
+      emissionlogs: arrayUnion(emissionLog),
+      lastPressedDate: currentDate
+    });
   
-      // Push data to the user's emission log and update the last pressed date
-      const emissionLog = { day: currentDate, value: totalCarbonFootprint };
-      const userDoc = doc(db, 'users', uid);
-      await updateDoc(userDoc, {
-        emissionlogs: arrayUnion(emissionLog),
-        lastPressedDate: currentDate
-      });
-  
-      // Save the current date as the last pressed date in AsyncStorage
-      await AsyncStorage.setItem('lastPressedDate', currentDate);
-      setLastPressedDate(currentDate);
-    }
+    await AsyncStorage.setItem('lastPressedDate', currentDate);
+    setLastPressedDate(currentDate);
   };
 
   const startAnimation = () => {
@@ -85,18 +78,6 @@ function CarbonFootprintScreen() {
       duration: 1000,
       useNativeDriver: true,
     }).start();
-  };
-
-  
-  const buttonGlow = {
-    backgroundColor: glowAnim.interpolate({
-      inputRange: [0, 1],
-      outputRange: ['green', '#00ff00']
-    }),
-    shadowColor: '#00ff00',
-    shadowOpacity: glowAnim,
-    shadowRadius: 10,
-    elevation: 5,
   };
   
   const startGlowAnimation = () => {
@@ -143,7 +124,7 @@ function CarbonFootprintScreen() {
         style={{ flex: 1 }}
       >
       <Animated.View style={{ padding: 20, opacity: keyboardStatus ? 0 : 1 }}>
-        <Text style={styles.text1}>Karbon</Text>
+        <Text style={styles.text1}>KARBON</Text>
         <Text style={styles.text21}>You have emitted a</Text>
         <Text style={styles.text22}>total of</Text>
         <Text style={styles.text3}>{carbonFootprint}</Text>
@@ -180,16 +161,26 @@ function CarbonFootprintScreen() {
           </ImageBackground>
         </View>
       </View>
-      <Animated.View style={[styles.button, allInputsFilled && buttonGlow]}>
-      <TouchableOpacity
-        onPress={handleCalculate}
-        disabled={!allInputsFilled}
-      >
-        <Text style={styles.buttonText}>Calculate and Record</Text>
-      </TouchableOpacity>
-      </Animated.View>
 
-      <Text style={styles.lowerText}>Can only record once a day!</Text>
+
+      <Animated.View style={[styles.button, allInputsFilled ]}>
+        <TouchableOpacity
+          onPress={handleCalculate}
+          disabled={!allInputsFilled}
+          style={styles.button}
+        >
+          <ImageBackground
+            source={allInputsFilled ? require('../assets/nav7.png') : require('../assets/buttonbg.png')}
+            style={styles.buttonBackground}
+          >
+            <Image
+              source={require('../assets/icons/plus.png')}
+              style={styles.icon}
+            />
+            <Text style={styles.buttonText}>RECORD YOUR EMISSION</Text>
+          </ImageBackground>
+        </TouchableOpacity>
+      </Animated.View>
 
       <Animated.View style={{ opacity: animation }}>
       <Text style={{ fontSize: 20 }}>
@@ -295,28 +286,29 @@ const styles = StyleSheet.create({
     paddingTop: 0,
   },
   text21: {
-    paddingTop: 0,
+    paddingTop: 10,
     fontSize: 25,
     color: 'white',
     textAlign: 'center',
     fontFamily: 'Codec',
   },
   text22: {
+    bottom: 10,
     fontSize: 25,
     color: 'white',
     textAlign: 'center',
     fontFamily: 'Codec',
   },
   text3: {
-    fontSize: 50,
+    fontSize: 60,
     color: 'white',
     textAlign: 'center',
     fontFamily: 'Codec',
-    bottom: 10,
+    bottom: 15,
   },
   text4: {
     fontSize: 25,
-    bottom: 20,
+    bottom: 25,
     color: 'white',
     textAlign: 'center',
     fontFamily: 'Codec',
@@ -350,13 +342,25 @@ const styles = StyleSheet.create({
     width: '40%',
   },
   button: {
-    width: '60%',
-    height: 50,
+    flexDirection: 'row', 
+    alignItems: 'center', 
+    width: '80%',
+    margin: 7,
+    marginLeft: 20,
+  },
+  icon: {
+    width: 20, // adjust as needed
+    height: 20, // adjust as needed
+    marginRight: 10, // adjust as needed
+  },
+  buttonBackground: {
+    flex: 1,
+    flexDirection: 'row',
     justifyContent: 'center',
     alignItems: 'center',
-    backgroundColor: '#7ED957',
-    marginTop: 20,
     borderRadius: 20,
+    overflow: 'hidden',
+    height: 50,
   },
   buttonGlow: {
     backgroundColor: 'green',
@@ -376,4 +380,4 @@ const styles = StyleSheet.create({
   }
 });
 
-export default CarbonFootprintScreen;
+export default KarbonCalculator;
