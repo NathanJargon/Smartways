@@ -230,7 +230,7 @@ function KarbonLeaderboard() {
         <Text style={styles.rankText}>{getOrdinalSuffix(user.rank)}</Text>
           <View style={{ flexDirection: 'row', alignItems: 'center', justifyContent: 'center' }}>
             <Text style={styles.name}>{user.name}</Text>
-            {user.email ? <Icon name='star' type='font-awesome' color='green' size={20} style={{ margin: 2, top: -2 }} /> : null}
+            {user.email ? <Icon name='star' type='font-awesome' color='green' size={10} style={{ margin: 2, top: -2 }} /> : null}
           </View>
         <Text style={styles.emission}>{user.emission} kgCO2</Text>
       </TouchableOpacity>
@@ -256,7 +256,7 @@ function KarbonLeaderboard() {
             <View style={styles.tableRow}>
               <View style={styles.iconContainer}>
                 <View style={styles.iconStyle1}>
-                  {item.email ? <Icon name='star' type='font-awesome' color='green'  size={30}  /> : null}
+                  {item.email ? <Icon name='star' type='font-awesome' color='green'  size={20}  /> : null}
                 </View>
                 <View style={styles.iconStyle2}>
                   {item.profile && item.profile !== '' ? (
@@ -379,8 +379,7 @@ const styles = StyleSheet.create({
     backgroundColor: 'orange',
     width: '80%',
     padding: 10,
-    top: 20,
-    marginVertical: 20,
+    marginTop: 40,
     alignSelf: 'center',
   },
   iconContainer: {
@@ -401,7 +400,6 @@ const styles = StyleSheet.create({
     marginLeft: 30,
   },
   headerBottomContainer: {
-    margin: 5,
     alignSelf: 'center',
   },
   headerBottom1: {
@@ -415,7 +413,7 @@ const styles = StyleSheet.create({
     fontFamily: 'Montserrat-Light',
   },
   header: {
-    fontSize: 24,
+    fontSize: 22,
     color: 'white',
     fontFamily: 'Codec',
     textAlign: 'center',

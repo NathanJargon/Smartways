@@ -10,6 +10,7 @@ import { ImageBackground } from 'react-native';
 import JapanFishPalette from './JapanFishPalette';
 import Background from '../components/Background';
 import { FontAwesome as Icon } from '@expo/vector-icons';
+import { useFocusEffect } from '@react-navigation/native';
 
 function HomeScreen({ navigation }) {
 
@@ -18,6 +19,20 @@ function HomeScreen({ navigation }) {
   const [userName, setUserName] = useState(null);
   const [userProfileImage, setUserProfileImage] = useState(null);
   const [loading, setLoading] = useState(true);
+  let initialMount = true;
+
+  useFocusEffect(
+    React.useCallback(() => {
+      if (initialMount) {
+        setLoading(true);
+        fetchUserData();
+        initialMount = false;
+      }
+  
+      return () => {};
+    }, [])
+  );
+
 
   useEffect(() => {
     Animated.timing(elevationAnim, {
@@ -60,48 +75,54 @@ function HomeScreen({ navigation }) {
     });
   };
 
-  useEffect(() => {
-    const fetchUserData = async () => {
-      try {
-        const jsonValue = await AsyncStorage.getItem('user');
-        if (jsonValue != null) {
-          const userData = JSON.parse(jsonValue);
-          const userDoc = doc(db, 'users', userData.user.uid);
+  const fetchUserData = async () => {
+    try {
+      const jsonValue = await AsyncStorage.getItem('user');
+      if (jsonValue != null) {
+        const userData = JSON.parse(jsonValue);
+        const userDoc = doc(db, 'users', userData.user.uid);
+        const userSnap = await getDoc(userDoc);
+
+        if (userSnap.exists()) {
+          const userName = userSnap.data().name || null;
+          const userProfile = userSnap.data().profile || null;
+
+          setUserName(userName);
+          setUserProfileImage(userProfile);
+          setLoading(false);
+        }
+      } else {
+        const user = auth.currentUser;
+        if (user) {
+          const userDoc = doc(db, 'users', user.uid);
           const userSnap = await getDoc(userDoc);
-  
+      
           if (userSnap.exists()) {
             const userName = userSnap.data().name || null;
             const userProfile = userSnap.data().profile || null;
-  
+      
             setUserName(userName);
             setUserProfileImage(userProfile);
             setLoading(false);
           }
-        } else {
-          const user = auth.currentUser;
-          if (user) {
-            const userDoc = doc(db, 'users', user.uid);
-            const userSnap = await getDoc(userDoc);
-        
-            if (userSnap.exists()) {
-              const userName = userSnap.data().name || null;
-              const userProfile = userSnap.data().profile || null;
-        
-              setUserName(userName);
-              setUserProfileImage(userProfile);
-              setLoading(false);
-            }
-          }
         }
-      } catch (error) {
-        console.error(error);
       }
-    };
-  
-    fetchUserData();
-  }, []);
+      return () => unsub();
 
-  
+    } catch (error) {
+      console.error(error);
+    }
+  };
+
+  if (loading) {
+    return (
+      <View style={{ flex: 1, justifyContent: 'center', alignItems: 'center' }}>
+        <Text style={{ fontWeight: 'bold' }}>Loading..</Text>
+      </View>
+    );
+  }
+
+
   return (
     <ImageBackground source={require('../assets/homebg.png')} style={styles.container}>
       <ImageBackground source={require('../assets/nav3.png')} style={styles.headerImage}>
@@ -123,7 +144,7 @@ function HomeScreen({ navigation }) {
             {userProfileImage ? (
               <Image source={{ uri: userProfileImage }} style={{ width: 40, height: 40, borderRadius: 20 }} />
             ) : (
-              <Image source={{ uri: userProfileImage }} style={{ width: 40, height: 40, borderRadius: 20 }} />
+              <Image source={require('../assets/icons/leaderboardIcon.png')} style={{ width: 40, height: 40, borderRadius: 0 }} />
             )}
           </TouchableOpacity>
         </View>

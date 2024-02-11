@@ -99,9 +99,6 @@ function CustomTabBar({ state, descriptors, navigation }) {
     <ImageBackground 
       source={require('./assets/nav1.png')} 
       style={{
-        borderTopLeftRadius: 5,
-        borderTopRightRadius: 5,
-        bottom: 0,
         overflow: 'hidden'
       }} 
     >

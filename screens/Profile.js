@@ -156,7 +156,7 @@ function Profile({ imageUrl = '', coverImageUrl = '' }) {
         {userProfileImage ? (
             <Image source={{ uri: userProfileImage }} style={{ width: 140, height: 140, borderRadius: 20 }} />
           ) : (
-            <FontIcon name="user" size={100} style={{ marginRight: 10, color: 'white' }} />
+            <Image source={require('../assets/icons/leaderboardIcon.png')} style={{ width: 140, height: 140, borderRadius: 20 }} />
           )}
       </TouchableOpacity>
       <View style={styles.userNameContainer}>

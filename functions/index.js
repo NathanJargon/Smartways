@@ -3,19 +3,26 @@ const regions = functions.region("asia-southeast1");
 const admin = require("firebase-admin");
 const {HttpsError} = require("firebase-functions").https;
 admin.initializeApp();
-
 const nodemailer = require("nodemailer");
 
-const gmailEmail = functions.config().gmail.email;
-const gmailPassword = functions.config().gmail.password;
+const gmailEmail = functions.config().gmail.user;
+const gmailType = functions.config().gmail.type;
+const gmailClientId = functions.config().gmail.clientid;
+const gmailClientSecret = functions.config().gmail.clientsecret;
+const gmailRefreshToken = functions.config().gmail.refreshtoken;
 
 const mailTransport = nodemailer.createTransport({
   service: "gmail",
   auth: {
+    type: gmailType,
     user: gmailEmail,
-    pass: gmailPassword,
+    clientId: gmailClientId,
+    clientSecret: gmailClientSecret,
+    refreshToken: gmailRefreshToken,
   },
 });
+
+
 exports.sendEmail = regions.https.onCall((data, context) => {
   const email = data.email;
 
@@ -24,7 +31,6 @@ exports.sendEmail = regions.https.onCall((data, context) => {
     to: email,
   };
 
-  // The user subscribed to the newsletter.
   mailOptions.subject = "New sign-in from a new device";
   mailOptions.text = `Hi,
 
@@ -53,7 +59,6 @@ exports.sendWelcomeEmail = regions.https.onCall((data, context) => {
     to: email,
   };
 
-  // The user has just signed up
   mailOptions.subject = "Welcome to KARBON";
   mailOptions.text = `Hi,
 

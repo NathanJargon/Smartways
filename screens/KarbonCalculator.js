@@ -244,11 +244,12 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     justifyContent: 'space-between',
     width: '100%',
-    paddingHorizontal: '10%',
+    paddingHorizontal: '9%',
+    paddingVertical: '5%',
   },
   imageBackground: {
     width: 150,
-    height: 200,
+    height: 150,
     borderRadius: 10,
     padding: 12,
     borderWidth: 1,
@@ -260,7 +261,7 @@ const styles = StyleSheet.create({
   },
   imageBackground2: {
     width: 150,
-    height: 200,
+    height: 150,
     borderRadius: 10,
     padding: 12,
     borderWidth: 1,

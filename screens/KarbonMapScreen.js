@@ -202,8 +202,8 @@ const KarbonMap = (props) => {
         >
           <View style={{ flex: 1, justifyContent: 'center' }}>
             <Text style={styles.header}>KARBON MAP</Text>
-            <Text style={{ textAlign: 'center', fontSize: 10, fontFamily: 'Montserrat-Light', marginTop: -30 }}>to reduce carbon emissions.</Text>
-            <Text style={{ textAlign: 'center', fontSize: 10, fontFamily: 'Montserrat-Light', marginTop: -30 }}>Select the best route</Text>
+            <Text style={{ textAlign: 'center', fontSize: 10, fontFamily: 'Montserrat-Light', marginTop: -50 }}>to reduce carbon emissions.</Text>
+            <Text style={{ textAlign: 'center', fontSize: 10, fontFamily: 'Montserrat-Light' }}>Select the best route</Text>
       
             <View style={styles.container}>
               <View style={styles.mapContainer}>
@@ -346,7 +346,6 @@ const styles = StyleSheet.create({
   cardContainer: {
     flexDirection: 'row',
     width: '90%',
-    height: 70,
     alignSelf: 'center',
     borderRadius: 10,
     justifyContent: 'center', // Change this
