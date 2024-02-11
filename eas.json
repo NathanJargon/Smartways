@@ -10,13 +10,21 @@
     "preview": {
       "distribution": "internal"
     },
+<<<<<<< HEAD
     "production": {
       "android": {
         "buildType": "apk"
       }
     }
+=======
+    "production": {}
+>>>>>>> 06dbe9169d2a3c1f004337136d3525fa1202e8f6
   },
   "submit": {
     "production": {}
   }
+<<<<<<< HEAD
 }
+=======
+}
+>>>>>>> 06dbe9169d2a3c1f004337136d3525fa1202e8f6
