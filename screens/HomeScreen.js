@@ -138,7 +138,7 @@ function HomeScreen({ navigation }) {
         {/* Profile User Icon to the Right */}
         <TouchableOpacity onPress={() => { navigateToScreen('Profile') }} style={styles.profileIcon}>
           {userProfileImage ? (
-            <Image source={{ uri: userProfileImage }} style={{ width: 40, height: 40, borderRadius: 20 }} />
+            <Image source={{ uri: userProfileImage }} style={{ width: 45, height: 45, borderRadius: 20 }} />
           ) : (
             <Image source={require('../assets/icons/leaderboardIcon.png')} style={{ width: 40, height: 40, borderRadius: 0 }} />
           )}
@@ -157,7 +157,7 @@ function HomeScreen({ navigation }) {
 
 
 
-      <View style={{ marginTop: 30 }}>
+      <View style={{ marginTop: 20 }}>
         <ScrollView
           contentContainerStyle={[styles.scrollContainer]}
           scrollEventThrottle={16}
@@ -268,32 +268,33 @@ const styles = StyleSheet.create({
     fontFamily: 'Montserrat-Light',
     fontSize: 40,
     textAlign: 'center',
-    top: -50, // adjust this value as needed
+    top: -60, // adjust this value as needed
   },
   logoTextBig: {
     fontFamily: 'Roc',
     fontSize: 50,
     textAlign: 'center',
-    top: -50, // adjust this value as needed
+    top: -60, // adjust this value as needed
   },
   subText1: {
     fontFamily: 'Montserrat-Light',
     fontSize: 12,
     textAlign: 'center',
-    top: -50, // adjust this value as needed
+    top: -55, // adjust this value as needed
   },
   subText2: {
     fontFamily: 'Montserrat-Light',
     fontSize: 12,
     textAlign: 'center',
-    top: -50, // adjust this value as needed
+    top: -55, // adjust this value as needed
   },
   welcomeText: {
     fontFamily: 'Codec',
     fontSize: 20,
+    marginTop: 15,
   },
   profileIcon: {
-    marginTop: 25,
+    marginTop: 20,
     marginRight: 15,
   },
   container: {

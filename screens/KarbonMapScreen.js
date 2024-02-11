@@ -443,8 +443,8 @@ const decodePolyline = (encoded) => {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    justifyContent: 'flex-end',
-    marginBottom: 36,
+    justifyContent: 'center',
+    alignItems: 'center',
   },
   cardContainer: {
     flexDirection: 'row',
@@ -526,9 +526,6 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     borderWidth: 6, 
     borderColor: 'green',
-    borderRadius: 10, 
-    marginLeft: 30,
-    marginBottom: 20,
     borderRadius: 20,
     overflow: 'hidden',
   },
