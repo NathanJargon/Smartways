@@ -113,17 +113,13 @@ function KarbonCalculator() {
 
   
   return (
-    <Background style={styles.backgroundImage}>
-
-
-      <Image source={require('../assets/assessbg.png')} style={styles.topImage} />
-
+    <ImageBackground source={require('../assets/assessbg.png')} style={styles.backgroundImage}>
 
       <KeyboardAvoidingView
         behavior={Platform.OS === "ios" ? "padding" : "height"}
         style={{ flex: 1 }}
       >
-      <Animated.View style={{ padding: 20, opacity: keyboardStatus ? 0 : 1 }}>
+      <Animated.View style={{ padding: 50, opacity: keyboardStatus ? 0 : 1 }}>
         <Text style={styles.text1}>KARBON</Text>
         <Text style={styles.text21}>You have emitted a</Text>
         <Text style={styles.text22}>total of</Text>
@@ -195,7 +191,7 @@ function KarbonCalculator() {
       </Animated.View>
     </View>
     </KeyboardAvoidingView>
-    </Background>
+    </ImageBackground>
   );
 }
 
@@ -256,7 +252,7 @@ const styles = StyleSheet.create({
     borderRadius: 10,
     padding: 12,
     borderWidth: 1,
-    borderColor: '#ddd',
+    borderColor: 'black',
     justifyContent: 'center',
     alignItems: 'center',
     borderRadius: 20,
@@ -268,15 +264,11 @@ const styles = StyleSheet.create({
     borderRadius: 10,
     padding: 12,
     borderWidth: 1,
-    borderColor: '#ddd',
+    borderColor: 'black',
     justifyContent: 'center',
     alignItems: 'center',
     borderRadius: 20,
     overflow: 'hidden',
-  },
-  topImage: {
-    position: 'absolute',
-    bottom: -755,
   },
   text1: {
     fontSize: 45,

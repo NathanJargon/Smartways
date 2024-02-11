@@ -78,13 +78,25 @@ function HomeScreen({ navigation }) {
             setLoading(false);
           }
         } else {
-          fetchUserName(); // Fetch from Firestore if not in AsyncStorage
+          const user = auth.currentUser;
+          if (user) {
+            const userDoc = doc(db, 'users', user.uid);
+            const userSnap = await getDoc(userDoc);
+        
+            if (userSnap.exists()) {
+              const userName = userSnap.data().name || null;
+              const userProfile = userSnap.data().profile || null;
+        
+              setUserName(userName);
+              setUserProfileImage(userProfile);
+              setLoading(false);
+            }
+          }
         }
-      } catch(e) {
-        // error reading value
-        console.error(e);
+      } catch (error) {
+        console.error(error);
       }
-    }
+    };
   
     fetchUserData();
   }, []);

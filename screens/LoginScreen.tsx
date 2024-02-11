@@ -12,7 +12,8 @@ import { Navigation } from '../types';
 import { auth } from '../screens/FirebaseConfig';
 import { getAuth, signInWithEmailAndPassword } from 'firebase/auth'; 
 import AsyncStorage from '@react-native-async-storage/async-storage';
-import { getFunctions, httpsCallable } from 'firebase/functions';
+import { getFunctions, httpsCallable, connectFunctionsEmulator } from 'firebase/functions';
+import { firebaseApp } from './FirebaseConfig';
 
 type Props = {
   navigation: Navigation;
@@ -23,12 +24,16 @@ const LoginScreen = ({ navigation }: Props) => {
   const [password, setPassword] = useState({ value: '', error: '' });
 
   const checkUserLoggedIn = async () => {
-    const userData = await AsyncStorage.getItem('user');
-    if (userData != null) {
-      navigation.navigate('Main');
+    try {
+      const userData = await AsyncStorage.getItem('user');
+      if (userData != null) {
+        navigation.navigate('Main');
+      }
+    } catch (error) {
+      console.error(error);
     }
   };
-
+  
   useEffect(() => {
     checkUserLoggedIn();
   }, []);
@@ -37,7 +42,7 @@ const LoginScreen = ({ navigation }: Props) => {
   const _onLoginPressed = () => {
     const emailError = emailValidator(email.value);
     const passwordError = passwordValidator(password.value);
-  
+
     if (emailError || passwordError) {
       setEmail({ ...email, error: emailError });
       setPassword({ ...password, error: passwordError });
@@ -47,9 +52,12 @@ const LoginScreen = ({ navigation }: Props) => {
     signInWithEmailAndPassword(auth, email.value, password.value)
     .then(async (userCredential) => {
 
+      // console.log(email.value);
       // Send email
-      const functions = getFunctions();
+      const functions = getFunctions(firebaseApp, 'asia-southeast1');
       const sendEmail = httpsCallable(functions, 'sendEmail');
+
+
       sendEmail({ email: email.value })
         .then((result) => {
           console.log(result); // Handle result

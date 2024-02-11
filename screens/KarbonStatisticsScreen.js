@@ -241,7 +241,10 @@ const KarbonStatisticsScreen = (props) => {
   }
   
   return (
-    <Background>
+    <ImageBackground
+    source={require('../assets/statbg.png')}
+    style={styles.background}
+    >
     <View style={styles.container}>
       <TouchableOpacity onPress={DatehandlePress} style={styles.row}>
         <View style={styles.leftContainer}>
@@ -313,20 +316,27 @@ const KarbonStatisticsScreen = (props) => {
           onChange={handleDateChange}
         />
       )}
-    </Background>
+    </ImageBackground>
   );}
 
 
   const styles = StyleSheet.create({
     container: {
       flex: 1,
-      justifyContent: 'flex-start',
+      padding: 20,
+      width: '100%',
+      maxWidth: 340,
+      alignSelf: 'center',
       alignItems: 'center',
-      paddingTop: 20,
+      justifyContent: 'center',
+    },
+    background: {
+      flex: 1,
+      width: '100%',
     },
     row: {
       flexDirection: 'row',
-      justifyContent: 'space-between',
+      justifyContent: 'center', // this will center the children horizontally
       alignItems: 'center',
       width: '100%', 
       padding: 5,
@@ -346,6 +356,7 @@ const KarbonStatisticsScreen = (props) => {
     leftContainer: {
       flexDirection: 'row',
       alignItems: 'center',
+      justifyContent: 'center',
     },
     image: {
       width: 40,

@@ -181,6 +181,7 @@ function KarbonLeaderboard() {
 
   return (
     isLoading ? null : (
+    <ImageBackground source={require('../assets/statbg.png')} style={{flex: 1}}>
     <View>
         <View style={{ flexDirection: 'row', left: 15  }}>
             <View style={{ flexDirection: 'row', left: -5, top: 48  }}>
@@ -284,6 +285,7 @@ function KarbonLeaderboard() {
       </ImageBackground>
       <CustomModal isVisible={isModalVisible} closeModal={() => setModalVisible(false)} selectedUser={selectedUser} />
     </View>
+    </ImageBackground>
     )
   );
 }

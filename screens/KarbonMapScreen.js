@@ -196,18 +196,17 @@ const KarbonMap = (props) => {
 
   return (
         <ImageBackground
-        source={require('../assets/background_dot.png')}
-        resizeMode="repeat"
-        style={{ flex: 1, width: '100%' }}
-      >
-
-    <Text style={styles.header}>KARBON MAP</Text>
-    <Text style={{ textAlign: 'center', fontSize: 10, fontFamily: 'Montserrat-Light', marginTop: -30 }}>to reduce carbon emissions.</Text>
-    <Text style={{ textAlign: 'center', fontSize: 10, fontFamily: 'Montserrat-Light', marginTop: -30 }}>Select the best route</Text>
-
-
-      <View style={styles.container}>
-        <View style={styles.mapContainer}>
+          source={require('../assets/mapbg.png')}
+          resizeMode="cover"
+          style={{ flex: 1, width: '100%' }}
+        >
+          <View style={{ flex: 1, justifyContent: 'center' }}>
+            <Text style={styles.header}>KARBON MAP</Text>
+            <Text style={{ textAlign: 'center', fontSize: 10, fontFamily: 'Montserrat-Light', marginTop: -30 }}>to reduce carbon emissions.</Text>
+            <Text style={{ textAlign: 'center', fontSize: 10, fontFamily: 'Montserrat-Light', marginTop: -30 }}>Select the best route</Text>
+      
+            <View style={styles.container}>
+              <View style={styles.mapContainer}>
           <MapView
             provider={PROVIDER_GOOGLE}
             style={styles.map}
@@ -290,7 +289,7 @@ const KarbonMap = (props) => {
       </ImageBackground>
     </TouchableOpacity>
 
-
+    </View>
   </View>
     </ImageBackground>
   );

@@ -209,10 +209,13 @@ function Profile({ imageUrl = '', coverImageUrl = '' }) {
       </View>
     </View>
 
+
     <TouchableOpacity
       style={styles.logoutButton}
       onPress={async () => {
         await signOut(auth);
+        // Clear AsyncStorage
+        await AsyncStorage.clear();
         // Reset navigation state
         navigation.dispatch(
           CommonActions.reset({
