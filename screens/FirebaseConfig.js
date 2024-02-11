@@ -3,6 +3,8 @@ import { getFirestore, collection } from 'firebase/firestore';
 import { getAuth, initializeAuth, getReactNativePersistence } from 'firebase/auth';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import { getStorage } from 'firebase/storage';
+import { getFunctions } from 'firebase/functions';
+import { setLogLevel, LogLevel } from '@firebase/logger';
 
 const firebaseConfig = {
   apiKey: "AIzaSyCxLGmhSPj8MZ-K-JVMae_90_rz7s-3S4M",
@@ -14,6 +16,7 @@ const firebaseConfig = {
   measurementId: "G-CJHLL5X62C"
 };
 
+setLogLevel(LogLevel.ERROR);
 // Initialize Firebase
 const firebaseApp = initializeApp(firebaseConfig);
 
@@ -27,4 +30,4 @@ const auth = initializeAuth(firebaseApp, {
 
 const storage = getStorage(firebaseApp);
 
-export { auth, db, collection, storage };
+export { auth, db, collection, storage, firebaseApp };

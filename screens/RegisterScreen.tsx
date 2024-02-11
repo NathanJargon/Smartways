@@ -19,6 +19,9 @@ import { doc, setDoc } from 'firebase/firestore';
 import { db } from '../screens/FirebaseConfig';
 import { Alert } from 'react-native';
 import moment from 'moment';
+import { getFunctions, httpsCallable, connectFunctionsEmulator } from 'firebase/functions';
+import { onAuthStateChanged, signInWithEmailAndPassword } from 'firebase/auth';
+import { firebaseApp } from './FirebaseConfig';
 
 type Props = {
   navigation: Navigation;
@@ -47,8 +50,8 @@ const RegisterScreen = ({ navigation }: Props) => {
       return;
     }
   
-    createUserWithEmailAndPassword(auth, email.value, password.value)
-      .then((userCredential) => {
+      createUserWithEmailAndPassword(auth, email.value, password.value)
+      .then(async (userCredential) => {
         // Registration successful, save additional user information in Firestore
         const user = userCredential.user;
         setDoc(doc(db, 'users', user.uid), {
@@ -62,8 +65,22 @@ const RegisterScreen = ({ navigation }: Props) => {
           emissionlogs: [{}],
           lastPressedDate: moment().format('YYYY-MM-DD'),
         });
-  
-        // Navigate to the main screen
+
+        // Get the user's ID token
+        const idToken = await user.getIdToken();
+
+        const functions = getFunctions(firebaseApp, 'asia-southeast1');
+        const sendWelcomeEmail = httpsCallable(functions, 'sendWelcomeEmail');
+
+        // Pass the ID token to the Cloud Function
+        sendWelcomeEmail({ email: email.value })
+          .then((result) => {
+            console.log(result); // Handle result
+          })
+          .catch((error) => {
+            console.error(error); // Handle error
+          });
+
         navigation.navigate('Main');
       })
       .catch((error) => {
@@ -89,11 +106,11 @@ const RegisterScreen = ({ navigation }: Props) => {
         onChangeText={text => setName({ value: text, error: '' })}
         error={!!name.error}
         errorText={name.error}
-        placeholder="5-8 characters"
+        placeholder="Minimum 5-8 characters"
       />
 
       <TextInput
-        label="Email"
+        label="Valid email address"
         returnKeyType="next"
         value={email.value}
         onChangeText={text => setEmail({ value: text, error: '' })}
@@ -106,7 +123,7 @@ const RegisterScreen = ({ navigation }: Props) => {
       />
 
       <TextInput
-        label="Password"
+        label="Minimum 6 characters"
         returnKeyType="done"
         value={password.value}
         onChangeText={text => setPassword({ value: text, error: '' })}
