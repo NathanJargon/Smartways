@@ -245,7 +245,7 @@ const styles = StyleSheet.create({
     justifyContent: 'space-between',
     width: '100%',
     paddingHorizontal: '9%',
-    paddingVertical: '5%',
+    paddingVertical: '8%',
   },
   imageBackground: {
     width: 150,

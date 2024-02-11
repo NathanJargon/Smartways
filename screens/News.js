@@ -1,11 +1,6 @@
 import React, { useEffect, useState, useRef } from 'react';
 import { View, Text, StyleSheet, TouchableOpacity, Linking, RefreshControl, ActivityIndicator, ImageBackground, FlatList, Animated, Image } from 'react-native';
 import axios from 'axios';
-<<<<<<< HEAD
-=======
-import { useFocusEffect } from '@react-navigation/native';
-import { Picker } from '@react-native-picker/picker';
->>>>>>> 06dbe9169d2a3c1f004337136d3525fa1202e8f6
 import { FontAwesome as Icon } from '@expo/vector-icons';
 import { Modal, TextInput, Button } from 'react-native';
 import DateTimePicker from '@react-native-community/datetimepicker';
@@ -24,7 +19,6 @@ function News() {
     date: '',
   });
 
-<<<<<<< HEAD
   const scrollY = useRef(new Animated.Value(0)).current;
   const flatListRef = useRef(null);
 
@@ -45,10 +39,6 @@ function News() {
     extrapolate: 'clamp',
   });
 
-=======
-  const flatListRef = useRef(null);
-
->>>>>>> 06dbe9169d2a3c1f004337136d3525fa1202e8f6
   const openFilterModal = () => {
     setFilterModalVisible(true);
   };
@@ -59,27 +49,17 @@ function News() {
 
   const FilterIcon = () => (
     <View style={styles.filterContainer}>
-<<<<<<< HEAD
       <TouchableOpacity 
         onPress={openFilterModal}
         style={{ flexDirection: 'row', alignItems: 'center' }} // Add this
       >
         <Icon name="filter" size={24} color="#90ee90" />
-=======
-      <TouchableOpacity onPress={openFilterModal}>
-        <Icon name="filter" size={24} color="#90ee90" />
-      </TouchableOpacity> 
-      <TouchableOpacity onPress={openFilterModal}>
->>>>>>> 06dbe9169d2a3c1f004337136d3525fa1202e8f6
         <Text style={styles.filterText}>Filter</Text>
       </TouchableOpacity> 
     </View>
   );
 
-<<<<<<< HEAD
   
-=======
->>>>>>> 06dbe9169d2a3c1f004337136d3525fa1202e8f6
   class FilterModal extends React.Component {
     state = {
       startDate: '',
@@ -335,14 +315,10 @@ function News() {
     <ImageBackground source={require('../assets/newsbg.png')} style={styles.backgroundImage}>
       <FlatList
         ref={flatListRef}
-<<<<<<< HEAD
         onScroll={Animated.event(
           [{ nativeEvent: { contentOffset: { y: scrollY } } }],
           { useNativeDriver: false },
         )}
-=======
-        onScroll={handleScroll}
->>>>>>> 06dbe9169d2a3c1f004337136d3525fa1202e8f6
         indicatorStyle="black"
         ListHeaderComponent={FilterIcon}
         contentContainerStyle={styles.container}
@@ -358,7 +334,6 @@ function News() {
         ListFooterComponent={renderFooter}
       />
       {isFilterModalVisible && <FilterModal setFilters={setFilters} closeModal={closeFilterModal} modalVisible={isFilterModalVisible} />}
-<<<<<<< HEAD
       <Animated.View
         style={[
           styles.scrollToTopButton,
@@ -366,23 +341,13 @@ function News() {
         ]}
       >
         <TouchableOpacity
-=======
-      {page > 3 && !isAtTop && (
-        <TouchableOpacity
-          style={styles.scrollToTopButton}
->>>>>>> 06dbe9169d2a3c1f004337136d3525fa1202e8f6
           onPress={scrollToTop}
           accessible={true}
           accessibilityLabel="Scroll to Top"
         >
           <Icon name="arrow-up" size={20} color="white" />
         </TouchableOpacity>
-<<<<<<< HEAD
       </Animated.View>
-=======
-
-      )}
->>>>>>> 06dbe9169d2a3c1f004337136d3525fa1202e8f6
     </ImageBackground>
   );
 }

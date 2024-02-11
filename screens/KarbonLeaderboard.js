@@ -406,11 +406,15 @@ const styles = StyleSheet.create({
     fontStyle: 'italic',
     textAlign: 'center',
     fontFamily: 'Montserrat-Light',
+    paddingTop: 10,
+    fontSize: 12,
   },
   headerBottom2: {
     fontStyle: 'italic',
     textAlign: 'center',
     fontFamily: 'Montserrat-Light',
+    fontSize: 12,
+    paddingBottom: 10,
   },
   header: {
     fontSize: 22,
@@ -456,8 +460,8 @@ const styles = StyleSheet.create({
   },
   TableBox: {
     height: 330,
+    alignSelf: 'center',
     bottom: 40,
-    left: 10,
     width: 340,
     borderRadius: 20,
     overflow: 'hidden'

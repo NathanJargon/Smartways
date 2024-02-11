@@ -34,6 +34,71 @@ const KarbonMap = (props) => {
   let totalEmissions = 0;
   const modeOfTransportation = 'driving';
   const [isLoaded, setIsLoaded] = useState(false);
+  const [markedPlace, setMarkedPlace] = useState(null);
+  const userDistance = userLocation && selectedPlace ? calculateDistance(userLocation.latitude, userLocation.longitude, selectedPlace.latitude, selectedPlace.longitude) : 0;
+  const markedDistance = userLocation && markedPlace ? calculateDistance(userLocation.latitude, userLocation.longitude, markedPlace.latitude, markedPlace.longitude) : 0;
+  let locationSubscription = null;
+
+  useEffect(() => {
+    startLocationTracking();
+    return () => {
+      stopLocationTracking();
+    };
+  }, []);
+  
+  const clearMarkers = () => {
+    setSelectedPlaces([]);
+    setDirections([]);
+    markerRefs.current = [];
+  };
+
+
+  const startLocationTracking = async () => {
+    let { status } = await Location.requestForegroundPermissionsAsync();
+    if (status !== 'granted') {
+      // handle permission not granted scenario
+      return;
+    }
+  
+    locationSubscription = await Location.watchPositionAsync(
+      {
+        accuracy: Location.Accuracy.High,
+        timeInterval: 1000, // Update every second
+        distanceInterval: 1, // Or update every meter traveled
+      },
+      (location) => {
+        setUserLocation(location.coords);
+        // Recalculate distance here
+      }
+    );
+  };
+  
+  const stopLocationTracking = () => {
+    if (locationSubscription) {
+      locationSubscription.remove();
+      locationSubscription = null;
+    }
+  };
+
+
+  const calculateDistance = (lat1, lon1, lat2, lon2) => {
+    var R = 6371; // Radius of the earth in km
+    var dLat = deg2rad(lat2-lat1);  // deg2rad below
+    var dLon = deg2rad(lon2-lon1); 
+    var a = 
+      Math.sin(dLat/2) * Math.sin(dLat/2) +
+      Math.cos(deg2rad(lat1)) * Math.cos(deg2rad(lat2)) * 
+      Math.sin(dLon/2) * Math.sin(dLon/2)
+      ; 
+    var c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1-a)); 
+    var d = R * c; // Distance in km
+    return d;
+  }
+  
+  const deg2rad = (deg) => {
+    return deg * (Math.PI/180)
+  }
+
 
   useEffect(() => {
     const getLocation = async () => {
@@ -276,18 +341,56 @@ const KarbonMap = (props) => {
       </View>
     </View>
 
-    <TouchableOpacity
-      onPress={handleGetDirections}
-      disabled={loading}
-      style={[styles.cardContainer, { backgroundColor: 'transparent' }]}
-    >
-      <ImageBackground source={require('../assets/nav7.png')} style={styles.profileBox}>
-        <View style={styles.profileContainer}>
-          <Image source={require('../assets/icons/send.png')} style={styles.leaderboardIcon} />
-          <Text style={styles.leaderboardText}>GET DIRECTION</Text>
-        </View>
-      </ImageBackground>
-    </TouchableOpacity>
+    <View style={{ flexDirection: 'row', justifyContent: 'space-between' }}>
+        <TouchableOpacity
+          onPress={handleGetDirections}
+          disabled={loading}
+          style={[styles.cardContainer, { flex: 1, margin: 10, backgroundColor: 'transparent' }]}
+        >
+          <ImageBackground source={require('../assets/nav7.png')} style={styles.profileBox}>
+            <View style={styles.profileContainer}>
+              <Image source={require('../assets/icons/send.png')} style={styles.leaderboardIcon} />
+              <Text style={styles.leaderboardText}>GET DIRECTION</Text>
+            </View>
+          </ImageBackground>
+        </TouchableOpacity>
+
+        <TouchableOpacity
+          onPress={() => {
+            Alert.alert(
+              "Confirmation",
+              "Are you sure you have arrived at the location?",
+              [
+                {
+                  text: "Cancel",
+                  style: "cancel"
+                },
+                { 
+                  text: "Yes", 
+                  onPress: () => {
+                    Alert.alert(
+                      "Congratulations, you have arrived!",
+                      `Kilometers reached: ${userDistance}\nMarked distance: ${markedDistance}`
+                    );
+                    clearMarkers();
+                  } 
+                }
+              ]
+            );
+          }}
+          style={[styles.cardContainer, { flex: 1, margin: 10, backgroundColor: 'transparent' }]}
+        >
+          <ImageBackground source={require('../assets/nav7.png')} style={styles.profileBox}>
+            <View style={styles.profileContainer}>
+              <Image source={require('../assets/icons/arrival.png')} style={styles.leaderboardIcon} />
+              <View style={{ flexDirection: 'column' }}>
+                <Text style={styles.leaderboardText}>ARRIVED AT</Text>
+                <Text style={styles.leaderboardText}>LOCATION</Text>
+              </View>
+            </View>
+          </ImageBackground>
+        </TouchableOpacity>
+      </View>
 
     </View>
   </View>
@@ -362,7 +465,7 @@ const styles = StyleSheet.create({
     marginRight: 10,
   },
   leaderboardText: {
-    fontSize: 18,
+    fontSize: 10,
     fontFamily: 'Codec',
   },
   leaderboardButton: {
@@ -379,7 +482,7 @@ const styles = StyleSheet.create({
     overflow: 'hidden',
   },
   profileBox: {
-    width: 230,
+    width: 165,
     height: 60,
     borderRadius: 20,
     overflow: 'hidden',
