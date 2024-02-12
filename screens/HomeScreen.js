@@ -5,7 +5,7 @@ import { auth, db } from '../screens/FirebaseConfig';
 import { getAuth, signInWithEmailAndPassword } from 'firebase/auth'; 
 import { doc, getDoc, onSnapshot } from 'firebase/firestore';
 
-import { View, Text, StyleSheet, TouchableOpacity, Image, ScrollView, Dimensions, Animated, TouchableHighlight  } from 'react-native';
+import { View, Text, StyleSheet, TouchableOpacity, Image, ScrollView, Dimensions, Animated, TouchableHighlight } from 'react-native';
 import { ImageBackground } from 'react-native';
 import JapanFishPalette from './JapanFishPalette';
 import Background from '../components/Background';
@@ -263,6 +263,12 @@ function HomeScreen({ navigation }) {
   );
 }
 
+
+const windowWidth = Dimensions.get('window').width;
+const windowHeight = Dimensions.get('window').height;
+
+
+
 const styles = StyleSheet.create({
   logoText: {
     fontFamily: 'Montserrat-Light',
@@ -296,16 +302,20 @@ const styles = StyleSheet.create({
   profileIcon: {
     marginTop: 20,
     marginRight: 15,
+    width: windowWidth * 0.12, // 10% of screen width
+    height: windowWidth * 0.12,
   },
   container: {
     flex: 1,
     alignItems: 'center',
     justifyContent: 'center',
+    width: windowWidth,
+    height: windowHeight,
   },
   headerImage: {
     marginTop: 200,
     width: '120%',
-    height: 245,
+    height: windowHeight * 0.35,
   },  
   welcomeContainer: {
     marginLeft: 10,

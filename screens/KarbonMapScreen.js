@@ -38,6 +38,7 @@ const KarbonMap = (props) => {
   const userDistance = userLocation && selectedPlace ? calculateDistance(userLocation.latitude, userLocation.longitude, selectedPlace.latitude, selectedPlace.longitude) : 0;
   const markedDistance = userLocation && markedPlace ? calculateDistance(userLocation.latitude, userLocation.longitude, markedPlace.latitude, markedPlace.longitude) : 0;
   let locationSubscription = null;
+  const [isNavigating, setIsNavigating] = useState(false);
 
   useEffect(() => {
     startLocationTracking();
@@ -51,6 +52,22 @@ const KarbonMap = (props) => {
     setDirections([]);
     markerRefs.current = [];
   };
+
+
+  useEffect(() => {
+    const checkLocationServices = async () => {
+      const hasServicesEnabled = await Location.hasServicesEnabledAsync();
+      if (hasServicesEnabled) {
+        startLocationTracking();
+      } else {
+        stopLocationTracking();
+      }
+    };
+  
+    const interval = setInterval(checkLocationServices, 1000); // Check every second
+  
+    return () => clearInterval(interval);
+  }, []);
 
 
   const startLocationTracking = async () => {
@@ -196,6 +213,7 @@ const KarbonMap = (props) => {
     try {
       setLoading(true);
       await calculateAndUpdateDistanceAndEmission();
+      setIsNavigating(true);
     } finally {
       setLoading(false);
     }
@@ -224,9 +242,9 @@ const KarbonMap = (props) => {
   // Calculate traffic level based on duration and duration in traffic
   const calculateTrafficLevel = (duration, durationInTraffic) => {
     const ratio = durationInTraffic / duration;
-    if (ratio < 1.1) {
+    if (ratio < 1.05) {
       return 'Light';
-    } else if (ratio < 1.5) {
+    } else if (ratio < 1.2) {
       return 'Medium';
     } else {
       return 'Heavy';
@@ -250,6 +268,10 @@ const KarbonMap = (props) => {
   }, [selectedPlaces]);
 
   const handleMapPress = (coordinate) => {
+    if (isNavigating) {
+      return;
+    }
+
     setSelectedPlaces((prevPlaces = []) => {
       let newPlaces = [...prevPlaces, coordinate];
       if (newPlaces.length > 5) {
@@ -344,13 +366,15 @@ const KarbonMap = (props) => {
     <View style={{ flexDirection: 'row', justifyContent: 'space-between' }}>
         <TouchableOpacity
           onPress={handleGetDirections}
-          disabled={loading}
+          disabled={isNavigating}
           style={[styles.cardContainer, { flex: 1, margin: 10, backgroundColor: 'transparent' }]}
         >
           <ImageBackground source={require('../assets/nav7.png')} style={styles.profileBox}>
             <View style={styles.profileContainer}>
               <Image source={require('../assets/icons/send.png')} style={styles.leaderboardIcon} />
-              <Text style={styles.leaderboardText}>GET DIRECTION</Text>
+                <Text style={styles.leaderboardText}>
+                  {isNavigating ? 'DIRECTION SET' : 'GET DIRECTION'}
+                </Text>
             </View>
           </ImageBackground>
         </TouchableOpacity>
@@ -373,6 +397,7 @@ const KarbonMap = (props) => {
                       `Kilometers reached: ${userDistance}\nMarked distance: ${markedDistance}`
                     );
                     clearMarkers();
+                    setIsNavigating(false);
                   } 
                 }
               ]

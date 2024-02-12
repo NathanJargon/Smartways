@@ -198,10 +198,9 @@ function KarbonCalculator() {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    justifyContent: 'flex-end',
+    justifyContent: 'center',
     alignItems: 'center',
     padding: 5,
-    top: 70,
   },
   lowerText: {
     fontSize: 15,

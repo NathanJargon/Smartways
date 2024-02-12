@@ -459,7 +459,7 @@ const styles = StyleSheet.create({
     fontFamily: 'Montserrat-Light',
   },
   TableBox: {
-    height: 330,
+    height: 310,
     alignSelf: 'center',
     bottom: 40,
     width: 340,
@@ -474,8 +474,11 @@ const styles = StyleSheet.create({
     width: '100%', 
   },
   bottomBorder: {
-    height: 3, 
-    backgroundColor: 'green',
+    height: 3,
+    padding: 2,
+    width: 300,
+    alignSelf: 'center', // Add this line
+    backgroundColor: '#FF8C00',
     borderTopLeftRadius: 5,
     borderTopRightRadius: 5,
     borderBottomLeftRadius: 5,
