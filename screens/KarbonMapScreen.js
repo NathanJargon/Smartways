@@ -35,10 +35,11 @@ const KarbonMap = (props) => {
   const modeOfTransportation = 'driving';
   const [isLoaded, setIsLoaded] = useState(false);
   const [markedPlace, setMarkedPlace] = useState(null);
-  const userDistance = userLocation && selectedPlace ? calculateDistance(userLocation.latitude, userLocation.longitude, selectedPlace.latitude, selectedPlace.longitude) : 0;
-  const markedDistance = userLocation && markedPlace ? calculateDistance(userLocation.latitude, userLocation.longitude, markedPlace.latitude, markedPlace.longitude) : 0;
+  const [userDistance, setUserDistance] = useState(0);
+  const [markedDistance, setMarkedDistance] = useState(0);
   let locationSubscription = null;
   const [isNavigating, setIsNavigating] = useState(false);
+  const [prevUserLocation, setPrevUserLocation] = useState(null);
 
   useEffect(() => {
     startLocationTracking();
@@ -80,12 +81,21 @@ const KarbonMap = (props) => {
     locationSubscription = await Location.watchPositionAsync(
       {
         accuracy: Location.Accuracy.High,
-        timeInterval: 1000, // Update every second
+        timeInterval: 10000, // Update every second
         distanceInterval: 1, // Or update every meter traveled
       },
       (location) => {
+        if (prevUserLocation) {
+          const distance = calculateDistance(
+            prevUserLocation.latitude,
+            prevUserLocation.longitude,
+            location.coords.latitude,
+            location.coords.longitude
+          );
+          setUserDistance(userDistance => userDistance + distance);
+        }
         setUserLocation(location.coords);
-        // Recalculate distance here
+        setPrevUserLocation(location.coords);
       }
     );
   };
@@ -157,68 +167,80 @@ const KarbonMap = (props) => {
   };
 
 
-  const calculateAndUpdateDistanceAndEmission = async () => {
-    try {
-      const place = selectedPlaces[selectedPlaces.length - 1];
-  
-      // Check if place is defined before trying to use its properties
-      if (place && userLocation) {
-        const directionsResponse = await fetch(
-          `https://maps.googleapis.com/maps/api/directions/json?` +
-          `origin=${userLocation.latitude},${userLocation.longitude}` +
-          `&destination=${place.latitude},${place.longitude}` +
-          '&mode=driving' +
-          '&alternatives=true' + 
-          `&key=${apiKey}`
-        );
-  
-  
-      const directionsData = await directionsResponse.json();
+      const calculateAndUpdateDistanceAndEmission = async () => {
+        try {
+          const place = selectedPlaces[selectedPlaces.length - 1];
+      
+          // Check if place is defined before trying to use its properties
+          if (place && userLocation) {
+            const directionsResponse = await fetch(
+              `https://maps.googleapis.com/maps/api/directions/json?` +
+              `origin=${userLocation.latitude},${userLocation.longitude}` +
+              `&destination=${place.latitude},${place.longitude}` +
+              '&mode=driving' +
+              '&alternatives=true' + 
+              `&key=${apiKey}`
+            );
+      
+      
+          const directionsData = await directionsResponse.json();
 
-      if (directionsData && directionsData.routes && directionsData.routes.length > 0) {
-        const route = directionsData.routes[0];
-        const legs = route.legs && route.legs.length > 0 ? route.legs[0] : null;
-  
-        if (legs) {
-          const newDirections = decodePolyline(route.overview_polyline.points);
-          setDirections(newDirections);
-  
-          // Set time to reach
-          const timeToReach = legs.duration.text;
-          setTimeToReach(timeToReach);
-  
-          // Calculate emission status
-          const distance = legs.distance.value; // distance in meters
-          const emissionStatus = calculateEmissionStatus(distance);
-          setEmissionStatus(emissionStatus);
-  
-          // Calculate traffic level
-          const duration = legs.duration ? legs.duration.value : 0; // duration in seconds
-          const durationInTraffic = legs.duration_in_traffic ? legs.duration_in_traffic.value : 0; // duration in traffic in seconds
-          const trafficLevel = calculateTrafficLevel(duration, durationInTraffic);
-          setTrafficLevel(trafficLevel);
-  
-          // Update distance count and approximate carbon emission
-          totalDistance += distance / 1000; // convert meters to kilometers
-          totalEmissions += calculateCarbonEmission(distance, modeOfTransportation);
+          if (directionsData && directionsData.routes && directionsData.routes.length > 0) {
+            const route = directionsData.routes[0];
+            const legs = route.legs && route.legs.length > 0 ? route.legs[0] : null;
+      
+            if (legs) {
+              const newDirections = decodePolyline(route.overview_polyline.points);
+              setDirections(newDirections);
+      
+              // Set time to reach
+              const timeToReach = legs.duration.text;
+              setTimeToReach(timeToReach);
+      
+              // Calculate emission status
+              const distance = legs.distance.value; // distance in meters
+
+              setMarkedDistance(distance / 1000);
+              
+              const emissionStatus = calculateEmissionStatus(distance);
+              setEmissionStatus(emissionStatus);
+      
+              // Calculate traffic level
+              const duration = legs.duration ? legs.duration.value : 0; // duration in seconds
+              const durationInTraffic = legs.duration_in_traffic ? legs.duration_in_traffic.value : 0; // duration in traffic in seconds
+              const trafficLevel = calculateTrafficLevel(duration, durationInTraffic);
+              setTrafficLevel(trafficLevel);
+      
+              // Update distance count and approximate carbon emission
+              totalDistance += distance / 1000; // convert meters to kilometers
+              totalEmissions += calculateCarbonEmission(distance, modeOfTransportation);
+            }
+          }
         }
+      } catch (error) {
+        console.error('Error in calculateAndUpdateDistanceAndEmission:', error);
       }
-    }
-  } catch (error) {
-    console.error('Error in calculateAndUpdateDistanceAndEmission:', error);
-  }
-};
+    };
 
-  const handleGetDirections = async () => {
-    try {
-      setLoading(true);
-      await calculateAndUpdateDistanceAndEmission();
-      setIsNavigating(true);
-    } finally {
-      setLoading(false);
-    }
-  };
-  
+
+    const handleGetDirections = async () => {
+      if (markerRefs.current.length === 0) {
+        Alert.alert(
+          "No Marker Placed",
+          "Please place a marker first before getting directions."
+        );
+      } else {
+      try {
+        setLoading(true);
+        await calculateAndUpdateDistanceAndEmission();
+        setIsNavigating(true);
+      } finally {
+        setLoading(false);
+      }
+    };
+  }
+
+
   // Periodically update distance and emission
   useEffect(() => {
     const interval = setInterval(async () => {
@@ -289,8 +311,8 @@ const KarbonMap = (props) => {
         >
           <View style={{ flex: 1, justifyContent: 'center' }}>
             <Text style={styles.header}>KARBON MAP</Text>
-            <Text style={{ textAlign: 'center', fontSize: 12, fontFamily: 'Montserrat-Light', marginTop: -50 }}>to reduce carbon emissions.</Text>
-            <Text style={{ textAlign: 'center', fontSize: 12, fontFamily: 'Montserrat-Light' }}>Select the best route</Text>
+            <Text style={{ textAlign: 'center', fontSize: 12, fontFamily: 'Montserrat-Light', marginTop: -40 }}>to reduce carbon emissions.</Text>
+            <Text style={{ textAlign: 'center', fontSize: 12, fontFamily: 'Montserrat-Light', marginTop: 5 }}>Select the best route</Text>
       
             <View style={styles.container}>
               <View style={styles.mapContainer}>
@@ -394,7 +416,7 @@ const KarbonMap = (props) => {
                   onPress: () => {
                     Alert.alert(
                       "Congratulations, you have arrived!",
-                      `Kilometers reached: ${userDistance}\nMarked distance: ${markedDistance}`
+                      `Kilometers reached: ${userDistance} km\nMarked distance: ${markedDistance} km`
                     );
                     clearMarkers();
                     setIsNavigating(false);
@@ -403,6 +425,7 @@ const KarbonMap = (props) => {
               ]
             );
           }}
+          disabled={!isNavigating}
           style={[styles.cardContainer, { flex: 1, margin: 10, backgroundColor: 'transparent' }]}
         >
           <ImageBackground source={require('../assets/nav7.png')} style={styles.profileBox}>
@@ -555,7 +578,7 @@ const styles = StyleSheet.create({
     borderColor: 'green',
     borderRadius: 20,
     overflow: 'hidden',
-    marginTop: 20, // Add this line
+    marginTop: 0, // Add this line
   },
   map: {
     ...StyleSheet.absoluteFillObject,
