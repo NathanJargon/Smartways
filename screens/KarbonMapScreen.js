@@ -92,7 +92,11 @@ const KarbonMap = (props) => {
             location.coords.latitude,
             location.coords.longitude
           );
-          setUserDistance(userDistance => userDistance + distance);
+          setUserDistance(userDistance => {
+            const newDistance = userDistance + distance;
+            // console.log('Updated userDistance:', newDistance);
+            return newDistance;
+          });
         }
         setUserLocation(location.coords);
         setPrevUserLocation(location.coords);
@@ -416,7 +420,7 @@ const KarbonMap = (props) => {
                   onPress: () => {
                     Alert.alert(
                       "Congratulations, you have arrived!",
-                      `Kilometers reached: ${userDistance} km\nMarked distance: ${markedDistance} km`
+                      `Kilometers reached: ${userDistance} km\nMarked distance: ${markedDistance} km\n`
                     );
                     clearMarkers();
                     setIsNavigating(false);
