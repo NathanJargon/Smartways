@@ -1,5 +1,5 @@
 import React, { useState, useEffect, useRef } from 'react';
-import { View, Text, StyleSheet, Button, Alert, TouchableOpacity, ImageBackground, Image, Linking  } from 'react-native';
+import { View, Text, StyleSheet, Button, Alert, TouchableOpacity, ImageBackground, Image, Linking, Dimensions } from 'react-native';
 import MapView, { Marker, PROVIDER_GOOGLE, Polyline } from 'react-native-maps';
 import MapViewDirections from 'react-native-maps-directions';
 import AsyncStorage from '@react-native-async-storage/async-storage';
@@ -267,8 +267,8 @@ const KarbonMap = (props) => {
         >
           <View style={{ flex: 1, justifyContent: 'center' }}>
             <Text style={styles.header}>KARBON MAP</Text>
-            <Text style={{ textAlign: 'center', fontSize: 10, fontFamily: 'Montserrat-Light', marginTop: -50 }}>to reduce carbon emissions.</Text>
-            <Text style={{ textAlign: 'center', fontSize: 10, fontFamily: 'Montserrat-Light' }}>Select the best route</Text>
+            <Text style={{ textAlign: 'center', fontSize: 12, fontFamily: 'Montserrat-Light', marginTop: -50 }}>to reduce carbon emissions.</Text>
+            <Text style={{ textAlign: 'center', fontSize: 12, fontFamily: 'Montserrat-Light' }}>Select the best route</Text>
       
             <View style={styles.container}>
               <View style={styles.mapContainer}>
@@ -439,6 +439,8 @@ const decodePolyline = (encoded) => {
   return poly;
 };
 
+const windowWidth = Dimensions.get('window').width;
+const windowHeight = Dimensions.get('window').height;
 
 const styles = StyleSheet.create({
   container: {
@@ -490,10 +492,10 @@ const styles = StyleSheet.create({
     alignItems: 'center', // Add this line
   },
   header: {
-    fontSize: 30,
+    fontSize: 35,
     fontFamily: 'Codec',
     textAlign: 'center',
-    padding: 40,
+    padding: 30,
   },
   infoContainer: {
     position: 'absolute',
@@ -520,14 +522,15 @@ const styles = StyleSheet.create({
     fontFamily: 'Montserrat-Light',
   },
   mapContainer: {
-    width: 300, 
-    height: 400, 
+    width: windowWidth * 0.9, // 90% of screen width
+    height: windowHeight * 0.59, // 40% of screen height
     justifyContent: 'center',
     alignItems: 'center',
     borderWidth: 6, 
     borderColor: 'green',
     borderRadius: 20,
     overflow: 'hidden',
+    marginTop: 20, // Add this line
   },
   map: {
     ...StyleSheet.absoluteFillObject,
