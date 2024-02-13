@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { View, Text, StyleSheet, Image, TouchableOpacity, ImageBackground, Modal, TextInput, Button } from 'react-native';
+import { View, Text, StyleSheet, Image, TouchableOpacity, ImageBackground, Modal, TextInput, Button, Dimensions } from 'react-native';
 import * as ImagePicker from 'expo-image-picker';
 import { ListItem, Icon } from 'react-native-elements';
 import Background from '../components/Background';
@@ -28,6 +28,10 @@ function Profile({ imageUrl = '', coverImageUrl = '' }) {
   const modalBackground = require('../assets/newsmodalbg.png');
   const [loading, setLoading] = useState(true);
 
+  const windowWidth = Dimensions.get('window').width;
+  const windowHeight = Dimensions.get('window').height;
+
+  
   const openModal = (field, value) => {
     setEditingField(field);
     setInputValue(value);
@@ -149,7 +153,7 @@ function Profile({ imageUrl = '', coverImageUrl = '' }) {
 
   
   return (
-    <Background style={styles.backgroundImage}>
+    <ImageBackground source={(require('../assets/homebg.jpg'))} style={styles.backgroundImage}>
       <View style={styles.container}>
       <View style={styles.content}>
       <TouchableOpacity onPress={() => selectImage(setProfileImage, [1, 1])}>
@@ -165,13 +169,13 @@ function Profile({ imageUrl = '', coverImageUrl = '' }) {
           {userName ? `${userName}` : 'Environmentalist'}
           </Text>
           <TouchableOpacity onPress={() => openModal('userName', userName)}>
-          <Icon name='edit' size={15} />
+          <Icon name='edit' size={15}  color='white' />
           </TouchableOpacity>
         </View>
         <View style={styles.userNameRow}>
           <Text style={styles.userDescription}>{userBio ? `${userBio}` : 'I love nature and will save nature!'}</Text>
           <TouchableOpacity onPress={() => openModal('userBio', userBio)}>
-        <Icon name='edit' size={15} />
+        <Icon name='edit' size={15}  color='white' />
       </TouchableOpacity>
         </View>
       </View>
@@ -189,26 +193,24 @@ function Profile({ imageUrl = '', coverImageUrl = '' }) {
     >
       <View style={{ flexDirection: 'row', alignItems: 'center', marginBottom: 40 }}>
         <View style={{ flexDirection: 'row', alignItems: 'center', marginRight: 20 }}>
-          <Icon name='email' />
+          <Icon name='email'  color='white' />
           <Text style={styles.listItemDescription}>Email</Text>
         </View>
         <Text style={styles.listItemValue}>{userEmail ? `${userEmail}` : 'user@example.com'}</Text>
       </View>
 
-      <View style={{ flexDirection: 'row', alignItems: 'center', marginBottom: 25 }}>
-        <View style={{ flexDirection: 'row', alignItems: 'center', marginRight: 20 }}>
-          <Icon name='phone' />
+      <View style={{ flexDirection: 'row', alignItems: 'center', marginBottom: 25,}}>
+        <View style={{ flexDirection: 'row', alignItems: 'center', marginRight: windowWidth * 0.10 }}>
+          <Icon name='phone'  color='white'/>
           <Text style={styles.listItemDescription2}>Phone</Text>
         </View>
         <Text style={styles.listItemValue}>{userPhone ? `${userPhone}` : '+1234567890'}</Text>
         <TouchableOpacity onPress={() => openModal('userPhone', userPhone)}>
-        <Icon name='edit' size={15} />
+        <Icon name='edit' size={15}  color='white'/>
       </TouchableOpacity>
       </View>
     </ListItem>
       </View>
-    </View>
-
 
     <TouchableOpacity
       style={styles.logoutButton}
@@ -227,6 +229,9 @@ function Profile({ imageUrl = '', coverImageUrl = '' }) {
     >
       <Text style={styles.logoutButtonText}>Logout</Text>
     </TouchableOpacity>
+    </View>
+
+
 
     <Modal visible={isModalVisible} animationType="slide" transparent={true}>
       <View style={styles.overlay}>
@@ -256,6 +261,7 @@ function Profile({ imageUrl = '', coverImageUrl = '' }) {
               }}
               style={styles.modalInput}
             />
+
             <TouchableOpacity style={styles.saveButton} onPress={handleSave}>
               <Text style={styles.saveButtonText}>Save</Text>
             </TouchableOpacity>
@@ -264,9 +270,12 @@ function Profile({ imageUrl = '', coverImageUrl = '' }) {
       </View>
     </Modal>
 
-    </Background>
+    </ImageBackground>
   );
 }
+
+const windowWidth = Dimensions.get('window').width;
+const windowHeight = Dimensions.get('window').height;
 
 const styles = StyleSheet.create({
   backgroundImage: {
@@ -368,7 +377,7 @@ const styles = StyleSheet.create({
   },
   userDescription: {
     fontSize: 14,
-    color: '#888',
+    color: 'white',
     marginRight: 10,
   },
   inContainer: {
@@ -380,7 +389,7 @@ const styles = StyleSheet.create({
     marginBottom: 20,
   },
   pointsText: {
-    color: '#4caf50',
+    color: 'white',
     fontSize: 16,
     textAlign: 'center',
   },
@@ -400,7 +409,7 @@ const styles = StyleSheet.create({
     backgroundColor: '#A5AAAB',
   },
   content: {
-    marginTop: 50,
+    marginTop: windowHeight * 0.15,
     alignItems: 'center',
   },
   profileImage: {
@@ -421,6 +430,7 @@ const styles = StyleSheet.create({
     fontSize: 20,
     fontWeight: 'bold',
     margin: 10,
+    color: 'white', 
   },
   buttonsContainer: {
     flexDirection: 'row',
@@ -429,6 +439,7 @@ const styles = StyleSheet.create({
   },
   buttonText: {
     margin: 10,
+    color: 'white',
   },
   signUpButton: {
     borderColor: '#4caf50', 
@@ -449,27 +460,28 @@ const styles = StyleSheet.create({
     fontSize: 18,
   },
   listItemDescription: {
-    color: '#008000',
+    color: 'white', 
     marginLeft: 10,
     marginRight: 50,
   },
   listItemDescription2: {
-    color: '#008000',
+    color: 'white', 
     marginLeft: 10,
     marginRight: 85,
   },
   listItemValue: {
+    color: 'white', 
     marginLeft: 'auto',
     marginRight: 10,
     fontSize: 10,
   },
   logoutButton: {
-    backgroundColor: '#ff6347',
+    backgroundColor: 'rgba(255, 255, 255, 0.2)',
     padding: 10,
     borderRadius: 5,
     alignItems: 'center',
     marginTop: 20,
-    bottom: 70,
+    marginBottom: windowHeight * 0.05,
   },
   logoutButtonText: {
     color: '#fff',

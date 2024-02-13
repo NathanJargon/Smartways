@@ -12,7 +12,8 @@ import { doc, getDoc, onSnapshot } from 'firebase/firestore';
 
 const KarbonMap = (props) => {
   const apiKey = 'AIzaSyCxLGmhSPj8MZ-K-JVMae_90_rz7s-3S4M'; // Replace with your actual Google Maps API key
-
+  const windowWidth = Dimensions.get('window').width;
+  const windowHeight = Dimensions.get('window').height;
   const philippinesRegion = {
     latitude: 13.41,
     longitude: 122.56,
@@ -309,14 +310,14 @@ const KarbonMap = (props) => {
 
   return (
         <ImageBackground
-          source={require('../assets/mapbg.png')}
+          source={require('../assets/homebg.jpg')}
           resizeMode="cover"
           style={{ flex: 1, width: '100%' }}
         >
           <View style={{ flex: 1, justifyContent: 'center' }}>
             <Text style={styles.header}>KARBON MAP</Text>
-            <Text style={{ textAlign: 'center', fontSize: 12, fontFamily: 'Montserrat-Light', marginTop: -40 }}>to reduce carbon emissions.</Text>
-            <Text style={{ textAlign: 'center', fontSize: 12, fontFamily: 'Montserrat-Light', marginTop: 5 }}>Select the best route</Text>
+            <Text style={{ textAlign: 'center', color: 'white', fontSize: 12, fontFamily: 'Montserrat-Light', marginTop: -40 }}>to reduce carbon emissions.</Text>
+            <Text style={{ textAlign: 'center', color: 'white', fontSize: 12, fontFamily: 'Montserrat-Light', marginTop: 5 }}>Select the best route</Text>
       
             <View style={styles.container}>
               <View style={styles.mapContainer}>
@@ -395,14 +396,14 @@ const KarbonMap = (props) => {
           disabled={isNavigating}
           style={[styles.cardContainer, { flex: 1, margin: 10, backgroundColor: 'transparent' }]}
         >
-          <ImageBackground source={require('../assets/nav7.png')} style={styles.profileBox}>
+        <View style={isNavigating ? styles.profileBox : styles.buttonGlow}>
             <View style={styles.profileContainer}>
               <Image source={require('../assets/icons/send.png')} style={styles.leaderboardIcon} />
                 <Text style={styles.leaderboardText}>
                   {isNavigating ? 'DIRECTION SET' : 'GET DIRECTION'}
                 </Text>
             </View>
-          </ImageBackground>
+          </View>
         </TouchableOpacity>
 
         <TouchableOpacity
@@ -432,15 +433,16 @@ const KarbonMap = (props) => {
           disabled={!isNavigating}
           style={[styles.cardContainer, { flex: 1, margin: 10, backgroundColor: 'transparent' }]}
         >
-          <ImageBackground source={require('../assets/nav7.png')} style={styles.profileBox}>
+        <View style={isNavigating ? styles.buttonGlow : styles.profileBox}>
             <View style={styles.profileContainer}>
               <Image source={require('../assets/icons/arrival.png')} style={styles.leaderboardIcon} />
               <View style={{ flexDirection: 'column' }}>
-                <Text style={styles.leaderboardText}>ARRIVED AT</Text>
-                <Text style={styles.leaderboardText}>LOCATION</Text>
+                <Text style={styles.leaderboardText}>ARRIVED AT LOCATION</Text>
               </View>
             </View>
-          </ImageBackground>
+          </View>
+
+
         </TouchableOpacity>
       </View>
 
@@ -495,6 +497,17 @@ const windowWidth = Dimensions.get('window').width;
 const windowHeight = Dimensions.get('window').height;
 
 const styles = StyleSheet.create({
+buttonGlow: {
+  flex: 1,
+  flexDirection: 'row',
+  justifyContent: 'center',
+  alignItems: 'center',
+  borderRadius: 20,
+  backgroundColor: 'rgba(255, 255, 255, 1)',
+  padding: 10,
+  elevation: 2,
+  marginTop: 15,
+},
   container: {
     flex: 1,
     justifyContent: 'center',
@@ -514,12 +527,12 @@ const styles = StyleSheet.create({
     alignItems: 'center',
   },
   leaderboardIcon: {
-    width: 30,
-    height: 30,
+    width: 25,
+    height: 25,
     marginRight: 10,
   },
   leaderboardText: {
-    fontSize: 10,
+    fontSize: 8,
     fontFamily: 'Codec',
   },
   leaderboardButton: {
@@ -536,18 +549,21 @@ const styles = StyleSheet.create({
     overflow: 'hidden',
   },
   profileBox: {
-    width: 165,
-    height: 60,
+    flexDirection: 'row',
+    justifyContent: 'center',
+    alignItems: 'center',
     borderRadius: 20,
-    overflow: 'hidden',
-    justifyContent: 'center', // Add this line
-    alignItems: 'center', // Add this line
+    backgroundColor: 'rgba(255, 255, 255, 0.5)',
+    padding: 10,
+    elevation: 2,
+    marginTop: 15,
   },
   header: {
     fontSize: 35,
     fontFamily: 'Codec',
     textAlign: 'center',
     padding: 30,
+    color: 'white',
   },
   infoContainer: {
     position: 'absolute',
@@ -579,7 +595,7 @@ const styles = StyleSheet.create({
     justifyContent: 'center',
     alignItems: 'center',
     borderWidth: 6, 
-    borderColor: 'green',
+    borderColor: 'rgba(255,255,255,0.5)',
     borderRadius: 20,
     overflow: 'hidden',
     marginTop: 0, // Add this line

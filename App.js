@@ -97,78 +97,91 @@ function KarbonStatisticsStack() {
 function CustomTabBar({ state, descriptors, navigation }) {
   return (
     <ImageBackground 
-      source={require('./assets/nav1.png')} 
-      style={{
-        overflow: 'hidden'
-      }} 
-    >
-      <View style={{ flexDirection: 'row', marginTop: 'auto', bottom: 5 }}>
-      {state.routes.map((route, index) => {
-        const { options } = descriptors[route.key];
-        const label =
-          options.tabBarLabel !== undefined
-            ? options.tabBarLabel
-            : options.title !== undefined
-            ? options.title
-            : route.name;
+      source={require('./assets/botnav.png')} 
+  >
+      <View
+        style={{
+          borderTopLeftRadius: 20,
+          borderTopRightRadius: 20,
+          overflow: 'hidden',
+          backgroundColor: 'rgba(255, 255, 255, 0.5)',
+          shadowColor: "#000",
+          shadowOffset: {
+            width: 0,
+            height: 2,
+          },
+          shadowOpacity: 0.25,
+          shadowRadius: 3,
+        }} 
+      >
+        <View style={{ flexDirection: 'row', marginTop: 'auto', bottom: 5 }}>
+        {state.routes.map((route, index) => {
+          const { options } = descriptors[route.key];
+          const label =
+            options.tabBarLabel !== undefined
+              ? options.tabBarLabel
+              : options.title !== undefined
+              ? options.title
+              : route.name;
 
-        const isFocused = state.index === index;
+          const isFocused = state.index === index;
 
-        const onPress = () => {
-          const event = navigation.emit({
-            type: 'tabPress',
-            target: route.key,
-            canPreventDefault: true,
-          });
+          const onPress = () => {
+            const event = navigation.emit({
+              type: 'tabPress',
+              target: route.key,
+              canPreventDefault: true,
+            });
 
-        if (!isFocused && !event.defaultPrevented) {
-          navigation.reset({
-            index: 0,
-            routes: [{ name: route.name }],
-          });
-        }
-      };
-
-        const onLongPress = () => {
-          navigation.emit({
-            type: 'tabLongPress',
-            target: route.key,
-          });
+          if (!isFocused && !event.defaultPrevented) {
+            navigation.reset({
+              index: 0,
+              routes: [{ name: route.name }],
+            });
+          }
         };
 
-        return (
-          <TouchableOpacity
-            key={index}
-            accessibilityRole="button"
-            accessibilityStates={isFocused ? ['selected'] : []}
-            accessibilityLabel={options.tabBarAccessibilityLabel}
-            testID={options.tabBarTestID}
-            onPress={onPress}
-            onLongPress={onLongPress}
-            style={{
-              flex: 1,
-              alignItems: 'center',
-              justifyContent: 'center',
-              marginTop: 10,
-            }}
-          >
-            <View style={{ padding: 10 }}>
-              {label === 'Home' ? (
-                <Image source={isFocused ? homeColor : home} style={{width: 30, height: 30}} />
-              ) : label === 'Karbon Calculator' ? (
-                <Image source={isFocused ? carLoanColor : carLoan} style={{width: 30, height: 30}} />
-              ) : label === 'Karbon Statistics' ? (
-                <Image source={isFocused ? analyticsColor : analytics} style={{width: 30, height: 30}} />
-              ) : label === 'Karbon Map' ? (
-                <Image source={isFocused ? directionColor : direction} style={{width: 30, height: 30}} />
-              ) : (
-                <Icon name="circle-o" size={30} color={isFocused ? '#4caf50' : '#222'} />
-              )}
-            </View>
-          </TouchableOpacity>
-        );
-      })}
-    </View>
+          const onLongPress = () => {
+            navigation.emit({
+              type: 'tabLongPress',
+              target: route.key,
+            });
+          };
+
+          return (
+            <TouchableOpacity
+              key={index}
+              accessibilityRole="button"
+              accessibilityStates={isFocused ? ['selected'] : []}
+              accessibilityLabel={options.tabBarAccessibilityLabel}
+              testID={options.tabBarTestID}
+              onPress={onPress}
+              onLongPress={onLongPress}
+              style={{
+                flex: 1,
+                alignItems: 'center',
+                justifyContent: 'center',
+                marginTop: 10,
+              }}
+            >
+              <View style={{ padding: 10 }}>
+                {label === 'Home' ? (
+                  <Image source={isFocused ? homeColor : home} style={{width: 30, height: 30}} />
+                ) : label === 'Karbon Calculator' ? (
+                  <Image source={isFocused ? carLoanColor : carLoan} style={{width: 30, height: 30}} />
+                ) : label === 'Karbon Statistics' ? (
+                  <Image source={isFocused ? analyticsColor : analytics} style={{width: 30, height: 30}} />
+                ) : label === 'Karbon Map' ? (
+                  <Image source={isFocused ? directionColor : direction} style={{width: 30, height: 30}} />
+                ) : (
+                  <Icon name="circle-o" size={30} color={isFocused ? '#4caf50' : '#222'} />
+                )}
+              </View>
+            </TouchableOpacity>
+          );
+        })}
+      </View>
+      </View>
     </ImageBackground>
   );
 }

@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from 'react';
-import { View, Text, StyleSheet, FlatList, Image, Modal, TouchableOpacity, ImageBackground } from 'react-native';
+import { View, Text, StyleSheet, FlatList, Image, Modal, TouchableOpacity, ImageBackground, Dimensions } from 'react-native';
 import { Card, Icon } from 'react-native-elements';
 import { useNavigation } from '@react-navigation/native';
 import { auth, db } from '../screens/FirebaseConfig';
@@ -180,16 +180,21 @@ function KarbonLeaderboard() {
 
 
   return (
-    isLoading ? null : (
-    <ImageBackground source={require('../assets/statbg.png')} style={{flex: 1}}>
+    isLoading ?       
+    <ImageBackground source={require('../assets/homebg.jpg')} style={{ flex: 1 }}>
+      <View style={{ flex: 1, justifyContent: 'center', alignItems: 'center' }}>
+        <Text style={{ fontWeight: 'bold', color: 'white' }}>Loading..</Text>
+      </View>
+    </ImageBackground> : (
+    <ImageBackground source={require('../assets/homebg.jpg')} style={{flex: 1}}>
     <View>
-        <View style={{ flexDirection: 'row', left: 15  }}>
-            <View style={{ flexDirection: 'row', left: -5, top: 48  }}>
+        <View style={{ flexDirection: 'row', left: windowWidth * 0.05  }}>
+            <View style={{ flexDirection: 'row', left: windowWidth * 0.0005, top: windowHeight * .08  }}>
                 <Icon
                     name='arrow-left'
                     type='font-awesome'
                     size={30}
-                    color='black'
+                    color='white'
                     onPress={() => navigation.navigate('KarbonStatistics')}
                 />
             </View>
@@ -207,13 +212,13 @@ function KarbonLeaderboard() {
   {topUsers.map((user, i) => (
     <ImageBackground source={require('../assets/nav7.png')} style={[styles.rankCard, i === 1 && styles.middleCard]} key={i}>
       {user.profile && user.profile !== '' ? (
-        <Image source={{ uri: user.profile }} style={{ width: 40, height: 40, borderRadius: 10, top: 2, }} />
+        <Image source={{ uri: user.profile }} style={{ width: 40, height: 40, borderRadius: 10, marginTop: windowHeight * 0.02, }} />
       ) : (
         <Icon
           name='user'
           type='font-awesome'
           size={40}
-          color='#517fa4'
+          color='white'
         />
       )}
       <TouchableOpacity onPress={() => {
@@ -240,7 +245,7 @@ function KarbonLeaderboard() {
 
       
 
-      <ImageBackground source={require('../assets/nav4.png')} style={styles.TableBox}>
+      <View tyle={styles.TableBox}>
       <FlatList
         data={rankedUsers.slice(3, 8)}
         keyExtractor={(item) => item.name}
@@ -282,7 +287,7 @@ function KarbonLeaderboard() {
           </View>
         )}
       />
-      </ImageBackground>
+      </View>
       <CustomModal isVisible={isModalVisible} closeModal={() => setModalVisible(false)} selectedUser={selectedUser} />
     </View>
     </ImageBackground>
@@ -290,6 +295,8 @@ function KarbonLeaderboard() {
   );
 }
 
+const windowWidth = Dimensions.get('window').width;
+const windowHeight = Dimensions.get('window').height;
 
 const styles = StyleSheet.create({
 
@@ -376,10 +383,11 @@ const styles = StyleSheet.create({
 
   headerContainer: {
     borderRadius: 30,
-    backgroundColor: 'orange',
-    width: '80%',
+    backgroundColor: 'rgba(255,255,255,0.9)',
+    borderWidth: 2,
+    width: windowWidth * 0.8,
     padding: 10,
-    marginTop: 40,
+    marginTop: windowHeight * 0.07,
     alignSelf: 'center',
   },
   iconContainer: {
@@ -408,6 +416,7 @@ const styles = StyleSheet.create({
     fontFamily: 'Montserrat-Light',
     paddingTop: 10,
     fontSize: 12,
+    color: 'white',
   },
   headerBottom2: {
     fontStyle: 'italic',
@@ -415,10 +424,11 @@ const styles = StyleSheet.create({
     fontFamily: 'Montserrat-Light',
     fontSize: 12,
     paddingBottom: 10,
+    color: 'white',
   },
   header: {
     fontSize: 22,
-    color: 'white',
+    color: 'black',
     fontFamily: 'Codec',
     textAlign: 'center',
     fontFamily: 'Montserrat-Light',
@@ -426,31 +436,31 @@ const styles = StyleSheet.create({
   rankContainer: {
     flexDirection: 'row',
     justifyContent: 'space-between',
-    paddingHorizontal: 20,
-    paddingHorizontal: 10,
-    right: 0,
+    paddingHorizontal: windowWidth * 0.02,
+    marginBottom: windowHeight * 0.02,
   },
   rankCard: {
     borderRadius: 20, 
     overflow: 'hidden',
     alignItems: 'center',
-    height: 180,
-    marginHorizontal: 4, 
-    width: 105,
-    top: 35,
+    height: windowHeight * 0.21,
+    marginHorizontal: windowWidth * 0.01, // 1% of window width
+    width: windowWidth * 0.29, // 26% of window width
+    top: windowHeight * 0.05,
   },
   middleCard: {
-    height: 200, 
-    top: 10,
+    height: windowHeight * 0.25, // 25% of window height
+    top: windowHeight * 0.009,
   },
   rankText: {
     fontSize: 15,
-    padding: 0,
+    marginTop: windowHeight * 0.02,
     fontFamily: 'Codec',
     textAlign: 'center',
   },
   name: {
     fontSize: 11,
+    marginTop: windowHeight * 0.01,
     textAlign: 'center',
     fontFamily: 'Codec',
   },
@@ -459,10 +469,9 @@ const styles = StyleSheet.create({
     fontFamily: 'Montserrat-Light',
   },
   TableBox: {
-    height: 310,
     alignSelf: 'center',
-    bottom: 40,
-    width: 340,
+    height: windowHeight * 0.3, // Adjust this value as needed
+    width: windowWidth * 0.9,
     borderRadius: 20,
     overflow: 'hidden'
   },
@@ -470,15 +479,15 @@ const styles = StyleSheet.create({
   tableRow: {
     flexDirection: 'row',
     justifyContent: 'space-between',
-    marginBottom: 10, 
-    width: '100%', 
+    marginBottom: windowHeight * 0.005, 
+    width: windowWidth * 1, // Adjust this value as needed
   },
   bottomBorder: {
     height: 3,
     padding: 2,
     width: 300,
     alignSelf: 'center', // Add this line
-    backgroundColor: '#FF8C00',
+    backgroundColor: 'rgba(255, 255, 255, 0.5)',
     borderTopLeftRadius: 5,
     borderTopRightRadius: 5,
     borderBottomLeftRadius: 5,
@@ -493,12 +502,14 @@ const styles = StyleSheet.create({
     paddingTop: 5,
     fontFamily: 'Codec',
     fontSize: 15,
+    color: 'white',
   },
 
   tableBoxText2: {
     fontSize: 15,
     marginRight: 60,
     fontFamily: 'Montserrat-Light',
+    color: 'white',
   },
 });
 

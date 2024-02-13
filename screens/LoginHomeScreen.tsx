@@ -1,4 +1,4 @@
-import { TouchableOpacity, StyleSheet, Text, View, Image } from 'react-native';
+import { TouchableOpacity, StyleSheet, Text, View, Image, Dimensions } from 'react-native';
 import React, { memo, useEffect } from 'react';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import Background from '../components/Background';
@@ -42,32 +42,32 @@ const HomeScreen = ({ navigation }: Props) => {
       >
         Sign Up
       </Button>
-      <View style={styles.row}>
-        <Text style={styles.label}>Don’t have an account? </Text>
-        <TouchableOpacity onPress={() => navigation.navigate('RegisterScreen')}>
-          <Text style={styles.link}>Sign up</Text>
-        </TouchableOpacity>
-      </View>
+
       <View style={styles.footer}>
         <Text style={styles.footerText}>Powered by</Text>
-        <Image source={require('../assets/icons/logo-black.png')} style={styles.footerImage} />
+        <Image source={require('../assets/icons/logo-white.png')} style={styles.footerImage} />
       </View>
     </Background>
   );
 };
+
+
+const windowWidth = Dimensions.get('window').width;
+const windowHeight = Dimensions.get('window').height;
 
 const styles = StyleSheet.create({
   footer: {
     flexDirection: 'row',
     alignItems: 'center',
     justifyContent: 'center',
-    marginTop: 50,
+    marginTop: 100,
   },
   footerText: {
     marginRight: 10,
     fontSize: 16,
-    color: theme.colors.secondary,
-    fontFamily: 'Montserrat-Light'
+    color: 'white',
+    fontFamily: 'Montserrat-Light',
+
   },
   footerImage: {
     width: 50,
@@ -78,12 +78,12 @@ const styles = StyleSheet.create({
     marginTop: 4,
   },
   label: {
-    color: theme.colors.secondary,
+    color: 'white',
     fontFamily: 'Montserrat-Light'
   },
   link: {
     fontFamily: 'Montserrat-Light',
-    color: theme.colors.primary,
+    color: 'red',
   },
 });
 export default memo(HomeScreen);

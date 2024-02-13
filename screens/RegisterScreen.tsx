@@ -148,7 +148,7 @@ const RegisterScreen = ({ navigation }: Props) => {
 
 const styles = StyleSheet.create({
   label: {
-    color: theme.colors.secondary,
+    color: 'white',
     fontFamily: 'Montserrat-Light'
   },
   button: {
@@ -159,7 +159,7 @@ const styles = StyleSheet.create({
     marginTop: 4,
   },
   link: {
-    color: theme.colors.primary,
+    color: 'red',
     fontFamily: 'Montserrat-Light'
   },
 });

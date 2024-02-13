@@ -20,6 +20,9 @@ function HomeScreen({ navigation }) {
   const [userProfileImage, setUserProfileImage] = useState(null);
   const [loading, setLoading] = useState(true);
   let initialMount = true;
+  const windowWidth = Dimensions.get('window').width;
+  const windowHeight = Dimensions.get('window').height;
+  
 
   useFocusEffect(
     React.useCallback(() => {
@@ -116,36 +119,35 @@ function HomeScreen({ navigation }) {
 
   if (loading) {
     return (
+      <ImageBackground source={require('../assets/homebg.jpg')} style={styles.container}>
       <View style={{ flex: 1, justifyContent: 'center', alignItems: 'center' }}>
-        <Text style={{ fontWeight: 'bold' }}>Loading..</Text>
+        <Text style={{ fontWeight: 'bold', color: 'white' }}>Loading..</Text>
       </View>
+      </ImageBackground>
     );
   }
 
 
   return (
-    <ImageBackground source={require('../assets/homebg.png')} style={styles.container}>
-      <ImageBackground source={require('../assets/nav3.png')} style={styles.headerImage}>
+    
+    <ImageBackground source={require('../assets/homebg.jpg')} style={styles.container}>
+      <View style={styles.headerImage}>
 
-      <View style={{ flexDirection: 'row', justifyContent: 'space-between', padding: 30, alignItems: 'center' }}>
-        {/* Welcome Message to the Left */}
-        <View style={styles.welcomeContainer}>
-          <Text style={styles.welcomeText}>
-            {userName ? `Welcome, ${userName}!` : 'Welcome,'}
-          </Text>
-        </View>
-
-        {/* Profile User Icon to the Right */}
+      <View style={{ flexDirection: 'row', justifyContent: 'space-between', padding: windowHeight * 0.05, alignItems: 'center' }}>
+                {/* Profile User Icon to the Right */}
         <TouchableOpacity onPress={() => { navigateToScreen('Profile') }} style={styles.profileIcon}>
           {userProfileImage ? (
             <Image source={{ uri: userProfileImage }} style={{ width: 45, height: 45, borderRadius: 20 }} />
           ) : (
             <Image source={require('../assets/icons/leaderboardIcon.png')} style={{ width: 40, height: 40, borderRadius: 0 }} />
           )}
+          <Text style={styles.welcomeText}>
+            {userName ? `${userName}` : 'username'}
+          </Text>
         </TouchableOpacity>
       </View>
 
-      <View style={{ alignItems: 'center', padding: 30 }}>
+      <View style={{ alignItems: 'center', padding: windowHeight * 0.035 }}>
         <Text style={styles.logoText}>Welcome to</Text>
         <Text style={styles.logoTextBig}>KARBON</Text>
         <Text style={styles.subText1}>Your journey to a sustainable</Text>
@@ -153,110 +155,79 @@ function HomeScreen({ navigation }) {
       </View>
 
 
-      </ImageBackground>
+      </View>
 
 
 
-      <View style={{ marginTop: 20 }}>
+      <View style={{ marginTop: windowHeight * 0.05 }}>
         <ScrollView
           contentContainerStyle={[styles.scrollContainer]}
           scrollEventThrottle={16}
         >
           <View style={styles.row}>
-            {/* Box 1 */}
-            <TouchableOpacity
-              activeOpacity={0.6}
-              underlayColor={JapanFishPalette.text8}
-              onPress={() => navigateToScreen("Calculator")}
-            >
-              <Animated.View
-                style={[
-                  styles.box1,
-                  {
-                    opacity: fadeAnim,
-                    elevation: elevationAnim,
-                  },
-                ]}
-              >
-                <ImageBackground source={require('../assets/nav5.png')} style={styles.box1}>
-                <Text style={styles.text10}>Record and</Text>
+
+              {/* Box 1 */}
+              <View style={styles.box1}>
+                <TouchableOpacity
+                  activeOpacity={0.6}
+                  underlayColor={JapanFishPalette.text8}
+                  onPress={() => navigateToScreen("Calculator")}
+                >
+                  <Text style={styles.text10}>Record and</Text>
                   <Text style={styles.text11}>calculate your</Text>
                   <Text style={styles.text12}>carbon emissions</Text>
-                </ImageBackground>
-              </Animated.View>
-            </TouchableOpacity>
+                  <Image source={require('../assets/icons/calculator1.png')} style={{ width: 80, height: 80, alignSelf: 'center', marginTop: windowHeight * 0.035, resizeMode: 'contain', }} />
+                </TouchableOpacity>
+              </View>
 
-            {/* Box 2 */}
-            <TouchableOpacity
-              activeOpacity={0.6}
-              underlayColor={JapanFishPalette.text8}
-              onPress={() => navigateToScreen("Map")}
-            >
-              <Animated.View
-                style={[
-                  styles.box2,
-                  {
-                    opacity: fadeAnim,
-                    elevation: elevationAnim,
-                  },
-                ]}
+              {/* Box 2 */}
+              <View style={styles.box2}>
+              <TouchableOpacity
+                activeOpacity={0.6}
+                underlayColor={JapanFishPalette.text8}
+                onPress={() => navigateToScreen("Map")}
               >
-                <ImageBackground source={require('../assets/nav7.png')} style={styles.box2}>
                   <Text style={styles.text21}>Know the fastest</Text>
                   <Text style={styles.text22}>and cleanest</Text>
                   <Text style={styles.text23}>route to your</Text>
                   <Text style={styles.text24}>destination</Text>
-                </ImageBackground>
-              </Animated.View>
-            </TouchableOpacity>
+                <Image source={require('../assets/icons/map1.png')} style={{ width: 100, height: 100, alignSelf: 'center', marginTop: windowHeight * 0.001, resizeMode: 'contain', }} />
+              </TouchableOpacity>
+              </View>
+
           </View>
 
           {/* Box 3 */}
           <View style={styles.row}>
-            <TouchableOpacity
-              activeOpacity={0.6}
-              underlayColor={JapanFishPalette.text8}
-              onPress={() => navigateToScreen("Statistics")}
-            >
-              <Animated.View
-                style={[
-                  styles.box3,
-                  {
-                    opacity: fadeAnim,
-                    elevation: elevationAnim,
-                  },
-                ]}
+
+          <View style={styles.box3}>
+              <TouchableOpacity
+                activeOpacity={0.6}
+                underlayColor={JapanFishPalette.text8}
+                onPress={() => navigateToScreen("Statistics")}
               >
-                <ImageBackground source={require('../assets/nav5.png')} style={styles.box3}>
+
                   <Text style={styles.text31}>View your records</Text>
                   <Text style={styles.text32}>and data of your</Text>
                   <Text style={styles.text33}>carbon footprint</Text>
-                </ImageBackground>
-              </Animated.View>
-            </TouchableOpacity>
+                  <Image source={require('../assets/icons/data1.png')} style={{ width:70, height: 70, alignSelf: 'center', marginTop: windowHeight * 0.035, resizeMode: 'contain', }} />
+              </TouchableOpacity>
+            </View>
 
-            {/* Box 4 */}
-            <TouchableOpacity
-              activeOpacity={0.6}
-              underlayColor={JapanFishPalette.text8}
-              onPress={() => navigateToScreen("Profile")}
-            >
-              <Animated.View
-                style={[
-                  styles.box4,
-                  {
-                    opacity: fadeAnim,
-                    elevation: elevationAnim,
-                  },
-                ]}
+              <View style={styles.box4}>
+              <TouchableOpacity
+                activeOpacity={0.6}
+                underlayColor={JapanFishPalette.text8}
+                onPress={() => navigateToScreen("Profile")}
               >
-                <ImageBackground source={require('../assets/nav7.png')} style={styles.box4}>
                   <Text style={styles.text41}>Edit your</Text>
                   <Text style={styles.text42}>personal profile</Text>
-                </ImageBackground>
-              </Animated.View>
-            </TouchableOpacity>
+                  <Image source={require('../assets/icons/profile1.png')} style={{ width: 100, height: 100, alignSelf: 'center', marginTop: windowHeight * 0.035, resizeMode: 'contain', }} />
+                
+              </TouchableOpacity>
+            </View>
           </View>
+          
         </ScrollView>
       </View>
     </ImageBackground>
@@ -270,40 +241,114 @@ const windowHeight = Dimensions.get('window').height;
 
 
 const styles = StyleSheet.create({
+  box1: {
+    width: windowWidth * 0.40, // 35% of screen width
+    height: windowHeight * 0.24, // 20% of screen height
+    borderRadius: 12,
+    backgroundColor: 'rgba(255, 255, 255, 0.5)', // Set the background color and opacity
+    margin: windowWidth * 0.02,
+    shadowColor: "#000",
+    shadowOffset: {
+      width: 0,
+      height: 2,
+    },
+    shadowOpacity: 0.25,
+    shadowRadius: 5.84,
+    elevation: 10,
+    marginTop: -windowHeight * 0.001,
+  },
+
+  box2: {
+    width: windowWidth * 0.40, // 35% of screen width
+    height: windowHeight * 0.24, // 20% of screen height
+    backgroundColor: 'rgba(255, 255, 255, 0.5)', // Set the background color and opacity
+    margin: 0,
+    borderRadius: 12,
+    margin: windowWidth * 0.02,
+    shadowColor: "#000",
+    shadowOffset: {
+      width: 0,
+      height: 2,
+    },
+    shadowOpacity: 0.25,
+    shadowRadius: 5.84,
+    elevation: 10,
+    marginTop: -windowHeight * 0.001,
+  },
+
+  box3: {
+    width: windowWidth * 0.40, // 35% of screen width
+    height: windowHeight * 0.24, // 20% of screen height
+    backgroundColor: 'rgba(255, 255, 255, 0.5)', // Set the background color and opacity
+    borderRadius: 12,
+    shadowColor: "#000",
+    shadowOffset: {
+      width: 0,
+      height: 2,
+    },
+    shadowOpacity: 0.25,
+    shadowRadius: 5.84,
+    elevation: 10,
+    marginTop: -windowHeight * 0.001,
+  },
+
+  box4: {
+    width: windowWidth * 0.40, // 35% of screen width
+    height: windowHeight * 0.24, // 20% of screen height
+    backgroundColor: 'rgba(255, 255, 255, 0.5)', // Set the background color and opacity
+    borderRadius: 12,
+    shadowColor: "#000",
+    shadowOffset: {
+      width: 0,
+      height: 2,
+    },
+    shadowOpacity: 0.50,
+    shadowRadius: 5.84,
+    elevation: 10,
+    marginTop: -windowHeight * 0.001,
+  },
+  profileIcon: {
+    flexDirection: 'row', // Add this line
+    alignItems: 'center', // Align items vertically
+    marginTop: windowHeight * 0.02, // Adjusted
+    marginRight: 15,
+    width: windowWidth * 1, // 10% of screen width
+    height: windowWidth * 0.12,
+  },
   logoText: {
     fontFamily: 'Montserrat-Light',
     fontSize: 40,
     textAlign: 'center',
-    top: -60, // adjust this value as needed
+    top: -windowHeight * 0.05, // Adjusted
+    color: 'white',
   },
   logoTextBig: {
     fontFamily: 'Roc',
     fontSize: 50,
     textAlign: 'center',
-    top: -60, // adjust this value as needed
+    top: -windowHeight * 0.05, // Adjusted
+    color: 'white',
   },
   subText1: {
     fontFamily: 'Montserrat-Light',
     fontSize: 12,
     textAlign: 'center',
-    top: -55, // adjust this value as needed
+    top: -windowHeight * 0.05, // Adjusted
+    color: 'white',
   },
   subText2: {
     fontFamily: 'Montserrat-Light',
     fontSize: 12,
     textAlign: 'center',
-    top: -55, // adjust this value as needed
+    top: -windowHeight * 0.05, // Adjusted
+    color: 'white',
   },
   welcomeText: {
     fontFamily: 'Codec',
     fontSize: 20,
-    marginTop: 15,
-  },
-  profileIcon: {
-    marginTop: 20,
-    marginRight: 15,
-    width: windowWidth * 0.12, // 10% of screen width
-    height: windowWidth * 0.12,
+    marginTop: windowHeight * 0.005,
+    marginLeft: windowWidth * 0.009,
+    color: 'white',
   },
   container: {
     flex: 1,
@@ -314,14 +359,12 @@ const styles = StyleSheet.create({
   },
   headerImage: {
     marginTop: 200,
-    width: '120%',
+    width: windowWidth * 1,
     height: windowHeight * 0.35,
+    borderBottomLeftRadius: 30,
+    borderBottomRightRadius: 30,
+    overflow: 'hidden'
   },  
-  welcomeContainer: {
-    marginLeft: 10,
-    marginTop: 20,
-    paddingLeft: 10,
-  },
   scrollContainer: {
     flexGrow: 1,
   },
@@ -335,121 +378,82 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     justifyContent: 'space-around',
   },
-  box1: {
-    width: 140,
-    height: 170,
-    backgroundColor: JapanFishPalette.text4,
-    borderRadius: 12,
-    overflow: 'hidden',
-    margin: 10,
-  },
   text10: {
-    position: 'absolute',
-    bottom: 55,
-    left: 5,
+    marginTop: windowHeight * 0.009,
+    textAlign: 'center',
     color: JapanFishPalette.text10,
     fontFamily: 'Montserrat-Light',
+    color: 'white',
   },
   text11: {
-    position: 'absolute',
-    bottom: 35,
-    left: 5,
+    textAlign: 'center',
     color: JapanFishPalette.text10,
     fontFamily: 'Montserrat-Light',
+    color: 'white',
   },
   text12: {
-    position: 'absolute',
-    bottom: 15,
-    left: 5,
+    textAlign: 'center',
     color: JapanFishPalette.text10,
     fontFamily: 'Montserrat-Light',
-  },
-  box2: {
-    width: 140,
-    height: 170,
-    backgroundColor: JapanFishPalette.text3,
-    margin: 0,
-    borderRadius: 12,
-    overflow: 'hidden'
+    color: 'white',
   },
   text21: {
-    position: 'absolute',
-    top: 10,
-    right: 10,
+    marginTop: windowHeight * 0.009,
+    textAlign: 'center',
     color: JapanFishPalette.text10,
     fontFamily: 'Montserrat-Light',
-    overflow: 'hidden'
+    overflow: 'hidden',
+    color: 'white',
   },
   text22: {
-    position: 'absolute',
-    top: 30,
-    right: 10,
+    textAlign: 'center',
     color: JapanFishPalette.text10,
     fontFamily: 'Montserrat-Light',
+    color: 'white',
   },
   text23: {
-    position: 'absolute',
-    top: 50,
-    right: 10,
+    textAlign: 'center',
     color: JapanFishPalette.text10,
     fontFamily: 'Montserrat-Light',
+    color: 'white',
   },
   text24: {
-    position: 'absolute',
-    top: 70,
-    right: 10,
+    textAlign: 'center',
     color: JapanFishPalette.text10,
     fontFamily: 'Montserrat-Light',
-  },
-  box3: {
-    width: 140,
-    height: 170,
-    backgroundColor: JapanFishPalette.text3,
-    borderRadius: 12,
-    overflow: 'hidden'
+    color: 'white',
   },
   text31: {
-    position: 'absolute',
-    top: 10,
-    left: 12,
+    marginTop: windowHeight * 0.009,
+    textAlign: 'center',
     color: JapanFishPalette.text10,
     fontFamily: 'Montserrat-Light',
+    color: 'white',
   },
   text32: {
-    position: 'absolute',
-    top: 30,
-    left: 15,
+    textAlign: 'center',
     color: JapanFishPalette.text10,
     fontFamily: 'Montserrat-Light',
+    color: 'white',
   },
   text33: {
-    position: 'absolute',
-    top: 50,
-    left: 15,
+    textAlign: 'center',
     color: JapanFishPalette.text10,
     fontFamily: 'Montserrat-Light',
-  },
-  box4: {
-    width: 140,
-    height: 170,
-    backgroundColor: JapanFishPalette.text4,
-    borderRadius: 12,
-    overflow: 'hidden',
-    margin: -10,
+    color: 'white',
   },
   text41: {
-    position: 'absolute',
-    bottom: 30,
-    left: 20,
+    marginTop: windowHeight * 0.009,
+    textAlign: 'center',
     color: JapanFishPalette.text10,
     fontFamily: 'Montserrat-Light',
+    color: 'white',
   },
   text42: {
-    position: 'absolute',
-    bottom: 10,
-    left: 20,
+    textAlign: 'center',
     color: JapanFishPalette.text10,
     fontFamily: 'Montserrat-Light',
+    color: 'white',
   },
 });
 

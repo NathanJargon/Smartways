@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { View, Text, StyleSheet, TextInput, TouchableOpacity, Animated, Switch, ImageBackground, KeyboardAvoidingView, Platform, Keyboard, Image } from 'react-native';
+import { View, Text, StyleSheet, TextInput, TouchableOpacity, Animated, Switch, ImageBackground, KeyboardAvoidingView, Platform, Keyboard, Image, Dimensions } from 'react-native';
 import { useNavigation } from '@react-navigation/native';
 import { useFonts } from 'expo-font';
 import JapanFishPalette from './JapanFishPalette.js';
@@ -26,7 +26,8 @@ function KarbonCalculator() {
   const [glowAnim] = useState(new Animated.Value(0));
   const [carbonFootprint, setCarbonFootprint] = useState(0);
   const [lastPressedDate, setLastPressedDate] = useState(null);
-
+  const windowWidth = Dimensions.get('window').width;
+  const windowHeight = Dimensions.get('window').height;
 
 
   const calculateCarbonFootprint = () => {
@@ -132,29 +133,31 @@ function KarbonCalculator() {
       <View style={styles.container}>
         <View style={styles.row}>
         <View style={[styles.rightMargin]}>
-          <ImageBackground source={require('../assets/nav7.png')} style={styles.imageBackground}>
+          <View style={styles.imageBackground}>
             <Text style={styles.label1}>Gallon</Text>
             <TextInput
               style={styles.input}
               value={litersValue}
               onChangeText={setLitersValue}
               placeholder="Liters"
+              placeholderTextColor="rgba(255, 255, 255, 0.5)" 
               keyboardType="numeric"
             />
-          </ImageBackground>
+          </View>
         </View>
 
         <View>
-          <ImageBackground source={require('../assets/nav5.png')} style={styles.imageBackground2}>
+          <View style={styles.imageBackground2}>
             <Text style={styles.label2}>Miles</Text>
             <TextInput
               style={styles.input2}
               value={kilometersValue}
               onChangeText={setKilometersValue}
               placeholder="Kilometers"
+              placeholderTextColor="rgba(255, 255, 255, 0.5)" 
               keyboardType="numeric"
             />
-          </ImageBackground>
+          </View>
         </View>
       </View>
 
@@ -165,16 +168,15 @@ function KarbonCalculator() {
           disabled={!allInputsFilled}
           style={styles.button}
         >
-          <ImageBackground
-            source={allInputsFilled ? require('../assets/nav7.png') : require('../assets/buttonbg.png')}
-            style={styles.buttonBackground}
+          <View
+            style={allInputsFilled ? styles.buttonGlow : styles.buttonBackground}
           >
             <Image
               source={require('../assets/icons/plus.png')}
               style={styles.icon}
             />
             <Text style={styles.buttonText}>RECORD YOUR EMISSION</Text>
-          </ImageBackground>
+          </View>
         </TouchableOpacity>
       </Animated.View>
 
@@ -195,7 +197,34 @@ function KarbonCalculator() {
   );
 }
 
+const windowWidth = Dimensions.get('window').width;
+const windowHeight = Dimensions.get('window').height;
+
+
 const styles = StyleSheet.create({
+  buttonBackground: {
+    flex: 1,
+    flexDirection: 'row',
+    justifyContent: 'center',
+    alignItems: 'center',
+    borderRadius: 20,
+    backgroundColor: 'rgba(255, 255, 255, 0.5)',
+    padding: 10,
+    elevation: 2,
+    marginBottom: windowHeight * 0.05,
+    
+  },
+  buttonGlow: {
+    flex: 1,
+    flexDirection: 'row',
+    justifyContent: 'center',
+    alignItems: 'center',
+    borderRadius: 20,
+    backgroundColor: 'rgba(255, 255, 255, 1)',
+    padding: 10,
+    elevation: 2,
+    marginBottom: windowHeight * 0.05,
+  },
   container: {
     flex: 1,
     justifyContent: 'center',
@@ -212,32 +241,36 @@ const styles = StyleSheet.create({
   input: {
     width: '100%',
     height: 40,
-    borderColor: 'black',
+    borderColor: 'white',
     borderWidth: 1,
     paddingHorizontal: 10,
     borderRadius: 10,
     marginBottom: 10,
+    color: 'white',
   },
   input2: {
     width: '90%',
     height: 40,
-    borderColor: 'black',
+    borderColor: 'white',
     borderWidth: 1,
     paddingHorizontal: 10,
     borderRadius: 10,
     marginBottom: 10,
+    color: 'white',
   },
   label1: {
     marginBottom: 5,
     textAlign: 'center',
     fontSize: 20,
     fontFamily: 'Codec',
+    color: 'white',
   },
   label2: {
     marginBottom: 5,
     textAlign: 'center',
     fontSize: 20,
     fontFamily: 'Codec',
+    color: 'white',
   },
   row: {
     flexDirection: 'row',
@@ -251,8 +284,6 @@ const styles = StyleSheet.create({
     height: 150,
     borderRadius: 10,
     padding: 12,
-    borderWidth: 1,
-    borderColor: 'black',
     justifyContent: 'center',
     alignItems: 'center',
     borderRadius: 20,
@@ -263,8 +294,6 @@ const styles = StyleSheet.create({
     height: 150,
     borderRadius: 10,
     padding: 12,
-    borderWidth: 1,
-    borderColor: 'black',
     justifyContent: 'center',
     alignItems: 'center',
     borderRadius: 20,
@@ -296,7 +325,7 @@ const styles = StyleSheet.create({
     color: 'white',
     textAlign: 'center',
     fontFamily: 'Codec',
-    bottom: 15,
+    marginTop: windowHeight * 0.05,
   },
   text4: {
     fontSize: 25,
@@ -345,29 +374,9 @@ const styles = StyleSheet.create({
     height: 20, // adjust as needed
     marginRight: 10, // adjust as needed
   },
-  buttonBackground: {
-    flex: 1,
-    flexDirection: 'row',
-    justifyContent: 'center',
-    alignItems: 'center',
-    borderRadius: 20,
-    overflow: 'hidden',
-    height: 50,
-  },
-  buttonGlow: {
-    backgroundColor: 'green',
-    shadowColor: '#00ff00',
-    shadowOffset: {
-      width: 0,
-      height: 2,
-    },
-    shadowOpacity: 1,
-    shadowRadius: 10,
-    elevation: 5,
-  },
   buttonText: {
     fontSize: 12,
-    top: 2,
+    top: windowHeight * 0.002,
     fontFamily: 'Codec',
   }
 });

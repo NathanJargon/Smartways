@@ -81,7 +81,7 @@ const styles = StyleSheet.create({
     marginTop: 12,
   },
   label: {
-    color: theme.colors.secondary,
+    color: 'white',
     width: '100%',
     fontFamily: 'Montserrat-Light'
   },

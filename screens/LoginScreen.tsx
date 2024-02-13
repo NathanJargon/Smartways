@@ -141,12 +141,12 @@ const styles = StyleSheet.create({
     marginTop: 4,
   },
   label: {
-    color: theme.colors.secondary,
+    color: 'white',
     fontFamily: 'Montserrat-Light'
   },
   link: {
     fontFamily: 'Montserrat-Light',
-    color: theme.colors.primary,
+    color: 'blue',
   },
 });
 

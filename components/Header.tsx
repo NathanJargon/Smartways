@@ -16,6 +16,7 @@ const styles = StyleSheet.create({
     color: theme.colors.primary,
     paddingVertical: 14,
     fontFamily: 'Roc',
+    textAlign: 'center',
   },
 });
 

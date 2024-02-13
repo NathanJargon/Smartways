@@ -26,7 +26,9 @@ const KarbonStatisticsScreen = (props) => {
   const currentDate = new Date();
   const currentDay = currentDate.getDate();
   const currentMonth = currentDate.toLocaleString('default', { month: 'long' });
-  
+  const windowWidth = Dimensions.get('window').width;
+  const windowHeight = Dimensions.get('window').height;
+
   const [formattedDate, setFormattedDate] = useState(`${currentDay} ${currentMonth}`);
 
 
@@ -234,15 +236,23 @@ const KarbonStatisticsScreen = (props) => {
   
   if (loading) {
     return (
+      <ImageBackground source={require('../assets/homebg.jpg')} style={{
+        flex: 1,
+        alignItems: 'center',
+        justifyContent: 'center',
+        width: windowWidth,
+        height: windowHeight,
+      }}>
       <View style={{ flex: 1, justifyContent: 'center', alignItems: 'center' }}>
-        <Text style={{ fontWeight: 'bold' }}>Loading..</Text>
+        <Text style={{ fontWeight: 'bold', color: 'white'  }}>Loading..</Text>
       </View>
+      </ImageBackground>
     );
   }
   
   return (
     <ImageBackground
-    source={require('../assets/statbg.png')}
+    source={require('../assets/homebg.jpg')}
     style={styles.background}
     >
     <View style={styles.container}>
@@ -282,9 +292,9 @@ const KarbonStatisticsScreen = (props) => {
               height={310}
               yAxisLabel=""
               chartConfig={{
-                backgroundColor: 'rgba(102, 204, 153, 0.5)',
-                backgroundGradientFrom: 'rgba(102, 204, 153, 0.5)',
-                backgroundGradientTo: 'rgba(102, 204, 153, 0.5)',
+                backgroundColor: 'transparent',
+                backgroundGradientFrom: 'transparent',
+                backgroundGradientTo:  'transparent',
                 decimalPlaces: 2,
                 color: (opacity = 1) => `rgba(255, 255, 255, ${opacity})`,
                 style: {
@@ -300,10 +310,10 @@ const KarbonStatisticsScreen = (props) => {
         )}
 
     <TouchableOpacity onPress={() => { props.navigation.navigate('Karbon Leaderboard') }}  style={styles.leaderboardButton}>
-      <ImageBackground source={require('../assets/nav7.png')} style={styles.leaderboardBackground}>
+      <View style={styles.leaderboardBackground}>
         <Image source={require('../assets/icons/podium.png')} style={styles.leaderboardIcon} />
         <Text style={styles.leaderboardText}>COMMUNITY RANKINGS</Text>
-      </ImageBackground>
+      </View>
     </TouchableOpacity>
 
 
@@ -320,7 +330,35 @@ const KarbonStatisticsScreen = (props) => {
   );}
 
 
+  const windowWidth = Dimensions.get('window').width;
+  const windowHeight = Dimensions.get('window').height;
+
+
   const styles = StyleSheet.create({
+    leaderboardButton: {
+      padding: windowHeight * 0.005,
+    },
+    leaderboardBackground: {
+      flexDirection: 'row',
+      justifyContent: 'center',
+      alignItems: 'center',
+      borderRadius: 20,
+      backgroundColor: 'rgba(255, 255, 255, 0.5)',
+      padding: 10,
+      elevation: 2,
+    },
+    leaderboardIcon: {
+      width: windowWidth * 0.08, // Adjust this value as needed
+      height: windowWidth * 0.08, // Adjust this value as needed
+      marginRight: windowWidth * 0.02, // Adjust this value as needed
+      margin: windowHeight * 0.02, // Adjust this value as needed
+      marginTop: windowHeight * 0.01, // Adjust this value as needed
+    },
+    leaderboardText: {
+      fontSize: windowWidth * 0.04,
+      fontFamily: 'Codec',
+      padding: windowHeight * 0.01,
+    },
     container: {
       flex: 1,
       padding: 20,
@@ -351,12 +389,13 @@ const KarbonStatisticsScreen = (props) => {
     buttonText: {
       fontSize: 18,
       fontFamily: 'Montserrat-Light',
-      color: '#000',
+      color: 'white',
     },
     leftContainer: {
       flexDirection: 'row',
       alignItems: 'center',
       justifyContent: 'center',
+      marginTop: windowHeight * 0.05,
     },
     image: {
       width: 40,
@@ -366,43 +405,20 @@ const KarbonStatisticsScreen = (props) => {
     text: {
       fontSize: 16,
       fontFamily: 'Montserrat-Light',
+      color: 'white',
     },
     title1: {
       fontSize: 24,
       fontFamily: 'Codec',
       marginTop: 10,
       textAlign: 'center',
+      color: 'white',
     },
     title2: {
       fontSize: 24,
       fontFamily: 'Codec',
       textAlign: 'center',
-    },
-    leaderboardButton: {
-      width: '100%',
-      height: 60,
-      marginTop: 20,
-    },
-    leaderboardBackground: {
-      flex: 1,
-      resizeMode: 'cover',
-      justifyContent: 'center',
-      alignItems: 'center',
-      flexDirection: 'row',
-      borderRadius: 20,
-      overflow: 'hidden'
-    },
-    leaderboardIcon: {
-      width: 30,
-      height: 30,
-      marginRight: 10,
-      margin: 20,
-      marginTop: 10,
-    },
-    leaderboardText: {
-      fontSize: 15,
-      fontFamily: 'Codec',
-      padding: 10,
+      color: 'white',
     },
   });
 
