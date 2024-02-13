@@ -150,15 +150,6 @@ const KarbonStatisticsScreen = (props) => {
               filteredLogs = [{ day: '00:00', value: '0', time: '08:00' }];
             }
 
-            setChartData({
-              labels: filteredLogs.map(log => log.time || '08:00'),
-              datasets: [
-                {
-                  data: filteredLogs.map(log => Number(log.value))
-                }
-              ]
-            });
-
             setSelectedLogs(filteredLogs);
           }
         }
@@ -199,15 +190,19 @@ const KarbonStatisticsScreen = (props) => {
               let labels;
               if (selectedPeriod === 'daily') {
                 periodLogs = emissionLogs;
-                labels = periodLogs.map(log => `Day ${log.day.split('-')[2]}`);
+                if (periodLogs.length > 5) {
+                  labels = periodLogs.filter((_, index) => (index + 1) % 5 === 0).map((_, index) => `Day ${5 * (index + 1)}`);
+                } else {
+                  labels = periodLogs.map(log => `Day ${log.day.split('-')[2]}`);
+                }
               } else if (selectedPeriod === 'monthly') {
                 periodLogs = calculateMonthlyLogs(emissionLogs);
-                labels = periodLogs.map(log => `${monthNames[Number(log.day.split('-')[1]) - 1]} ${log.day.split('-')[0]}`);
+                labels = periodLogs.map(log => `${monthNames[Number(log.day.split('-')[1]) - 1]}`);
               } else if (selectedPeriod === 'yearly') {
                 periodLogs = calculateYearlyLogs(emissionLogs);
-                labels = periodLogs.map(log => `Year ${log.day}`);
+                labels = periodLogs.map(log => `${log.day}`);
               }
-
+          
               // If there's no data for the selected period, set the periodLogs to a default value
               if (periodLogs.length === 0) {
                 periodLogs = [{ day: 'Day 1', value: '0' }];

@@ -189,7 +189,7 @@ function KarbonLeaderboard() {
     <ImageBackground source={require('../assets/homebg.jpg')} style={{flex: 1}}>
     <View>
         <View style={{ flexDirection: 'row', left: windowWidth * 0.05  }}>
-            <View style={{ flexDirection: 'row', left: windowWidth * 0.0005, top: windowHeight * .08  }}>
+            <View style={{ flexDirection: 'row', left: windowWidth * 0.0005, top: windowHeight * .051  }}>
                 <Icon
                     name='arrow-left'
                     type='font-awesome'
@@ -387,7 +387,7 @@ const styles = StyleSheet.create({
     borderWidth: 2,
     width: windowWidth * 0.8,
     padding: 10,
-    marginTop: windowHeight * 0.07,
+    marginTop: windowHeight * 0.04,
     alignSelf: 'center',
   },
   iconContainer: {
