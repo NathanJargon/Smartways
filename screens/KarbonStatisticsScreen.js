@@ -93,7 +93,7 @@ const KarbonStatisticsScreen = (props) => {
   }, []);
 
 
-  const monthNames = ['JAN', 'FEB', 'MAR', 'APR', 'MAY', 'JUN', 'JUL', 'AUG', 'SEP', 'OCT', 'NOV', 'DEC'];
+  const monthNames = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'];
 
   const calculateMonthlyLogs = (logs) => {
     let monthlyLogs = {};
@@ -197,12 +197,19 @@ const KarbonStatisticsScreen = (props) => {
                 }
               } else if (selectedPeriod === 'monthly') {
                 periodLogs = calculateMonthlyLogs(emissionLogs);
-                labels = periodLogs.map(log => `${monthNames[Number(log.day.split('-')[1]) - 1]}`);
+                if (periodLogs.length > 4) {
+                  labels = periodLogs.filter((_, index) => (index + 1) % 4 === 0).map((_, index) => `${monthNames[Number(log.day.split('-')[1]) - 1]}`);
+                } else {
+                  labels = periodLogs.map(log => `${monthNames[Number(log.day.split('-')[1]) - 1]}`);
+                }
               } else if (selectedPeriod === 'yearly') {
                 periodLogs = calculateYearlyLogs(emissionLogs);
-                labels = periodLogs.map(log => `${log.day}`);
+                if (periodLogs.length > 4) {
+                  labels = periodLogs.filter((_, index) => (index + 1) % 4 === 0).map((_, index) => `${log.day}`);
+                } else {
+                  labels = periodLogs.map(log => `${log.day}`);
+                }
               }
-          
               // If there's no data for the selected period, set the periodLogs to a default value
               if (periodLogs.length === 0) {
                 periodLogs = [{ day: 'Day 1', value: '0' }];
