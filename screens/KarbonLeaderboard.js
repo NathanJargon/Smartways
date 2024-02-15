@@ -28,7 +28,7 @@ function KarbonLeaderboard() {
         querySnapshot.forEach((userDoc) => {
           const userData = userDoc.data();
           
-          let totalEmission = 100; // Default to 100
+          let totalEmission = 0; // Default to 100
           let emissionlogs = [{ day: "2024-01-01", value: "100" }]; // Default log
         
           if ('emissionlogs' in userData && Array.isArray(userData.emissionlogs) && userData.emissionlogs.length > 0) {
@@ -48,7 +48,7 @@ function KarbonLeaderboard() {
         });
 
         // Order users by total emission from lowest to highest
-        const rankedUsers = usersData.sort((a, b) => a.emission - b.emission).map((user, index) => ({
+        const rankedUsers = usersData.sort((a, b) => b.emission - a.emission).map((user, index) => ({
           ...user,
           rank: index + 1,
         }));
@@ -113,14 +113,19 @@ function KarbonLeaderboard() {
       const data = [].concat(...emissionLogs.map(log => Number(log.value)));
       // console.log(data);
     
+      const dataMin = Math.min(...data);
+      const dataMax = Math.max(...data);
+
       return (
         <View style={{ marginTop: -10, left: 10, flexDirection: 'row', alignItems: 'center', justifyContent: 'center' }}>
+
           <YAxis
             data={data}
             contentInset={{ top: 20, bottom: 20 }}
             svg={{ fill: 'grey', fontSize: 10 }}
-            numberOfTicks={10}
-            formatLabel={(value) => `${value}`}
+            min={dataMin}
+            max={dataMax}
+            numberOfTicks={5}
           />
           <View style={{ flex: 1, marginLeft: 10 }}>
             <LineChart
@@ -203,8 +208,8 @@ function KarbonLeaderboard() {
         </View>
         </View>
       <View style={styles.headerBottomContainer}>
-        <Text style={styles.headerBottom1}>Compete with your friends and get the lowest</Text>
-        <Text style={styles.headerBottom2}>carbon footprint in your circle!</Text>
+        <Text style={styles.headerBottom1}>Compete with your friends and get the highest</Text>
+        <Text style={styles.headerBottom2}>carbon footprint reduced in your circle!</Text>
       </View>
 
       

@@ -191,7 +191,7 @@ function HomeScreen({ navigation }) {
                   <Text style={styles.text22}>and cleanest</Text>
                   <Text style={styles.text23}>route to your</Text>
                   <Text style={styles.text24}>destination</Text>
-                <Image source={require('../assets/icons/map1.png')} style={{ width: 100, height: 100, alignSelf: 'center', marginTop: windowHeight * 0.001, resizeMode: 'contain', }} />
+                <Image source={require('../assets/icons/place.png')} style={{ width: 60, height: 60, alignSelf: 'center', marginTop: windowHeight * 0.025, resizeMode: 'contain', }} />
               </TouchableOpacity>
               </View>
 
@@ -210,7 +210,7 @@ function HomeScreen({ navigation }) {
                   <Text style={styles.text31}>View your records</Text>
                   <Text style={styles.text32}>and data of your</Text>
                   <Text style={styles.text33}>carbon footprint</Text>
-                  <Image source={require('../assets/icons/data1.png')} style={{ width:70, height: 70, alignSelf: 'center', marginTop: windowHeight * 0.035, resizeMode: 'contain', }} />
+                  <Image source={require('../assets/icons/data1.png')} style={{ width: 70, height: 70, alignSelf: 'center', marginTop: windowHeight * 0.035, resizeMode: 'contain', }} />
               </TouchableOpacity>
             </View>
 
@@ -222,7 +222,7 @@ function HomeScreen({ navigation }) {
               >
                   <Text style={styles.text41}>Edit your</Text>
                   <Text style={styles.text42}>personal profile</Text>
-                  <Image source={require('../assets/icons/profile1.png')} style={{ width: 100, height: 100, alignSelf: 'center', marginTop: windowHeight * 0.035, resizeMode: 'contain', }} />
+                  <Image source={require('../assets/icons/resume.png')} style={{ width: 65, height: 65, alignSelf: 'center', marginLeft: windowWidth * 0.02, marginTop: windowHeight * 0.065, resizeMode: 'contain', }} />
                 
               </TouchableOpacity>
             </View>

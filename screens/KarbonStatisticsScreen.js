@@ -28,6 +28,7 @@ const KarbonStatisticsScreen = (props) => {
   const currentMonth = currentDate.toLocaleString('default', { month: 'long' });
   const windowWidth = Dimensions.get('window').width;
   const windowHeight = Dimensions.get('window').height;
+  const [fetchForDate, setFetchForDate] = useState(false);
 
   const [formattedDate, setFormattedDate] = useState(`${currentDay} ${currentMonth}`);
 
@@ -43,12 +44,18 @@ const KarbonStatisticsScreen = (props) => {
   const handleDateChange = (event, selectedDate) => {
     const currentDate = selectedDate || date;
     setShowDatePicker(false);
-    setDate(currentDate);
+    setDate(currentDate); // Change this line
+    setFetchForDate(true);
   
     // Format the date
     const day = currentDate.getDate();
     const month = currentDate.toLocaleString('default', { month: 'long' });
     setFormattedDate(`${day} ${month}`);
+  };
+
+  const handlePeriodChange = (selectedPeriod) => {
+    setSelectedPeriod(selectedPeriod);
+    setFetchForDate(false);
   };
 
   useEffect(() => {
@@ -127,45 +134,8 @@ const KarbonStatisticsScreen = (props) => {
 
   // useEffect for fetching the date
   useEffect(() => {
-    const fetchUserData = async () => {
-      try {
-        setIsLoading(true);
-        const user = auth.currentUser;
-        if (user) {
-          const userDoc = doc(db, 'users', user.uid);
-          const userSnap = await getDoc(userDoc);
-
-          if (userSnap.exists()) {
-            const emissionLogs = userSnap.data().emissionlogs || [];
-            
-            let filteredLogs = emissionLogs.filter(log => {
-              const logDate = new Date(log.day);
-              return logDate.getFullYear() === date.getFullYear() &&
-                    logDate.getMonth() === date.getMonth() &&
-                    logDate.getDate() === date.getDate();
-            });
-
-            // If there's no data for the selected period, set the periodLogs to a default value
-            if (filteredLogs.length === 0) {
-              filteredLogs = [{ day: '00:00', value: '0', time: '08:00' }];
-            }
-
-            setSelectedLogs(filteredLogs);
-          }
-        }
-        setIsLoading(false); 
-      } catch (error) {
-        setIsLoading(false);
-      }
-    };
-
-    fetchUserData(); 
-  }, [date]);
-
-
-    // useEffect for fetching the period
-    useEffect(() => {
-      const fetchPeriodData = async () => {
+      if (fetchForDate) {
+      const fetchUserData = async () => {
         try {
           setIsLoading(true);
           const user = auth.currentUser;
@@ -174,53 +144,27 @@ const KarbonStatisticsScreen = (props) => {
             const userSnap = await getDoc(userDoc);
 
             if (userSnap.exists()) {
-              let emissionLogs = userSnap.data().emissionlogs || [];
-              const currentMonth = new Date().getMonth();
-              const currentYear = new Date().getFullYear();
-    
-              // Filter logs for the current month
-              emissionLogs = emissionLogs.filter(log => {
+              const emissionLogs = userSnap.data().emissionlogs || [];
+              
+              let filteredLogs = emissionLogs.filter(log => {
                 const logDate = new Date(log.day);
-                return logDate.getFullYear() === currentYear && logDate.getMonth() === currentMonth;
+                return logDate.getFullYear() === date.getFullYear() &&
+                      logDate.getMonth() === date.getMonth() &&
+                      logDate.getDate() === date.getDate();
               });
-    
-              // Sort the logs by day
-              emissionLogs.sort((a, b) => new Date(a.day) - new Date(b.day));
-              let periodLogs;
-              let labels;
-              if (selectedPeriod === 'daily') {
-                periodLogs = emissionLogs;
-                if (periodLogs.length > 5) {
-                  labels = periodLogs.filter((_, index) => (index + 1) % 5 === 0).map((_, index) => `Day ${5 * (index + 1)}`);
-                } else {
-                  labels = periodLogs.map(log => `Day ${log.day.split('-')[2]}`);
-                }
-              } else if (selectedPeriod === 'monthly') {
-                periodLogs = calculateMonthlyLogs(emissionLogs);
-                if (periodLogs.length > 4) {
-                  labels = periodLogs.filter((_, index) => (index + 1) % 4 === 0).map((_, index) => `${monthNames[Number(log.day.split('-')[1]) - 1]}`);
-                } else {
-                  labels = periodLogs.map(log => `${monthNames[Number(log.day.split('-')[1]) - 1]}`);
-                }
-              } else if (selectedPeriod === 'yearly') {
-                periodLogs = calculateYearlyLogs(emissionLogs);
-                if (periodLogs.length > 4) {
-                  labels = periodLogs.filter((_, index) => (index + 1) % 4 === 0).map((_, index) => `${log.day}`);
-                } else {
-                  labels = periodLogs.map(log => `${log.day}`);
-                }
-              }
-              // If there's no data for the selected period, set the periodLogs to a default value
-              if (periodLogs.length === 0) {
-                periodLogs = [{ day: 'Day 1', value: '0' }];
-                labels = ['Day 1'];
+
+              // If there's no data for the selected date, set the filteredLogs to a default value
+              if (filteredLogs.length === 0) {
+                filteredLogs = [{ day: '00:00', value: '0', time: '08:00' }];
               }
 
               setChartData({
-                labels: labels,
+                labels: filteredLogs.map((log, index) => 
+                  filteredLogs.length > 2 && index % 3 !== 0 ? '' : log.time
+                ),
                 datasets: [
                   {
-                    data: periodLogs.map(log => Number(log.value))
+                    data: filteredLogs.map(log => Number(log.value))
                   }
                 ]
               });
@@ -232,8 +176,84 @@ const KarbonStatisticsScreen = (props) => {
         }
       };
 
-      fetchPeriodData();
-    }, [selectedPeriod]);
+      fetchUserData(); 
+    }
+  }, [fetchForDate, date]);
+
+
+    // useEffect for fetching the period
+    useEffect(() => {
+      if (!fetchForDate) {
+        const fetchPeriodData = async () => {
+          try {
+            setIsLoading(true);
+            const user = auth.currentUser;
+            if (user) {
+              const userDoc = doc(db, 'users', user.uid);
+              const userSnap = await getDoc(userDoc);
+
+              if (userSnap.exists()) {
+                let emissionLogs = userSnap.data().emissionlogs || [];
+                const currentMonth = new Date().getMonth();
+                const currentYear = new Date().getFullYear();
+      
+                // Filter logs for the current month
+                emissionLogs = emissionLogs.filter(log => {
+                  const logDate = new Date(log.day);
+                  return logDate.getFullYear() === currentYear && logDate.getMonth() === currentMonth;
+                });
+      
+                // Sort the logs by day
+                emissionLogs.sort((a, b) => new Date(a.day) - new Date(b.day));
+                let periodLogs;
+                let labels;
+                if (selectedPeriod === 'daily') {
+                  periodLogs = emissionLogs;
+                  if (periodLogs.length > 5) {
+                    labels = periodLogs.filter((_, index) => (index + 1) % 5 === 0).map((_, index) => `Day ${5 * (index + 1)}`);
+                  } else {
+                    labels = periodLogs.map(log => `Day ${log.day.split('-')[2]}`);
+                  }
+                } else if (selectedPeriod === 'monthly') {
+                  periodLogs = calculateMonthlyLogs(emissionLogs);
+                  if (periodLogs.length > 4) {
+                    labels = periodLogs.filter((_, index) => (index + 1) % 4 === 0).map((_, index) => `${monthNames[Number(log.day.split('-')[1]) - 1]}`);
+                  } else {
+                    labels = periodLogs.map(log => `${monthNames[Number(log.day.split('-')[1]) - 1]}`);
+                  }
+                } else if (selectedPeriod === 'yearly') {
+                  periodLogs = calculateYearlyLogs(emissionLogs);
+                  if (periodLogs.length > 4) {
+                    labels = periodLogs.filter((_, index) => (index + 1) % 4 === 0).map((_, index) => `${log.day}`);
+                  } else {
+                    labels = periodLogs.map(log => `${log.day}`);
+                  }
+                }
+                // If there's no data for the selected period, set the periodLogs to a default value
+                if (periodLogs.length === 0) {
+                  periodLogs = [{ day: 'Day 1', value: '0' }];
+                  labels = ['Day 1'];
+                }
+
+                setChartData({
+                  labels: labels,
+                  datasets: [
+                    {
+                      data: periodLogs.map(log => Number(log.value))
+                    }
+                  ]
+                });
+              }
+            }
+            setIsLoading(false); 
+          } catch (error) {
+            setIsLoading(false);
+          }
+        };
+
+        fetchPeriodData();
+    }
+  }, [selectedPeriod, fetchForDate]);
 
   
   if (loading) {
@@ -271,7 +291,7 @@ const KarbonStatisticsScreen = (props) => {
 
 
       <View style={styles.buttonsrow}>
-        <TouchableOpacity onPress={() => PeriodhandlePress('daily')}>
+        <TouchableOpacity onPress={() => handlePeriodChange('daily')}>
           <Text style={styles.buttonText}>Daily</Text>
         </TouchableOpacity>
         <TouchableOpacity onPress={() => PeriodhandlePress('monthly')}>
@@ -297,7 +317,7 @@ const KarbonStatisticsScreen = (props) => {
                 backgroundColor: 'transparent',
                 backgroundGradientFrom: 'transparent',
                 backgroundGradientTo:  'transparent',
-                decimalPlaces: 2,
+                decimalPlaces: 3,
                 color: (opacity = 1) => `rgba(255, 255, 255, ${opacity})`,
                 style: {
                   borderRadius: 16

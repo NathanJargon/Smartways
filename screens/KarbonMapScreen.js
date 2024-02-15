@@ -21,6 +21,7 @@ const KarbonMap = (props) => {
     longitudeDelta: 20,
   };
 
+  const [destination, setDestination] = useState({ latitude: 0, longitude: 0 });
   const [directions, setDirections] = useState([]);
   const [loading, setLoading] = useState(false);
   const [selectedPlace, setSelectedPlace] = useState(null);
@@ -66,7 +67,7 @@ const KarbonMap = (props) => {
       }
     };
   
-    const interval = setInterval(checkLocationServices, 1000); // Check every second
+    const interval = setInterval(checkLocationServices, 10000); // Check every second
   
     return () => clearInterval(interval);
   }, []);
@@ -79,28 +80,47 @@ const KarbonMap = (props) => {
       return;
     }
   
+    let prevDistanceToDestination = null;
+  
     locationSubscription = await Location.watchPositionAsync(
       {
         accuracy: Location.Accuracy.High,
-        timeInterval: 10000, // Update every second
-        distanceInterval: 1, // Or update every meter traveled
+        timeInterval: 30000, // Update every second
+        distanceInterval: 0.1, // Or update every meter traveled
       },
       (location) => {
-        if (prevUserLocation) {
-          const distance = calculateDistance(
-            prevUserLocation.latitude,
-            prevUserLocation.longitude,
-            location.coords.latitude,
-            location.coords.longitude
-          );
-          setUserDistance(userDistance => {
+        const distanceToDestination = calculateDistance(
+          location.coords.latitude,
+          location.coords.longitude,
+          destination.latitude,
+          destination.longitude
+        );
+  
+        if (
+          prevDistanceToDestination === null ||
+          distanceToDestination < prevDistanceToDestination
+        ) {
+          // The user is getting closer to the destination
+          if (prevUserLocation) {
+            const distance = calculateDistance(
+              prevUserLocation.latitude,
+              prevUserLocation.longitude,
+              location.coords.latitude,
+              location.coords.longitude
+            );
+  
             const newDistance = userDistance + distance;
-            // console.log('Updated userDistance:', newDistance);
-            return newDistance;
-          });
+            const formattedDistance = parseFloat(newDistance.toFixed(4));
+            // console.log(formattedDistance);
+            if (formattedDistance > userDistance + 0.001) {
+              setUserDistance(formattedDistance);
+            }
+          }
+          setUserLocation(location.coords);
+          setPrevUserLocation(location.coords);
         }
-        setUserLocation(location.coords);
-        setPrevUserLocation(location.coords);
+  
+        prevDistanceToDestination = distanceToDestination;
       }
     );
   };
@@ -235,15 +255,27 @@ const KarbonMap = (props) => {
           "Please place a marker first before getting directions."
         );
       } else {
-      try {
-        setLoading(true);
-        await calculateAndUpdateDistanceAndEmission();
-        setIsNavigating(true);
-      } finally {
-        setLoading(false);
+        Alert.alert(
+          "Please Note",
+          "To make sure the result is accurate, the following must be followed:\n1. Internet connection must be fast.\n2. Signal must be high.\n",
+          [
+            {
+              text: "Understood",
+              onPress: async () => {
+                try {
+                  setLoading(true);
+                  await calculateAndUpdateDistanceAndEmission();
+                  await startLocationTracking();
+                  setIsNavigating(true);
+                } finally {
+                  setLoading(false);
+                }
+              }
+            }
+          ]
+        );
       }
     };
-  }
 
 
   // Periodically update distance and emission
@@ -316,8 +348,8 @@ const KarbonMap = (props) => {
         >
           <View style={{ flex: 1, justifyContent: 'center' }}>
             <Text style={styles.header}>KARBON MAP</Text>
-            <Text style={{ textAlign: 'center', color: 'white', fontSize: 12, fontFamily: 'Montserrat-Light', marginTop: -40 }}>to reduce carbon emissions.</Text>
-            <Text style={{ textAlign: 'center', color: 'white', fontSize: 12, fontFamily: 'Montserrat-Light', marginTop: 5 }}>Select the best route</Text>
+            <Text style={{ textAlign: 'center', color: 'white', fontSize: 12, fontFamily: 'Montserrat-Light', marginTop: -40 }}>Select the best route</Text>
+            <Text style={{ textAlign: 'center', color: 'white', fontSize: 12, fontFamily: 'Montserrat-Light', marginTop: 5 }}>to reduce carbon emissions.</Text>
       
             <View style={styles.container}>
               <View style={styles.mapContainer}>
@@ -425,6 +457,7 @@ const KarbonMap = (props) => {
                     );
                     clearMarkers();
                     setIsNavigating(false);
+                    setUserDistance(0);
                   } 
                 }
               ]
