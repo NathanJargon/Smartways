@@ -25,14 +25,23 @@ function KarbonLeaderboard() {
         const querySnapshot = await getDocs(usersCollectionRef);
 
         const usersData = [];
+        const currentDate = new Date();
+        const currentYear = currentDate.getFullYear();
+        const currentMonth = currentDate.getMonth();
+        
         querySnapshot.forEach((userDoc) => {
           const userData = userDoc.data();
-          
+        
           let totalEmission = 0; // Default to 100
           let emissionlogs = [{ day: "2024-01-01", value: "100" }]; // Default log
         
           if ('emissionlogs' in userData && Array.isArray(userData.emissionlogs) && userData.emissionlogs.length > 0) {
-            const logs = userData.emissionlogs.filter(log => 'value' in log).map(log => ({ ...log, name: userData.name }));
+            const logs = userData.emissionlogs.filter(log => {
+              // Check if 'value' is in log and if the log is from the current month
+              const logDate = new Date(log.day);
+              return 'value' in log && logDate.getFullYear() === currentYear && logDate.getMonth() === currentMonth;
+            }).map(log => ({ ...log, name: userData.name }));
+        
             if (logs.length > 0) {
               totalEmission = logs.reduce((total, log) => total + Number(log.value), 0);
               emissionlogs = logs;
@@ -140,7 +149,7 @@ function KarbonLeaderboard() {
             <XAxis
               style={{ marginHorizontal: -10 }}
               data={data}
-              formatLabel={(value, index) => index % 5 === 0 ? index : ''} // Change this line
+              formatLabel={(value, index) => index % 7 === 0 ? index : ''} // Change this line
               contentInset={{ left: 10, right: 100 }}
               svg={{ fontSize: 10, fill: 'grey' }}
             />
@@ -214,8 +223,8 @@ function KarbonLeaderboard() {
 
       
       <View style={styles.rankContainer}>
-  {topUsers.map((user, i) => (
-    <ImageBackground source={require('../assets/nav7.png')} style={[styles.rankCard, i === 1 && styles.middleCard]} key={i}>
+      {topUsers.map((user, i) => (
+        <ImageBackground source={require('../assets/nav7.png')} style={[styles.rankCard, i === 1 && styles.middleCard]} key={i}>
       {user.profile && user.profile !== '' ? (
         <Image source={{ uri: user.profile }} style={{ width: 40, height: 40, borderRadius: 10, marginTop: windowHeight * 0.02, }} />
       ) : (
@@ -253,7 +262,7 @@ function KarbonLeaderboard() {
       <View tyle={styles.TableBox}>
       <FlatList
         data={rankedUsers.slice(3, 8)}
-        keyExtractor={(item) => item.name}
+        keyExtractor={(item, index) => index.toString()}
         renderItem={({ item, index, separators }) => (
           <View>
 

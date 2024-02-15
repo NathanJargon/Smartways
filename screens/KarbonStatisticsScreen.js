@@ -100,6 +100,41 @@ const KarbonStatisticsScreen = (props) => {
   }, []);
 
 
+  function calculateDailyLogs(logs) {
+    const summedLogs = {};
+    let dayCount = 0;
+  
+    for (let log of logs) {
+      const date = new Date(log.day);
+      const day = date.getDate();
+      const value = Number(log.value);
+  
+      // Ignore logs with undefined day, NaN value, or value of 0
+      if (isNaN(date.getTime()) || isNaN(value) || value === 0) {
+        continue;
+      }
+  
+      dayCount++;
+  
+      // If dayCount is a multiple of 7, use it as the label
+      const label = dayCount % 7 === 0 ? `Day ${day}` : '';
+  
+      // Sum values for the same day
+      if (label in summedLogs) {
+        summedLogs[label] += value;
+      } else {
+        summedLogs[label] = value;
+      }
+    }
+  
+    const dailyLogs = Object.entries(summedLogs).map(([day, value]) => ({
+      day,
+      value: value.toFixed(2),
+    }));
+  
+    return dailyLogs;
+  }
+  
   const monthNames = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'];
 
   const calculateMonthlyLogs = (logs) => {
@@ -181,80 +216,72 @@ const KarbonStatisticsScreen = (props) => {
   }, [fetchForDate, date]);
 
 
-    // useEffect for fetching the period
-    useEffect(() => {
-      if (!fetchForDate) {
-        const fetchPeriodData = async () => {
-          try {
-            setIsLoading(true);
-            const user = auth.currentUser;
-            if (user) {
-              const userDoc = doc(db, 'users', user.uid);
-              const userSnap = await getDoc(userDoc);
+  useEffect(() => {
+    if (!fetchForDate) {
+      const fetchPeriodData = async () => {
+        try {
+          setIsLoading(true);
+          const user = auth.currentUser;
+          if (user) {
+            const userDoc = doc(db, 'users', user.uid);
+            const userSnap = await getDoc(userDoc);
+  
+            if (userSnap.exists()) {
+              let emissionLogs = userSnap.data().emissionlogs || [];
+              let periodLogs;
+              let labels;
+              
 
-              if (userSnap.exists()) {
-                let emissionLogs = userSnap.data().emissionlogs || [];
+              if (selectedPeriod === 'daily') {
+                periodLogs = calculateDailyLogs(emissionLogs);
+                labels = periodLogs.map(log => log.day);
+              } else {
                 const currentMonth = new Date().getMonth();
                 const currentYear = new Date().getFullYear();
-      
+        
                 // Filter logs for the current month
                 emissionLogs = emissionLogs.filter(log => {
                   const logDate = new Date(log.day);
                   return logDate.getFullYear() === currentYear && logDate.getMonth() === currentMonth;
                 });
-      
+        
                 // Sort the logs by day
                 emissionLogs.sort((a, b) => new Date(a.day) - new Date(b.day));
-                let periodLogs;
-                let labels;
-                if (selectedPeriod === 'daily') {
-                  periodLogs = emissionLogs;
-                  if (periodLogs.length > 5) {
-                    labels = periodLogs.filter((_, index) => (index + 1) % 5 === 0).map((_, index) => `Day ${5 * (index + 1)}`);
-                  } else {
-                    labels = periodLogs.map(log => `Day ${log.day.split('-')[2]}`);
-                  }
-                } else if (selectedPeriod === 'monthly') {
+                
+                if (selectedPeriod === 'monthly') {
                   periodLogs = calculateMonthlyLogs(emissionLogs);
-                  if (periodLogs.length > 4) {
-                    labels = periodLogs.filter((_, index) => (index + 1) % 4 === 0).map((_, index) => `${monthNames[Number(log.day.split('-')[1]) - 1]}`);
-                  } else {
-                    labels = periodLogs.map(log => `${monthNames[Number(log.day.split('-')[1]) - 1]}`);
-                  }
+                  labels = periodLogs.map(log => `${monthNames[Number(log.day.split('-')[1]) - 1]}`);
                 } else if (selectedPeriod === 'yearly') {
                   periodLogs = calculateYearlyLogs(emissionLogs);
-                  if (periodLogs.length > 4) {
-                    labels = periodLogs.filter((_, index) => (index + 1) % 4 === 0).map((_, index) => `${log.day}`);
-                  } else {
-                    labels = periodLogs.map(log => `${log.day}`);
-                  }
+                  labels = periodLogs.map(log => `${log.day}`);
                 }
-                // If there's no data for the selected period, set the periodLogs to a default value
-                if (periodLogs.length === 0) {
-                  periodLogs = [{ day: 'Day 1', value: '0' }];
-                  labels = ['Day 1'];
-                }
-
-                setChartData({
-                  labels: labels,
-                  datasets: [
-                    {
-                      data: periodLogs.map(log => Number(log.value))
-                    }
-                  ]
-                });
               }
+  
+              // If there's no data for the selected period, set the periodLogs to a default value
+              if (periodLogs.length === 0) {
+                periodLogs = [{ day: 'Day 1', value: '0' }];
+                labels = ['Day 1'];
+              }
+  
+              setChartData({
+                labels: labels,
+                datasets: [
+                  {
+                    data: periodLogs.map(log => Number(log.value))
+                  }
+                ]
+              });
             }
-            setIsLoading(false); 
-          } catch (error) {
-            setIsLoading(false);
           }
-        };
-
-        fetchPeriodData();
+          setIsLoading(false); 
+        } catch (error) {
+          setIsLoading(false);
+        }
+      };
+  
+      fetchPeriodData();
     }
   }, [selectedPeriod, fetchForDate]);
-
   
   if (loading) {
     return (
