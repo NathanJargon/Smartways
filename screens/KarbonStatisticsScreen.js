@@ -101,8 +101,19 @@ const KarbonStatisticsScreen = (props) => {
 
 
   function calculateDailyLogs(logs) {
+    // Sort logs by date in ascending order
+    logs.sort((a, b) => new Date(a.day) - new Date(b.day));
+  
+    // Keep only the last 7 days
+    logs = logs.filter(log => {
+      const date = new Date(log.day);
+      const sevenDaysAgo = new Date();
+      sevenDaysAgo.setDate(sevenDaysAgo.getDate() - 7);
+      return date >= sevenDaysAgo;
+    });
+  
     const summedLogs = {};
-    let dayCount = 0;
+    let previousDay;
   
     for (let log of logs) {
       const date = new Date(log.day);
@@ -114,10 +125,8 @@ const KarbonStatisticsScreen = (props) => {
         continue;
       }
   
-      dayCount++;
-  
-      // If dayCount is a multiple of 7, use it as the label
-      const label = dayCount % 7 === 0 ? `Day ${day}` : '';
+      // If the day has changed, use it as the label
+      const label = day !== previousDay ? `Day ${day}` : '';
   
       // Sum values for the same day
       if (label in summedLogs) {
@@ -125,13 +134,16 @@ const KarbonStatisticsScreen = (props) => {
       } else {
         summedLogs[label] = value;
       }
-    }
   
+      // Update previousDay
+      previousDay = day;
+    }
+    
     const dailyLogs = Object.entries(summedLogs).map(([day, value]) => ({
       day,
       value: value.toFixed(2),
     }));
-  
+    
     return dailyLogs;
   }
   
