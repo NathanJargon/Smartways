@@ -108,7 +108,7 @@ const KarbonStatisticsScreen = (props) => {
     logs = logs.filter(log => {
       const date = new Date(log.day);
       const sevenDaysAgo = new Date();
-      sevenDaysAgo.setDate(sevenDaysAgo.getDate() - 7);
+      sevenDaysAgo.setDate(sevenDaysAgo.getDate() - 6);
       return date >= sevenDaysAgo;
     });
   
@@ -121,7 +121,7 @@ const KarbonStatisticsScreen = (props) => {
       const value = Number(log.value);
   
       // Ignore logs with undefined day, NaN value, or value of 0
-      if (isNaN(date.getTime()) || isNaN(value) || value === 0) {
+      if (isNaN(date.getTime()) || isNaN(value) || value < 0.001) {
         continue;
       }
   
@@ -151,13 +151,18 @@ const KarbonStatisticsScreen = (props) => {
 
   const calculateMonthlyLogs = (logs) => {
     let monthlyLogs = {};
+    const sixMonthsAgo = new Date();
+    sixMonthsAgo.setMonth(sixMonthsAgo.getMonth() - 6);
+  
     logs.forEach(log => {
       const logDate = new Date(log.day);
-      const month = `${logDate.getFullYear()}-${logDate.getMonth() + 1}`;
-      if (monthlyLogs[month]) {
-        monthlyLogs[month] += Number(log.value);
-      } else {
-        monthlyLogs[month] = Number(log.value);
+      if (logDate >= sixMonthsAgo) {
+        const month = `${logDate.getFullYear()}-${logDate.getMonth() + 1}`;
+        if (monthlyLogs[month]) {
+          monthlyLogs[month] += Number(log.value);
+        } else {
+          monthlyLogs[month] = Number(log.value);
+        }
       }
     });
     return Object.keys(monthlyLogs).map(month => ({ day: month, value: monthlyLogs[month] }));
@@ -165,13 +170,18 @@ const KarbonStatisticsScreen = (props) => {
   
   const calculateYearlyLogs = (logs) => {
     let yearlyLogs = {};
+    const sevenYearsAgo = new Date();
+    sevenYearsAgo.setFullYear(sevenYearsAgo.getFullYear() - 7);
+  
     logs.forEach(log => {
       const logDate = new Date(log.day);
-      const year = logDate.getFullYear().toString();
-      if (yearlyLogs[year]) {
-        yearlyLogs[year] += Number(log.value);
-      } else {
-        yearlyLogs[year] = Number(log.value);
+      if (logDate >= sevenYearsAgo) {
+        const year = logDate.getFullYear().toString();
+        if (yearlyLogs[year]) {
+          yearlyLogs[year] += Number(log.value);
+        } else {
+          yearlyLogs[year] = Number(log.value);
+        }
       }
     });
     return Object.keys(yearlyLogs).map(year => ({ day: year, value: yearlyLogs[year] }));
