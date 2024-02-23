@@ -1,11 +1,55 @@
-import React, { useState, useEffect } from 'react';
+import React from 'react';
+import { NavigationContainer } from '@react-navigation/native';
+import { createStackNavigator, CardStyleInterpolators } from '@react-navigation/stack';
 
-import { View, TouchableOpacity, Text, Image, ImageBackground } from 'react-native';
-import { NavigationContainer, useNavigation } from '@react-navigation/native';
-import { createBottomTabNavigator } from '@react-navigation/bottom-tabs';
-import { createStackNavigator } from '@react-navigation/stack';
-import { FontAwesome as Icon } from '@expo/vector-icons';
-import { useFonts } from 'expo-font';
-import { AppLoading } from 'expo';
-import AsyncStorage from '@react-native-async-storage/async-storage';
+// Import your screens
+import HomeScreen from './screens/HomeScreen';
+import Login from './screens/Login';
+import Dashboard from './screens/Dashboard';
 
+// Create the stack navigators
+const AuthStack = createStackNavigator();
+const MainStack = createStackNavigator();
+
+function AuthStackScreen() {
+  return (
+    <AuthStack.Navigator initialRouteName="Home">
+      <AuthStack.Screen 
+        name="Home" 
+        component={HomeScreen} 
+        options={{ 
+          headerShown: false,
+          cardStyleInterpolator: CardStyleInterpolators.forRevealFromBottomAndroid
+        }} 
+      />
+      <AuthStack.Screen 
+        name="Login" 
+        component={Login} 
+        options={{ 
+          headerShown: false,
+          cardStyleInterpolator: CardStyleInterpolators.forHorizontalIOS
+        }} 
+      />
+    </AuthStack.Navigator>
+  );
+}
+
+function MainStackScreen() {
+  return (
+    <MainStack.Navigator>
+      <MainStack.Screen name="Dashboard" component={Dashboard} />
+    </MainStack.Navigator>
+  );
+}
+
+function App() {
+  const [isAuthenticated, setIsAuthenticated] = React.useState(false);
+
+  return (
+    <NavigationContainer>
+      {isAuthenticated ? <MainStackScreen /> : <AuthStackScreen />}
+    </NavigationContainer>
+  );
+}
+
+export default App;
