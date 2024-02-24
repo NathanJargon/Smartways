@@ -1,29 +1,24 @@
-import React, { useState, useRef } from 'react';
-import { StyleSheet, Text, View, TouchableOpacity, Dimensions, Image, Animated, ImageBackground } from 'react-native';
+import React, { useState } from 'react';
+import { StyleSheet, Text, View, TouchableOpacity, Dimensions, Image, ImageBackground } from 'react-native';
 import { TextInput, Button } from 'react-native-paper';
-
-const AnimatedImageBackground = Animated.createAnimatedComponent(ImageBackground);
 
 function HomeScreen({ navigation }) {
   const [bottomContent, setBottomContent] = useState('default');
-  const bottomHeight = useRef(new Animated.Value(windowHeight / 3.5)).current;
-
-  const animateHeightChange = (newHeight) => {
-    Animated.timing(bottomHeight, {
-      toValue: newHeight,
-      duration: 500,
-      useNativeDriver: false,
-    }).start();
-  };
-
+  const [bottomHeight, setBottomHeight] = useState(windowHeight / 2.5);
 
   return (
     <ImageBackground source={require('../assets/image1.png')} style={styles.container}>
-      <AnimatedImageBackground source={require('../assets/appBackground.png')} style={[styles.bottomContainer, { height: bottomHeight }]}>
-
+        <View style={styles.logoContainer}>
+          <Image source={require('../assets/logo-white-trans.png')} style={styles.logo} />
+        </View>
+        <View style={styles.footerContainer}>
+          <Text style={styles.footerText}>Powered by</Text>
+          <Image source={require('../assets/icons/logo-white.png')} style={styles.footerImage} />
+        </View>
+      <ImageBackground source={require('../assets/appBackground.png')} style={[styles.bottomContainer, { height: bottomHeight }]}>
         {bottomContent === 'default' ? (
           <>
-            <TouchableOpacity style={styles.button} onPress={() => { setBottomContent('login'); animateHeightChange(windowHeight / 1.5); }}>
+            <TouchableOpacity style={styles.button} onPress={() => { setBottomContent('login'); setBottomHeight(windowHeight / 2); }}>
               <ImageBackground source={require('../assets/buttonContainer.jpg')} style={styles.buttonImage}>
                 <Text style={styles.buttonText}>Login</Text>
               </ImageBackground>
@@ -37,6 +32,9 @@ function HomeScreen({ navigation }) {
         ) : (
           // Render entry forms when bottomContent is 'login'
           <View>
+            <TouchableOpacity onPress={() => { setBottomContent('default'); setBottomHeight(windowHeight / 2.5); }}>
+              <Image source={require('../assets/arrow_back_white.png')} style={styles.backButtonImage} />
+            </TouchableOpacity>
             <TextInput
               style={styles.input}
               label="Username"
@@ -48,12 +46,20 @@ function HomeScreen({ navigation }) {
               mode="outlined"
               secureTextEntry
             />
-            <Button mode="contained" onPress={() => console.log('Pressed')}>
-              Submit
-            </Button>
+            <TouchableOpacity style={styles.button} onPress={() => console.log('Pressed')}>
+              <ImageBackground source={require('../assets/buttonContainer.jpg')} style={styles.buttonImage}>
+                <Text style={styles.buttonText}>Login</Text>
+              </ImageBackground>
+            </TouchableOpacity>
+            <View style={styles.signupContainer}>
+              <Text style={styles.signupText}>Don't have an account? </Text>
+              <TouchableOpacity onPress={() => navigation.navigate('Register')}>
+                <Text style={styles.signupButton}>Sign Up</Text>
+              </TouchableOpacity>
+            </View>
           </View>
         )}
-      </AnimatedImageBackground>
+      </ImageBackground>
     </ImageBackground>
   );
 }
@@ -68,7 +74,7 @@ const styles = StyleSheet.create({
   },
   logoContainer: {
     position: 'absolute', // Add this line
-    top: windowHeight / 10, // Add this line to move the logo up
+    top: windowHeight / 20, // Add this line to move the logo up
     width: windowWidth,
     justifyContent: 'center',
     alignItems: 'center',
@@ -81,6 +87,8 @@ const styles = StyleSheet.create({
   footerContainer: {
     flexDirection: 'row',
     alignItems: 'center',
+    position: 'absolute', // Add this line
+    top: 0, // Add this line
     left: windowWidth / 2 - (windowWidth / 7) / 0.8,
   },
   footerText: {
@@ -121,7 +129,30 @@ const styles = StyleSheet.create({
     alignItems: 'center',
   },
   input: {
-    marginBottom: 10,
+    width: windowWidth - 100,
+    height: windowHeight / 15,
+    marginBottom: windowHeight / 60,
+    backgroundColor: 'transparent',
+    color: 'white',
+  },
+  signupContainer: {
+    flexDirection: 'row',
+    marginTop: windowHeight / 60,
+    justifyContent: 'center', // Add this line
+    alignItems: 'center', // Add this line
+  },
+  signupText: {
+    color: 'white',
+  },
+  signupButton: {
+    color: 'white',
+    fontWeight: 'bold',
+  },
+  backButtonImage: {
+    width: windowWidth / 15,
+    height: windowWidth / 15,
+    marginBottom: windowHeight / 60,
+    resizeMode: 'contain',
   },
 });
 
