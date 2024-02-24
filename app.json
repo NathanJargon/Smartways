@@ -1,7 +1,7 @@
 {
   "expo": {
-    "name": "Carapp",
-    "slug": "Carapp",
+    "name": "Smartways",
+    "slug": "Smartways",
     "version": "1.0.0",
     "orientation": "portrait",
     "icon": "./assets/icon.png",
@@ -11,7 +11,7 @@
       "supportsTablet": true
     },
     "android": {
-      "package": "com.quantumquill.carapp",
+      "package": "com.quantumquill.smartways",
       "googleServicesFile": "google-services.json",
       "adaptiveIcon": {
         "foregroundImage": "./assets/icon.png",

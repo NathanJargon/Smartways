@@ -1,31 +1,62 @@
-import React from 'react';
-import { StyleSheet, Text, View, TouchableOpacity, Dimensions, ImageBackground, Image } from 'react-native';
+import React, { useState, useRef } from 'react';
+import { StyleSheet, Text, View, TouchableOpacity, Dimensions, Image, Animated, ImageBackground } from 'react-native';
+import { TextInput, Button } from 'react-native-paper';
+
+const AnimatedImageBackground = Animated.createAnimatedComponent(ImageBackground);
 
 function HomeScreen({ navigation }) {
-    return (
-      <ImageBackground source={require('../assets/image1.png')} style={styles.container}>
-        <View style={styles.logoContainer}>
-          <Image source={require('../assets/logo-white-trans.png')} style={styles.logo} />
-        </View>
-        <View style={styles.footerContainer}>
-          <Text style={styles.footerText}>Powered by</Text>
-          <Image source={require('../assets/icons/logo-white.png')} style={styles.footerImage} />
-        </View>
-        <ImageBackground source={require('../assets/appBackground.png')} style={styles.bottomContainer}>
-          <TouchableOpacity style={styles.button} onPress={() => navigation.navigate('Login')}>
-            <ImageBackground source={require('../assets/buttonContainer.jpg')} style={styles.buttonImage}>
-              <Text style={styles.buttonText}>Login</Text>
-            </ImageBackground>
-          </TouchableOpacity>
-          <TouchableOpacity style={styles.button}>
-            <ImageBackground source={require('../assets/buttonContainer.jpg')} style={styles.buttonImage}>
-              <Text style={styles.buttonText}>Create Account</Text>
-            </ImageBackground>
-          </TouchableOpacity>
-        </ImageBackground>
-      </ImageBackground>
-    );
-  }
+  const [bottomContent, setBottomContent] = useState('default');
+  const bottomHeight = useRef(new Animated.Value(windowHeight / 3.5)).current;
+
+  const animateHeightChange = (newHeight) => {
+    Animated.timing(bottomHeight, {
+      toValue: newHeight,
+      duration: 500,
+      useNativeDriver: false,
+    }).start();
+  };
+
+
+  return (
+    <ImageBackground source={require('../assets/image1.png')} style={styles.container}>
+      <AnimatedImageBackground source={require('../assets/appBackground.png')} style={[styles.bottomContainer, { height: bottomHeight }]}>
+
+        {bottomContent === 'default' ? (
+          <>
+            <TouchableOpacity style={styles.button} onPress={() => { setBottomContent('login'); animateHeightChange(windowHeight / 1.5); }}>
+              <ImageBackground source={require('../assets/buttonContainer.jpg')} style={styles.buttonImage}>
+                <Text style={styles.buttonText}>Login</Text>
+              </ImageBackground>
+            </TouchableOpacity>
+            <TouchableOpacity style={styles.button}>
+              <ImageBackground source={require('../assets/buttonContainer.jpg')} style={styles.buttonImage}>
+                <Text style={styles.buttonText}>Create Account</Text>
+              </ImageBackground>
+            </TouchableOpacity>
+          </>
+        ) : (
+          // Render entry forms when bottomContent is 'login'
+          <View>
+            <TextInput
+              style={styles.input}
+              label="Username"
+              mode="outlined"
+            />
+            <TextInput
+              style={styles.input}
+              label="Password"
+              mode="outlined"
+              secureTextEntry
+            />
+            <Button mode="contained" onPress={() => console.log('Pressed')}>
+              Submit
+            </Button>
+          </View>
+        )}
+      </AnimatedImageBackground>
+    </ImageBackground>
+  );
+}
 
 const windowWidth = Dimensions.get('window').width;
 const windowHeight = Dimensions.get('window').height;
@@ -33,7 +64,7 @@ const windowHeight = Dimensions.get('window').height;
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    justifyContent: 'space-between',
+    justifyContent: 'flex-end',
   },
   logoContainer: {
     position: 'absolute', // Add this line
@@ -62,15 +93,6 @@ const styles = StyleSheet.create({
     width: windowWidth / 7,
     height: windowHeight / 5,
   },
-  bottomContainer: {
-    width: windowWidth,
-    height: windowHeight / 3.5,
-    borderTopLeftRadius: 100,
-    borderTopRightRadius: 100,
-    overflow: 'hidden',
-    justifyContent: 'center',
-    alignItems: 'center',
-  },
   button: {
     width: windowWidth - 100,
     height: windowHeight / 15,
@@ -89,6 +111,17 @@ const styles = StyleSheet.create({
   buttonText: {
     fontSize: 20,
     color: 'white',
+  },
+  bottomContainer: {
+    width: windowWidth,
+    borderTopLeftRadius: 100,
+    borderTopRightRadius: 100,
+    overflow: 'hidden',
+    justifyContent: 'center',
+    alignItems: 'center',
+  },
+  input: {
+    marginBottom: 10,
   },
 });
 
