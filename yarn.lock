@@ -4446,7 +4446,7 @@ find-yarn-workspace-root@~2.0.0:
 
 firebase@^10.8.0:
   version "10.8.0"
-  resolved "https://registry.npmjs.org/firebase/-/firebase-10.8.0.tgz"
+  resolved "https://registry.yarnpkg.com/firebase/-/firebase-10.8.0.tgz#764fa98b5699ca40dfb604df21747b836a101fa3"
   integrity sha512-UJpC24vw8JFuHEOQyArBGKTUd7+kohLISCzHyn0M/prP0KOTx2io1eyLliEid330QqnWI7FOlPxoU97qecCSfQ==
   dependencies:
     "@firebase/analytics" "0.10.1"
@@ -6706,6 +6706,11 @@ react-native-elements@^3.4.3:
     react-native-ratings "8.0.4"
     react-native-size-matters "^0.3.1"
 
+react-native-geolocation-service@^5.3.1:
+  version "5.3.1"
+  resolved "https://registry.yarnpkg.com/react-native-geolocation-service/-/react-native-geolocation-service-5.3.1.tgz#4ce1017789da6fdfcf7576eb6f59435622af4289"
+  integrity sha512-LTXPtPNmrdhx+yeWG47sAaCgQc3nG1z+HLLHlhK/5YfOgfLcAb9HAkhREPjQKPZOUx8pKZMIpdGFUGfJYtimXQ==
+
 react-native-gesture-handler@~2.14.0:
   version "2.14.1"
   resolved "https://registry.npmjs.org/react-native-gesture-handler/-/react-native-gesture-handler-2.14.1.tgz"
@@ -6725,10 +6730,10 @@ react-native-maps-directions@^1.9.0:
     lodash.isequal "^4.5.0"
     prop-types "^15.6.0"
 
-react-native-maps@^1.10.1:
-  version "1.10.2"
-  resolved "https://registry.npmjs.org/react-native-maps/-/react-native-maps-1.10.2.tgz"
-  integrity sha512-kWKr14kQXIF3h8x5D072gE2MSXEz0DGt5EdKV11dcyUbXj3cId1hviOTc4aYkstjsqefKN27ZNeGALG7/f5u9g==
+react-native-maps@^1.10.3:
+  version "1.10.3"
+  resolved "https://registry.yarnpkg.com/react-native-maps/-/react-native-maps-1.10.3.tgz#a669ee3a8baa01d30c5c7af7bdc498428d0e8284"
+  integrity sha512-P8/Viq5vgW9FRhvfDFQHxq02cZUcDJu6VbBZar7c/voGDbD5nrTIA0qlpiUAmrs1ikd8+7S4QjXQlorppBBMvA==
   dependencies:
     "@types/geojson" "^7946.0.13"
 

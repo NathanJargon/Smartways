@@ -8,7 +8,10 @@
     "userInterfaceStyle": "light",
     "assetBundlePatterns": ["**/*"],
     "ios": {
-      "supportsTablet": true
+      "supportsTablet": true,
+      "config": {
+        "googleMapsApiKey": "AIzaSyDzL6z5m4wryKimwQzRxtq-FBqiSMNiuAY"
+      }
     },
     "android": {
       "package": "com.quantumquill.smartways",
@@ -19,7 +22,7 @@
       },
       "config": {
         "googleMaps": {
-          "apiKey": "AIzaSyCxLGmhSPj8MZ-K-JVMae_90_rz7s-3S4M"
+          "apiKey": "AIzaSyDzL6z5m4wryKimwQzRxtq-FBqiSMNiuAY"
         }
       }
     },

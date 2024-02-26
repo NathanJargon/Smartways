@@ -71,7 +71,7 @@ function HomeScreen({ navigation }) {
             />
               <TouchableOpacity style={styles.button} onPress={() => navigation.reset({
                 index: 0,
-                routes: [{ name: 'Dashboard' }],
+                routes: [{ name: 'VehicleTracker' }],
               })}>
                 <ImageBackground source={require('../assets/buttonContainer.jpg')} style={styles.buttonImage}>
                   <Text style={styles.buttonText}>Login</Text>
@@ -108,7 +108,7 @@ function HomeScreen({ navigation }) {
             />
                 <TouchableOpacity style={styles.button} onPress={() => navigation.reset({
                   index: 0,
-                  routes: [{ name: 'Dashboard' }],
+                  routes: [{ name: 'VehicleTracker' }],
                 })}>
                   <ImageBackground source={require('../assets/buttonContainer.jpg')} style={styles.buttonImage}>
                     <Text style={styles.buttonText}>Sign Up</Text>

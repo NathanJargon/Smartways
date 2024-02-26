@@ -1,0 +1,30 @@
+{
+  "project_info": {
+    "project_number": "277141185652",
+    "firebase_url": "https://smartways-583d4-default-rtdb.asia-southeast1.firebasedatabase.app",
+    "project_id": "smartways-583d4",
+    "storage_bucket": "smartways-583d4.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:277141185652:android:e296b956dc456e2e351d21",
+        "android_client_info": {
+          "package_name": "com.quantumquill.smartways"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyAB3ksc6xFClVY6iLbqf_HL1QhpHLnIVwY"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
