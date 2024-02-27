@@ -5,6 +5,7 @@ import { createStackNavigator, CardStyleInterpolators } from '@react-navigation/
 // Import your screens
 import HomeScreen from './screens/HomeScreen';
 import VehicleTracker from './screens/VehicleTracker';
+import Dashboard from './screens/Dashboard';
 
 // Create the stack navigators
 const AuthStack = createStackNavigator();
@@ -12,7 +13,7 @@ const MainStack = createStackNavigator();
 
 function AuthStackScreen() {
   return (
-    <AuthStack.Navigator initialRouteName="VehicleTracker">
+    <AuthStack.Navigator initialRouteName="Dashboard">
       <AuthStack.Screen 
         name="Home" 
         component={HomeScreen} 
@@ -22,13 +23,13 @@ function AuthStackScreen() {
         }} 
       />
       <AuthStack.Screen 
-        name="VehicleTracker" 
-        component={VehicleTracker} 
-        options={{ 
-          headerShown: false,
-          cardStyleInterpolator: CardStyleInterpolators.forRevealFromBottomAndroid
-        }} 
-      />
+      name="Dashboard" 
+      component={Dashboard} 
+      options={{ 
+        headerShown: false,
+        cardStyleInterpolator: CardStyleInterpolators.forRevealFromBottomAndroid
+      }} 
+    />
     </AuthStack.Navigator>
   );
 }
