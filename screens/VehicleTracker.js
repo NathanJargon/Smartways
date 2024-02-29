@@ -5,8 +5,12 @@ import MapView, { Marker, PROVIDER_GOOGLE } from 'react-native-maps';
 
 export default function VehicleTracker({ setIsLoading: setIsLoadingProp }) {
   const [location, setLocation] = useState(null);
+  const [markerLocation, setMarkerLocation] = useState(null); // New state for marker location
   const [mapLoaded, setMapLoaded] = useState(false);
-  const [isLoading, setIsLoading] = useState(true); // Add this line
+  const [isLoading, setIsLoading] = useState(true);
+  const placeMarker = (newLocation) => {
+    setMarkerLocation(newLocation);
+  };
 
   useEffect(() => {
     (async () => {
@@ -25,6 +29,7 @@ export default function VehicleTracker({ setIsLoading: setIsLoadingProp }) {
         (location) => {
           const { latitude, longitude } = location.coords;
           setLocation({ latitude, longitude });
+          setMarkerLocation({ latitude, longitude }); // Set marker location to current location
           setIsLoading(false);
         }
       );
@@ -58,11 +63,14 @@ export default function VehicleTracker({ setIsLoading: setIsLoadingProp }) {
                   longitudeDelta: 0.0421,
                 }}
                 onMapReady={onMapLoad}
+                onPress={(e) => placeMarker(e.nativeEvent.coordinate)}
               >
-                <Marker
-                  coordinate={{ latitude: location.latitude, longitude: location.longitude }}
-                  title="Vehicle's location"
-                />
+                {markerLocation && (
+                  <Marker
+                    coordinate={{ latitude: markerLocation.latitude, longitude: markerLocation.longitude }}
+                    title="Vehicle's location"
+                  />
+                )}
               </MapView>
             </View>
           </View>

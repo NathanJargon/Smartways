@@ -76,10 +76,15 @@ function HomeScreen({ navigation }) {
               </TouchableOpacity>
 
             <View style={styles.signupContainer}>
-              <Text style={styles.signupText}>Don't have an account? </Text>
-              <TouchableOpacity onPress={() => navigation.navigate('Register')}>
-                <Text style={styles.signupButton}>Sign Up</Text>
-              </TouchableOpacity>
+
+              <Text style={styles.signupText}>
+                Don't have an account?{' '}
+                <TouchableOpacity onPress={() => { setBottomContent('createAccount'); setBottomHeight(windowHeight / 2); }}>
+                  <Text style={styles.signupButton}>Sign Up</Text>
+                </TouchableOpacity>
+              </Text>
+
+
             </View>
           </View>
         ) : (
@@ -110,12 +115,18 @@ function HomeScreen({ navigation }) {
                   <ImageBackground source={require('../assets/buttonContainer.jpg')} style={styles.buttonImage}>
                     <Text style={styles.buttonText}>Sign Up</Text>
                   </ImageBackground>
+
+
                 </TouchableOpacity>
               <View style={styles.loginContainer}>
-                <Text style={styles.signupText}>Already have an account? </Text>
-                <TouchableOpacity onPress={() => navigation.navigate('Register')}>
-                  <Text style={styles.signupButton}>Log in</Text>
-                </TouchableOpacity>
+
+                <Text style={styles.signupText}>
+                  Already have an account?{' '}
+                  <TouchableOpacity onPress={() => { setBottomContent('login'); setBottomHeight(windowHeight / 2); }}>
+                    <Text style={styles.signupButton}>Log in</Text>
+                  </TouchableOpacity>
+                </Text>
+
               </View>
           </View>
         )}
@@ -214,7 +225,10 @@ const styles = StyleSheet.create({
   signupButton: {
     color: 'white',
     fontWeight: 'bold',
+    textAlign: 'center',
+    marginTop: 0,
   },
+  
   backButtonImage: {
     width: windowWidth / 15,
     height: windowWidth / 15,
