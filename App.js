@@ -13,7 +13,7 @@ const MainStack = createStackNavigator();
 
 function AuthStackScreen() {
   return (
-    <AuthStack.Navigator initialRouteName="Dashboard">
+    <AuthStack.Navigator initialRouteName="Home">
       <AuthStack.Screen 
         name="Home" 
         component={HomeScreen} 

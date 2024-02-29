@@ -30,18 +30,15 @@ function HomeScreen({ navigation }) {
   }, []); // Empty dependency array so this effect only runs once when the component mounts
 
   return (
-    <ImageBackground source={require('../assets/image1.png')} style={styles.container}>
-        <View style={styles.logoContainer}>
-          <Image source={require('../assets/logo-white-trans.png')} style={styles.logo} />
-        </View>
+    <ImageBackground source={require('../assets/homescreen.png')} style={styles.container}>
         <View style={styles.footerContainer}>
           <Text style={styles.footerText}>Powered by</Text>
           <Image source={require('../assets/icons/logo-white.png')} style={styles.footerImage} />
         </View>
-        <ImageBackground source={require('../assets/appBackground.png')} style={[styles.bottomContainer, { height: bottomHeight }]}>
+        <ImageBackground source={require('../assets/bg.png')} style={[styles.bottomContainer, { height: bottomHeight }]}>
         {bottomContent === 'default' ? (
           <>
-            <Text style={styles.welcomeText}>Welcome to Smartways!</Text>
+            <Text style={styles.welcomeText}>WELCOME!</Text>
             <TouchableOpacity style={styles.button} onPress={() => { setBottomContent('login'); setBottomHeight(windowHeight / 2); }}>
               <ImageBackground source={require('../assets/buttonContainer.jpg')} style={styles.buttonImage}>
                 <Text style={styles.buttonText}>Login</Text>
@@ -135,6 +132,7 @@ const styles = StyleSheet.create({
     fontSize: 24,
     fontWeight: 'bold',
     textAlign: 'center',
+    color: 'white',
     marginBottom: windowWidth * 0.09, // or whatever space you want
   },
   container: {

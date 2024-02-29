@@ -3,10 +3,10 @@ import { StyleSheet, View, Text, Dimensions, ImageBackground } from 'react-nativ
 import * as Location from 'expo-location';
 import MapView, { Marker, PROVIDER_GOOGLE } from 'react-native-maps';
 
-export default function VehicleTracker() {
+export default function VehicleTracker({ setIsLoading: setIsLoadingProp }) {
   const [location, setLocation] = useState(null);
-  const screenHeight = Dimensions.get('window').height;
-  const screenWidth = Dimensions.get('window').width;
+  const [mapLoaded, setMapLoaded] = useState(false);
+  const [isLoading, setIsLoading] = useState(true); // Add this line
 
   useEffect(() => {
     (async () => {
@@ -25,17 +25,25 @@ export default function VehicleTracker() {
         (location) => {
           const { latitude, longitude } = location.coords;
           setLocation({ latitude, longitude });
-
-          // Update the vehicle location in Firebase
-          // const vehicleRef = firebase.database().ref('vehicles/vehicleId');
-          // vehicleRef.update({ latitude, longitude });
+          setIsLoading(false);
         }
       );
     })();
   }, []);
 
+  const onMapLoad = () => {
+    setMapLoaded(true);
+  };
+
   return (
-    <ImageBackground source={require('../assets/buttonContainer.jpg')} style={{ flex: 1 }}>
+    <ImageBackground 
+      source={isLoading ? require('../assets/loading.png') : require('../assets/bg.png')} 
+      style={styles.backgroundImage} 
+      resizeMode="cover"
+    >
+      {mapLoaded && location && (
+        <Text style={styles.trackerText}>Location Tracker</Text>
+      )}
       <View style={{ flex: 1 }}>
         {location && (
           <View style={styles.mapContainer}>
@@ -49,6 +57,7 @@ export default function VehicleTracker() {
                   latitudeDelta: 0.0922,
                   longitudeDelta: 0.0421,
                 }}
+                onMapReady={onMapLoad}
               >
                 <Marker
                   coordinate={{ latitude: location.latitude, longitude: location.longitude }}
@@ -60,28 +69,35 @@ export default function VehicleTracker() {
         )}
       </View>
     </ImageBackground>
-  );}
+  );
+}
 
 const windowWidth = Dimensions.get('window').width;
 const windowHeight = Dimensions.get('window').height;
 
-
 const styles = StyleSheet.create({
+  trackerText: {
+    fontSize: 30,
+    textAlign: 'center',
+    color: 'white',
+    fontWeight: 'bold',
+    marginTop: windowHeight * 0.13,
+  },
   mapContainer: {
     flex: 1,
-    justifyContent: 'flex-start', // Align items to the start
+    justifyContent: 'flex-end',
     alignItems: 'center',
-    marginTop: windowHeight * 0.12, // Add a top margin
+    marginBottom: windowHeight * 0.05,
     padding: 10,
   },
   mapWrapper: {
     width: windowWidth - 20,
-    height: windowHeight - 300,
+    height: windowHeight - 200,
     borderRadius: 20,
     overflow: 'hidden',
   },
   map: {
-    width: '100%', // Use 100% of the parent's width (mapWrapper)
-    height: '100%', // Use 100% of the parent's height (mapWrapper)
+    width: '100%',
+    height: '100%',
   },
 });
