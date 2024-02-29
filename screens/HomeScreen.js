@@ -141,7 +141,7 @@ const windowHeight = Dimensions.get('window').height;
 const styles = StyleSheet.create({
   welcomeText: {
     fontSize: 24,
-    fontWeight: 'bold',
+    fontFamily: 'NeueMachina-Ultrabold',
     textAlign: 'center',
     color: 'white',
     marginBottom: windowWidth * 0.09, // or whatever space you want
@@ -197,6 +197,7 @@ const styles = StyleSheet.create({
   buttonText: {
     fontSize: 20,
     color: 'white',
+    fontFamily: 'NeueMachina-Regular',
   },
   bottomContainer: {
     width: windowWidth,
@@ -221,10 +222,11 @@ const styles = StyleSheet.create({
   },
   signupText: {
     color: 'white',
+    fontFamily: 'NeueMachina-Regular',
   },
   signupButton: {
     color: 'blue',
-    fontWeight: 'bold',
+    fontFamily: 'NeueMachina-Ultrabold',
     textAlign: 'center',
   },
   

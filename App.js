@@ -6,6 +6,7 @@ import { createStackNavigator, CardStyleInterpolators } from '@react-navigation/
 import HomeScreen from './screens/HomeScreen';
 import VehicleTracker from './screens/VehicleTracker';
 import Dashboard from './screens/Dashboard';
+import FontLoader from './screens/FontLoader';
 
 // Create the stack navigators
 const AuthStack = createStackNavigator();
@@ -13,6 +14,7 @@ const MainStack = createStackNavigator();
 
 function AuthStackScreen() {
   return (
+    <FontLoader>
     <AuthStack.Navigator initialRouteName="Home">
       <AuthStack.Screen 
         name="Home" 
@@ -31,6 +33,7 @@ function AuthStackScreen() {
       }} 
     />
     </AuthStack.Navigator>
+    </FontLoader>
   );
 }
 
