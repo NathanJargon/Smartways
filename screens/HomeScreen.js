@@ -223,10 +223,9 @@ const styles = StyleSheet.create({
     color: 'white',
   },
   signupButton: {
-    color: 'white',
+    color: 'blue',
     fontWeight: 'bold',
     textAlign: 'center',
-    marginTop: 0,
   },
   
   backButtonImage: {
@@ -237,7 +236,7 @@ const styles = StyleSheet.create({
   },
   loginContainer: {
     flexDirection: 'row',
-    marginTop: windowHeight * 0.005,
+    marginBottom: windowHeight * 0.005,
     justifyContent: 'center', // Add this line
     alignItems: 'center', // Add this line
   }
