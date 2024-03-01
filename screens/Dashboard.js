@@ -59,44 +59,56 @@ export default function Dashboard({ navigation }) {
             style={{ width: windowWidth * 0.1, height: windowHeight * 0.05 }}
           />
         </TouchableOpacity>
-        {sidebarOpen && (
-          <View style={styles.sidebar}>
-            <View style={styles.buttonsContainer}>
-              <TouchableOpacity
-                style={[
-                  styles.customButton,
-                  !showVehicleTracker && { backgroundColor: 'rgba(0, 0, 0, 0.5)' },
-                ]}
-                onPress={loadHome}
-              >
-                <Text style={styles.buttonText}>Home</Text>
-              </TouchableOpacity>
 
-              <TouchableOpacity
-                style={[
-                  styles.customButton,
-                  showVehicleTracker && { backgroundColor: 'rgba(0, 0, 0, 0.5)' },
-                ]}
-                onPress={() => handleCarTypePress()}
-              >
-                <Text style={styles.buttonText}>Tracking</Text>
-              </TouchableOpacity>
-            </View>
 
-            <View style={styles.credits}>
-              <Text style={styles.creditsText}>Made by Nathan Jargon</Text>
-              <TouchableOpacity onPress={() => Linking.openURL('https://github.com/NathanJargon')}>
-                <Text style={styles.creditsLink}>Github</Text>
-              </TouchableOpacity>
-              <TouchableOpacity onPress={() => Linking.openURL('https://www.linkedin.com/in/nashbondoc/')}>
-                <Text style={styles.creditsLink}>LinkedIn</Text>
-              </TouchableOpacity>
-              <TouchableOpacity onPress={() => Linking.openURL('https://nathanjargon.itch.io')}>
-                <Text style={styles.creditsLink}>Itch.io</Text>
-              </TouchableOpacity>
-            </View>
-          </View>
-        )}
+    {sidebarOpen && (
+      <ImageBackground 
+        source={require('../assets/bg.png')} 
+        style={styles.sidebar}
+        resizeMode="cover"
+      >
+
+        <View style={styles.buttonsContainer}>
+          <ImageBackground 
+            source={!showVehicleTracker ? require('../assets/buttonContainer-semi.png') : require('../assets/buttonContainer.jpg')} 
+            style={styles.customButton}
+            resizeMode="cover"
+          >
+            <TouchableOpacity
+              onPress={loadHome}
+            >
+              <Text style={styles.buttonText}>Home</Text>
+            </TouchableOpacity>
+          </ImageBackground>
+
+          <ImageBackground 
+            source={showVehicleTracker ? require('../assets/buttonContainer-semi.png') : require('../assets/buttonContainer.jpg')} 
+            style={styles.customButton}
+            resizeMode="cover"
+          >
+            <TouchableOpacity
+              onPress={() => handleCarTypePress()}
+            >
+              <Text style={styles.buttonText}>Tracking</Text>
+            </TouchableOpacity>
+          </ImageBackground>
+        </View>
+
+        <View style={styles.credits}>
+          <Text style={styles.creditsText}>Made by</Text>
+          <Text style={styles.creditsText}>Nathan Jargon</Text>
+          <TouchableOpacity onPress={() => Linking.openURL('https://github.com/NathanJargon')}>
+            <Text style={styles.creditsLink}>Github</Text>
+          </TouchableOpacity>
+          <TouchableOpacity onPress={() => Linking.openURL('https://www.linkedin.com/in/nashbondoc/')}>
+            <Text style={styles.creditsLink}>LinkedIn</Text>
+          </TouchableOpacity>
+          <TouchableOpacity onPress={() => Linking.openURL('https://nathanjargon.itch.io')}>
+            <Text style={styles.creditsLink}>Itch.io</Text>
+          </TouchableOpacity>
+        </View>
+      </ImageBackground>
+    )}
 
         {showVehicleTracker ? (
           <VehicleTracker carType={selectedCarType} selectedCar={selectedCar} setIsLoading={setIsLoading} goBackToHome={goBackToHome} />
@@ -124,14 +136,14 @@ const styles = StyleSheet.create({
     left: 0,
     top: 0,
     bottom: 0,
-    width: '60%',
-    backgroundColor: 'rgba(221, 221, 221, 1)', 
+    width: windowWidth * 0.6,
     zIndex: 1,
     borderTopRightRadius: 20,
     borderBottomRightRadius: 150, 
-    justifyContent: 'space-between', // Change this line
+    justifyContent: 'space-between',
     alignItems: 'center', 
-    flex: 1, // Add this line
+    flex: 1,
+    overflow: 'hidden',
   },
   buttonClosed: {
     position: 'absolute',
@@ -146,12 +158,12 @@ const styles = StyleSheet.create({
     zIndex: 1, 
   },
   customButton: {
-    backgroundColor: 'rgba(0, 0, 0, 1)', 
     padding: 10,
     marginTop: windowHeight * 0.09,
     borderRadius: 5,
     justifyContent: 'center', // Add this line
     alignItems: 'center', // Add this line
+    overflow: 'hidden', // Add this line
   },
   buttonText: {
     color: 'white',
@@ -169,13 +181,14 @@ const styles = StyleSheet.create({
   },
   creditsText: {
     fontFamily: 'NeueMachina-Ultrabold',
-    color: 'black',
+    color: 'white',
     fontSize: 15,
   },
   creditsLink: {
     fontFamily: 'NeueMachina-Ultrabold',
     color: 'blue',
     fontSize: 15,
+    margin: 10,
   },
 });
 

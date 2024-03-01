@@ -77,7 +77,11 @@ export default function VehicleTracker({ carType, selectedCar, setIsLoading: set
               </View>
             )}
             {mapLoaded && selectedCar && (
-              <View style={styles.carInfoContainer}>
+              <ImageBackground 
+                source={require('../assets/bg.png')} 
+                style={styles.carInfoContainer}
+                resizeMode="cover"
+              >
                 <Text style={styles.carInfoText}>Type: {selectedCar.type}</Text>
                 <Text style={styles.carInfoText}>Plate: {selectedCar.plate}</Text>
                 <Text style={styles.carInfoText}>Capacity: {selectedCar.capacity}</Text>
@@ -87,7 +91,7 @@ export default function VehicleTracker({ carType, selectedCar, setIsLoading: set
                     source={require('../assets/icons/change.png')} // replace with your icon image path
                   />
                 </TouchableOpacity>
-              </View>
+              </ImageBackground>
             )}
           </View>
         </ImageBackground>
@@ -129,6 +133,7 @@ const styles = StyleSheet.create({
     margin: 20,
   },
   carInfoText: {
+    color: 'white',
     fontSize: 16,
     fontFamily: 'NeueMachina-Regular',
   },

@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { ScrollView, TouchableOpacity, Text, StyleSheet, Dimensions, View, Image, Modal, TextInput, InteractionManager } from 'react-native';
+import { ScrollView, TouchableOpacity, Text, StyleSheet, Dimensions, View, Image, Modal, TextInput, InteractionManager, ImageBackground } from 'react-native';
 
 const { width, height } = Dimensions.get('window');
 
@@ -25,13 +25,11 @@ export default function Home({ handleCarTypePress }) {
         // ...add other car types with their information
       ]);
 
-    const handleEditPress = (car) => {
-        InteractionManager.runAfterInteractions(() => {
-          setSelectedCar(car);
-          setPlate(car.plate);
-          setCapacity(String(car.capacity));
-          setModalVisible(true);
-        });
+      const handleEditPress = (car) => {
+        setSelectedCar(car);
+        setPlate(car.plate);
+        setCapacity(String(car.capacity));
+        setModalVisible(true);
       };
     
       const handleSavePress = () => {
@@ -50,55 +48,68 @@ export default function Home({ handleCarTypePress }) {
           <ScrollView showsVerticalScrollIndicator={false}>
           {carTypes.map((car, index) => (
             <View key={index}>
+              <ImageBackground 
+                source={require('../assets/bg.png')} 
+                style={styles.carType}
+                resizeMode="cover"
+              >
                 <TouchableOpacity onPress={() => handleCarTypePress(car)}>
-                <View style={styles.carType}>
-                    <View style={styles.transparentBackground} />
-                    <Text style={styles.carTypeText}>{car.type}</Text>
-                    <View style={styles.infoContainer}>
+                  <View style={styles.transparentBackground} />
+                  <Text style={styles.carTypeText}>{car.type}</Text>
+                  <View style={styles.infoContainer}>
                     <Text style={styles.infoText}>Plate: {car.plate}</Text>
                     <Text style={styles.infoText}>Capacity: {car.capacity}</Text>
-                    </View>
-                </View>
+                  </View>
                 </TouchableOpacity>
-                <TouchableOpacity onPress={() => handleEditPress(car)} style={styles.editIconContainer}>
+              </ImageBackground>
+              <TouchableOpacity onPress={() => handleEditPress(car)} style={[styles.editIconContainer, { padding: 10 }]}>
                 <Image source={require('../assets/icons/edit.png')} style={styles.editIcon} />
-                </TouchableOpacity>
+              </TouchableOpacity>
             </View>
-            ))}
+          ))}
           </ScrollView>
-        <Modal
-        animationType="slide"
-        transparent={true}
-        visible={modalVisible}
-        onRequestClose={() => {
-          setModalVisible(!modalVisible);
-        }}
-        >
-        <View style={styles.centeredView}>
-          <View style={styles.modalView}>
-            <Text style={styles.modalText}>Edit Car Details</Text>
-            <TextInput 
-              style={styles.input} 
-              placeholder="Plate" 
-              value={plate} 
-              onChangeText={setPlate} 
-            />
-            <TextInput 
-              style={styles.input} 
-              placeholder="Capacity" 
-              value={capacity} 
-              onChangeText={setCapacity} 
-              keyboardType="numeric" 
-            />
-            <TouchableOpacity
-              style={styles.saveButton}
-              onPress={handleSavePress}
-            >
-              <Text style={styles.saveButtonText}>Save</Text>
-            </TouchableOpacity>
-          </View>
-        </View>
-      </Modal>
+          <Modal
+            animationType="slide"
+            transparent={true}
+            visible={modalVisible}
+            onRequestClose={() => {
+              setModalVisible(!modalVisible);
+            }}
+          >
+            <View style={styles.centeredView}>
+              <ImageBackground 
+                source={require('../assets/bg.png')} 
+                style={styles.modalView}
+              >
+                <Text style={styles.modalText}>Edit Car Details</Text>
+                <TextInput 
+                  style={styles.input} 
+                  placeholder="Plate" 
+                  value={plate} 
+                  onChangeText={setPlate} 
+                />
+                <TextInput 
+                  style={styles.input} 
+                  placeholder="Capacity" 
+                  value={capacity} 
+                  onChangeText={setCapacity} 
+                  keyboardType="numeric" 
+                />
+                <TouchableOpacity
+                  style={styles.saveButton}
+                  onPress={handleSavePress}
+                >
+                  <ImageBackground 
+                    source={require('../assets/buttonContainer.jpg')} 
+                    style={{flex: 1, justifyContent: 'center', alignItems: 'center', borderRadius: 20, overflow: 'hidden', width: '100%', height: '100%' }}
+                    resizeMode="stretch"
+                  >
+                    <Text style={styles.saveButtonText}>Save</Text>
+                  </ImageBackground>
+                </TouchableOpacity>
+              </ImageBackground>
+            </View>
+          </Modal>
     </View>
   );
 }
@@ -122,6 +133,7 @@ const styles = StyleSheet.create({
     backgroundColor: 'transparent',
   },
   carTypeText: {
+    color: 'white',
     fontSize: 18,
     fontFamily: 'NeueMachina-Regular',
   },
@@ -129,6 +141,7 @@ const styles = StyleSheet.create({
     marginTop: 10,
   },
   infoText: {
+    color: 'white',
     fontSize: 16,
     fontFamily: 'NeueMachina-Regular',
   },
@@ -138,14 +151,14 @@ const styles = StyleSheet.create({
     borderRadius: 10,
     width: width * .8, // increase width to 120% of screen width
     backgroundColor: 'rgba(221, 221, 221, 1)', // semi-transparent background
+    overflow: 'hidden',
   },
   editIcon: {
-    width: width * 0.1,
-    height: height * 0.1,
+    width: width * 0.14,
+    height: height * 0.14,
     resizeMode: 'contain',
-    position: 'absolute',
-    right: width * 0.05,
-    top: -width * .065,
+    right: '10%',
+    top: '-45%',
   },
   centeredView: {
     flex: 1,
@@ -166,7 +179,8 @@ const styles = StyleSheet.create({
     },
     shadowOpacity: 0.25,
     shadowRadius: 4,
-    elevation: 5
+    elevation: 5,
+    overflow: 'hidden',
   },
   button: {
     borderRadius: 20,
@@ -179,26 +193,29 @@ const styles = StyleSheet.create({
     textAlign: "center"
   },
   modalText: {  
+    color: "white",
     marginBottom: height * 0.01,
     textAlign: "center",
     fontFamily: 'NeueMachina-Ultrabold',
   },
   input: {
+    color: "white",
     width: width * 0.5,
     height: 40,
-    borderColor: 'gray',
+    borderColor: 'white',
     borderWidth: 1,
     marginTop: 10,
     padding: 10,
     borderRadius: 5,
   },
   saveButton: {
-    backgroundColor: '#2196F3',
     borderRadius: 5,
     padding: 10,
     marginTop: 20,
-    width: '100%',
+    width: 100,
+    height: 50,
     alignItems: 'center',
+    overflow: 'hidden',
   },
   saveButtonText: {
     color: 'white',
